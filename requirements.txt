@@ -1,0 +1,7 @@
+django
+flake8
+isort
+pytest
+pytest-cov
+autopep8
+mypy
