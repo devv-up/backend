@@ -22,3 +22,19 @@ conda env create -f conda.yaml
     "python.jediEnabled": false
 }
 ```
+
+## 파이참 설정법
+
+파이참은 좀 귀찮습니다.
+아무 폴더나 다음과 같은 `.bat` 파일이나 `.sh`로 만들어주세요. 
+
+```bash
+#!/bin/sh
+isort $1
+autopep8 --in-place --aggressive $1
+flake8 $1
+```
+리눅스 같은 경우 `chmod +x` 로 권한을 주세요
+
+PyCharm  Preference -> External Tools -> FileWatcher -> Global로 하나 만들고 아래처럼 만들어주세요.
+![img](./pycharm.png)
