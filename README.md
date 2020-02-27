@@ -1,8 +1,8 @@
 # DEV-UP
 
-## 콘다 env 설정
+## 패키지 설치
 ```bash
-conda env create -f conda.yaml 
+pip install -r requirements.txt
 ```
 
 ## VSCode 설정
