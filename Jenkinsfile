@@ -25,7 +25,7 @@ pipeline {
         }
         stage ('Test') {
             steps {
-                sh 'pytest'
+                sh 'pytest --ds=dev_up.jenkins'
             }
         }
     }
