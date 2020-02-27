@@ -6,3 +6,5 @@ pytest-cov
 autopep8
 mypy
 django-stubs
+djangorestframework
+psycopg2
