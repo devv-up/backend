@@ -1,8 +1,9 @@
+from typing import Any
+
 from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
                                         PermissionsMixin)
 from django.db import models
 from django.utils import timezone
-from typing import Any
 
 
 class UserManager(BaseUserManager["User"]):
