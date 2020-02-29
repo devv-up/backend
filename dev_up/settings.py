@@ -30,6 +30,7 @@ DEBUG = os.environ.get("DJANGO_MODE", "development") != "production"
 
 ALLOWED_HOSTS: List[str] = []
 
+AUTH_USER_MODEL = 'user.User'
 
 # Application definition
 
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'post',
+    'user.apps.UserConfig',
 ]
 
 MIDDLEWARE = [
