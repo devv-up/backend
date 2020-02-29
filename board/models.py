@@ -27,7 +27,7 @@ class Board(models.Model):
     meeting_times_of_day = models.IntegerField()
     created_date = models.DateTimeField(auto_now_add=True)
 
-    author = models.ForeignKey('user.User', on_delete=models.CASCADE)
+    author = models.ForeignKey('User', on_delete=models.CASCADE)
     category = models.ForeignKey('Category', on_delete=models.CASCADE)
 
     def __str__(self):
@@ -44,7 +44,7 @@ class Comment(models.Model):
 
     board = models.ForeignKey('Board', on_delete=models.CASCADE)
     parent_comment = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
-    user = models.ForeignKey('user.User', on_delete=models.CASCADE)
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.content
