@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from django.db import models  # noqa: F401
+from django.db import models
 
 
 # Create your models here.
@@ -9,7 +9,7 @@ class Category(models.Model):
     ex) Project, Meet-up, etc.
     """
 
-    title = models.CharField(max_length=30, unique=True)
+    title = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
         return self.title
@@ -22,17 +22,18 @@ class Post(models.Model):
     :0=morning, 1=afternoon, 2=evening
     """
 
-    title = models.CharField(max_length=30, db_index=True)
+    title = models.CharField(max_length=50)
     content = models.TextField()
-    meeting_location = models.CharField(max_length=75)
-    meeting_capacity = models.IntegerField()
-    meeting_date = models.DateTimeField()
-    meeting_time_of_day = models.IntegerField()
+    location = models.CharField(max_length=255)
+    capacity = models.IntegerField()
+    date = models.DateTimeField()
+    time_of_day = models.IntegerField()
     is_active = models.BooleanField(default=True)
     created_date = models.DateTimeField(auto_now_add=True)
 
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
-    category = models.ForeignKey('Category', on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.PROTECT)
+    category = models.ForeignKey('Category', on_delete=models.PROTECT)
+    post_tags = models.ManyToManyField('Post')
 
     def __str__(self):
         return self.title
@@ -48,9 +49,9 @@ class Comment(models.Model):
     is_active = models.BooleanField(default=True)
     created_date = models.DateTimeField(auto_now_add=True)
 
-    post = models.ForeignKey('Post', on_delete=models.CASCADE)
-    parent_comment = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey('Post', on_delete=models.PROTECT)
+    parent_comment = models.ForeignKey('self', on_delete=models.PROTECT, null=True)
+    author = models.ForeignKey(User, on_delete=models.PROTECT)
 
     def __str__(self):
         return self.content
@@ -62,9 +63,7 @@ class Tag(models.Model):
     ex) Frontend, JavaScript, React, Backend, Node.js, Python, Spring, etc.
     """
 
-    title = models.CharField(max_length=30, unique=True)
-
-    post_tags = models.ManyToManyField('Post')
+    title = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
         return self.title
