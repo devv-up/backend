@@ -21,10 +21,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
+# SECRET_KEY = '#2r0owr!p%q3k%^$wb3nt!rqh^v^dha5k!z%7=7%26nv!1&ig8'
+
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "abcd")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ['DJANGO_DEBUG']
+DEBUG = os.environ.get("DJANGO_MODE", "development") != "production"
 
 ALLOWED_HOSTS: List[str] = []
 
@@ -78,11 +80,11 @@ WSGI_APPLICATION = 'dev_up.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'HOST': os.environ['POSTGRESQL_HOST'],
-        'NAME': os.environ['POSTGRESQL_NAME'],
-        'USER': os.environ['POSTGRESQL_USER'],
-        'PASSWORD': os.environ['POSTGRESQL_PASSWORD'],
-        'PORT': os.environ['POSTGRESQL_PORT']
+        'HOST': '127.0.0.1',
+        'NAME': 'devupdb',
+        'USER': 'devup',
+        'PASSWORD': '1111',
+        'PORT': '5432'
     }
 }
 
