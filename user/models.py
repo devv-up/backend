@@ -2,23 +2,16 @@ from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
                                         PermissionsMixin)
 from django.db import models
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
 
 
 class UserManager(BaseUserManager):
-    def create_user(
-            self, email, first_name, last_name, password=None,
-            commit=True):
-        """
-        Creates and saves a User with the given email, first name, last name
-        and password.
-        """
+    def create_user(self, email, first_name, last_name, password=None, commit=True):
         if not email:
-            raise ValueError(_('Users must have an email address'))
+            raise ValueError('Users must have an email address')
         if not first_name:
-            raise ValueError(_('Users must have a first name'))
+            raise ValueError('Users must have a first name')
         if not last_name:
-            raise ValueError(_('Users must have a last name'))
+            raise ValueError('Users must have a last name')
 
         user = self.model(
             email=self.normalize_email(email),
@@ -32,10 +25,6 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, first_name, last_name, password):
-        """
-        Creates and saves a superuser with the given email, first name,
-        last name and password.
-        """
         user = self.create_user(
             email,
             password=password,
@@ -50,36 +39,14 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(
-        verbose_name=_('email address'), max_length=255, unique=True
-    )
-    # password field supplied by AbstractBaseUser
-    # last_login field supplied by AbstractBaseUser
-    first_name = models.CharField(_('first name'), max_length=30, blank=True)
-    last_name = models.CharField(_('last name'), max_length=150, blank=True)
-
-    is_active = models.BooleanField(
-        _('active'),
-        default=True,
-        help_text=_(
-            'Designates whether this user should be treated as active. '
-            'Unselect this instead of deleting accounts.'
-        ),
-    )
-    is_staff = models.BooleanField(
-        _('staff status'),
-        default=False,
-        help_text=_(
-            'Designates whether the user can log into this admin site.'
-        ),
-    )
-    # is_superuser field provided by PermissionsMixin
-    # groups field provided by PermissionsMixin
-    # user_permissions field provided by PermissionsMixin
-
-    date_joined = models.DateTimeField(
-        _('date joined'), default=timezone.now
-    )
+    email = models.EmailField(max_length=255, unique=True)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=150)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    date_joined = models.DateTimeField(default=timezone.now)
+    verification = models.BooleanField(null=False, default=False)
+    verification_key = models.CharField(max_length=128)
 
     objects = UserManager()
 
@@ -87,21 +54,23 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['first_name', 'last_name']
 
     def get_full_name(self):
-        """
-        Return the first_name plus the last_name, with a space in between.
-        """
-        full_name = '%s %s' % (self.first_name, self.last_name)
+        full_name = '%s%s' % (self.first_name, self.last_name)
         return full_name.strip()
 
     def __str__(self):
-        return '{} <{}>'.format(self.get_full_name(), self.email)
+        return self.get_full_name()
 
+    # 사용자가 특정권한을 가지고있는지 확인하려면 User 객체의 has_perm 메서드를 사용한다.
     def has_perm(self, perm, obj=None):
-        "Does the user have a specific permission?"
-        # Simplest possible answer: Yes, always
         return True
 
     def has_module_perms(self, app_label):
-        "Does the user have permissions to view the app `app_label`?"
-        # Simplest possible answer: Yes, always
         return True
+
+
+class Photo(models.Model):
+    photo_name = models.CharField(max_length=255)
+    photo_info = models.IntegerField(null=True)
+
+    def __str__(self):
+        return self.photo_name
