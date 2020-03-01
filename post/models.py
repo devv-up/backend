@@ -5,19 +5,21 @@ from django.db import models  # noqa: F401
 # Create your models here.
 class Category(models.Model):
     """
-    Category model which defines purposes of boards.
+    A category model which defines purposes of posts.
     ex) Project, Meet-up, etc.
     """
 
-    title = models.CharField(max_length=30)
+    title = models.CharField(max_length=30, unique=True)
 
     def __str__(self):
         return self.title
 
 
-class Board(models.Model):
+class Post(models.Model):
     """
-    Board model which has simple information.
+    A post model which has simple information.
+    meeting_time_of_day have integer value
+    :0=morning, 1=afternoon, 2=evening
     """
 
     title = models.CharField(max_length=30, db_index=True)
@@ -25,7 +27,8 @@ class Board(models.Model):
     meeting_location = models.CharField(max_length=75)
     meeting_capacity = models.IntegerField()
     meeting_date = models.DateTimeField()
-    meeting_times_of_day = models.IntegerField()
+    meeting_time_of_day = models.IntegerField()
+    is_active = models.BooleanField(default=True)
     created_date = models.DateTimeField(auto_now_add=True)
 
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -37,15 +40,17 @@ class Board(models.Model):
 
 class Comment(models.Model):
     """
-    Comment model which has the depth up to 2 levels
+    A Comment model which has the depth up to 2 levels
     by possessing another comment's id.
     """
+
     content = models.TextField()
+    is_active = models.BooleanField(default=True)
     created_date = models.DateTimeField(auto_now_add=True)
 
-    board = models.ForeignKey('Board', on_delete=models.CASCADE)
+    post = models.ForeignKey('Post', on_delete=models.CASCADE)
     parent_comment = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.content
@@ -53,12 +58,13 @@ class Comment(models.Model):
 
 class Tag(models.Model):
     """
-    Tag model which defines properties of boards.
+    A Tag model which defines properties of posts.
     ex) Frontend, JavaScript, React, Backend, Node.js, Python, Spring, etc.
     """
-    title = models.CharField(max_length=30)
 
-    board_tags = models.ManyToManyField('Board')
+    title = models.CharField(max_length=30, unique=True)
+
+    post_tags = models.ManyToManyField('Post')
 
     def __str__(self):
         return self.title
