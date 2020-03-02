@@ -6,3 +6,7 @@ pytest-cov
 autopep8
 mypy
 django-stubs
+pytest-django
+djangorestframework
+psycopg2
+model_mommy
