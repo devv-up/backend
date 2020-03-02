@@ -80,11 +80,11 @@ WSGI_APPLICATION = 'dev_up.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'HOST': '127.0.0.1',
-        'NAME': 'devupdb',
-        'USER': 'devup',
-        'PASSWORD': '1111',
-        'PORT': '5432'
+        'HOST': os.environ['POSTGRESQL_HOST'],
+        'NAME': os.environ['POSTGRESQL_NAME'],
+        'USER': os.environ['POSTGRESQL_USER'],
+        'PASSWORD': os.environ['POSTGRESQL_PASSWORD'],
+        'PORT': os.environ['POSTGRESQL_PORT']
     }
 }
 
