@@ -7,6 +7,6 @@ autopep8
 mypy
 django-stubs
 pytest-django
-djangorestframework
-psycopg2
+djangorestframework==3.11.0 
+psycopg2==2.8.4
 model_mommy
