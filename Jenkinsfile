@@ -1,31 +1,41 @@
 pipeline {
-    agent { dockerfile true }
+    agent {
+        docker {
+            image 'python:3.8'
+        }
+    }
     options {
         timeout(time: 10, unit: 'MINUTES')
     }
     stages {
+        stage ('Build') {
+            steps {
+                sh 'python -m venv .env'
+                sh '.env/bin/pip install -r requirements.txt'
+            }
+        }
         stage ('Lint') {
             parallel {
                 stage('flake8') {
                     steps {
-                        sh 'flake8'
+                        sh '.env/bin/flake8'
                     }
                 }
                 stage('isort') {
                     steps {
-                        sh 'isort -c'
+                        sh '.env/bin/isort -c'
                     }
                 }
                 stage('mypy') {
                     steps {
-                        sh 'mypy .'
+                        sh '.env/bin/mypy .'
                     }
                 }
             }
         }
         stage ('Test') {
             steps {
-                sh 'pytest --ds=dev_up.jenkins'
+                sh '.env/bin/pytest --ds=dev_up.jenkins'
             }
         }
     }
