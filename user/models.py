@@ -60,7 +60,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.get_full_name()
 
-    # 사용자가 특정권한을 가지고있는지 확인하려면 User 객체의 has_perm 메서드를 사용한다.
     def has_perm(self, perm, obj=None):
         return True
 
