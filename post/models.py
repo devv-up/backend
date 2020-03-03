@@ -12,7 +12,7 @@ class Category(models.Model):
     title = models.CharField(max_length=50, unique=True)
 
     def __str__(self) -> str:
-        return f'#{self.id} : {self.title}'
+        return f'Category(title="{self.title}")'
 
 
 class Post(models.Model):
@@ -33,10 +33,10 @@ class Post(models.Model):
 
     author = models.ForeignKey(User, on_delete=models.PROTECT)
     category = models.ForeignKey('Category', on_delete=models.PROTECT)
-    tags = models.ManyToManyField('Post')
+    tags = models.ManyToManyField('Tag')
 
     def __str__(self) -> str:
-        return f'#{self.id} : {self.title}'
+        return f'Post(id={self.id}, title="{self.title}")'
 
 
 class Comment(models.Model):
@@ -54,7 +54,7 @@ class Comment(models.Model):
     author = models.ForeignKey(User, on_delete=models.PROTECT)
 
     def __str__(self) -> str:
-        return f'Comment {self.id}'
+        return f'Comment(id={self.id})'
 
 
 class Tag(models.Model):
@@ -66,4 +66,4 @@ class Tag(models.Model):
     title = models.CharField(max_length=50, unique=True)
 
     def __str__(self) -> str:
-        return f'#{self.id} : {self.title}'
+        return f'Tag(title="{self.title}")'
