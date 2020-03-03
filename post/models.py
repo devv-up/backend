@@ -31,8 +31,8 @@ class Post(models.Model):
     is_active = models.BooleanField(default=True)
     created_date = models.DateTimeField(auto_now_add=True)
 
-    author = models.ForeignKey(User, on_delete=models.PROTECT)
-    category = models.ForeignKey('Category', on_delete=models.PROTECT)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL)
+    category = models.ForeignKey('Category', on_delete=models.SET_NULL)
     tags = models.ManyToManyField('Tag')
 
     def __str__(self) -> str:
@@ -49,9 +49,9 @@ class Comment(models.Model):
     is_active = models.BooleanField(default=True)
     created_date = models.DateTimeField(auto_now_add=True)
 
-    post = models.ForeignKey('Post', on_delete=models.PROTECT)
+    post = models.ForeignKey('Post', on_delete=models.SET_NULL)
     parent_comment = models.ForeignKey('self', on_delete=models.PROTECT, null=True)
-    author = models.ForeignKey(User, on_delete=models.PROTECT)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL)
 
     def __str__(self) -> str:
         return f'Comment(id={self.id})'
