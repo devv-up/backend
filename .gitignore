@@ -266,4 +266,13 @@ fabric.properties
 # Ignore all local history of files
 .history
 
+### Pycharm setting files
+.idea/backend.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/saveactions_settings.xml
+.idea/vcs.xml
+.idea/watcherTasks.xml
+.idea/inspectionProfiles/profiles_settings.xml
+
 # End of https://www.gitignore.io/api/django,python,pycharm,visualstudiocode
