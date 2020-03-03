@@ -1,11 +1,15 @@
+from typing import Any
+
 from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
                                         PermissionsMixin)
 from django.db import models
 from django.utils import timezone
 
+from user.models import User
+
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, first_name, last_name, password=None, commit=True):
+    def create_user(self, email, first_name, last_name, password=None, commit=True) -> Any:
         if not email:
             raise ValueError('Users must have an email address')
         if not first_name:
@@ -24,7 +28,7 @@ class UserManager(BaseUserManager):
             user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, first_name, last_name, password):
+    def create_superuser(self, email, first_name, last_name, password) -> Any:
         user = self.create_user(
             email,
             password=password,
@@ -53,17 +57,19 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
 
-    def get_full_name(self):
+    def get_full_name(self) -> str:
         full_name = '%s%s' % (self.first_name, self.last_name)
         return full_name.strip()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.get_full_name()
 
-    def has_perm(self, perm, obj=None):
+    def has_perm(self, perm, obj=None) -> bool:
+
         return True
 
-    def has_module_perms(self, app_label):
+    def has_module_perms(self, app_label) -> bool:
+
         return True
 
 
@@ -71,5 +77,5 @@ class Photo(models.Model):
     photo_name = models.CharField(max_length=255)
     photo_info = models.IntegerField(null=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.photo_name
