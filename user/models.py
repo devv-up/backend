@@ -5,8 +5,6 @@ from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
 from django.db import models
 from django.utils import timezone
 
-from user.models import User
-
 
 class UserManager(BaseUserManager["User"]):
     def create_user(self, email: str, first_name: str, last_name: str,
