@@ -5,11 +5,10 @@ from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
 from django.db import models
 from django.utils import timezone
 
-from user.models import User
 
-
-class UserManager(BaseUserManager):
-    def create_user(self, email, first_name, last_name, password=None, commit=True) -> Any:
+class UserManager(BaseUserManager["User"]):
+    def create_user(self, email: str, first_name: str, last_name: str,
+                    password: str = None, commit: bool = True) -> Any:
         if not email:
             raise ValueError('Users must have an email address')
         if not first_name:
@@ -25,10 +24,10 @@ class UserManager(BaseUserManager):
 
         user.set_password(password)
         if commit:
-            user.save(using=self._db)
+            user.save(using=self.db)
         return user
 
-    def create_superuser(self, email, first_name, last_name, password) -> Any:
+    def create_superuser(self, email: str, first_name: str, last_name: str, password: str) -> Any:
         user = self.create_user(
             email,
             password=password,
@@ -38,7 +37,7 @@ class UserManager(BaseUserManager):
         )
         user.is_staff = True
         user.is_superuser = True
-        user.save(using=self._db)
+        user.save(using=self.db)
         return user
 
 
@@ -64,11 +63,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self) -> str:
         return self.get_full_name()
 
-    def has_perm(self, perm, obj=None) -> bool:
+    def has_perm(self, perm: Any, obj: Any = None) -> bool:
 
         return True
 
-    def has_module_perms(self, app_label) -> bool:
+    def has_module_perms(self, app_label: Any) -> bool:
 
         return True
 
