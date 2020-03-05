@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
     'post',
-    'user.apps.UserConfig',
+    'user',
 ]
 
 MIDDLEWARE = [
