@@ -8,7 +8,6 @@ class Category(models.Model):
     A category model which defines purposes of posts.
     ex) Project, Meet-up, etc.
     """
-
     title = models.CharField(max_length=50, unique=True)
     is_active = models.BooleanField(default=True)
 
@@ -22,7 +21,6 @@ class Post(models.Model):
     meeting_time_of_day have integer value
     :0=morning, 1=afternoon, 2=evening
     """
-
     title = models.CharField(max_length=50)
     content = models.TextField()
     location = models.CharField(max_length=255)
@@ -45,7 +43,6 @@ class Comment(models.Model):
     A Comment model which has the depth up to 2 levels
     by possessing another comment's id.
     """
-
     content = models.TextField()
     is_active = models.BooleanField(default=True)
     created_date = models.DateTimeField(auto_now_add=True)
@@ -63,7 +60,6 @@ class Tag(models.Model):
     A Tag model which defines properties of posts.
     ex) Frontend, JavaScript, React, Backend, Node.js, Python, Spring, etc.
     """
-
     title = models.CharField(max_length=50, unique=True)
 
     def __str__(self) -> str:
