@@ -1,38 +1,31 @@
-from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
-                                        PermissionsMixin)
-from django.db import models
-from django.utils import timezone
 from typing import Any
+
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.db import models
 
 
 class UserManager(BaseUserManager["User"]):
-    def create_user(self, email: str, first_name: str, last_name: str,
-                    password: str = None, commit: bool = True) -> Any:
+    def create_user(self, email: str, name: str,
+                    password: str = None) -> 'User':
         if not email:
             raise ValueError('Users must have an email address')
-        if not first_name:
-            raise ValueError('Users must have a first name')
-        if not last_name:
-            raise ValueError('Users must have a last name')
+        if not name:
+            raise ValueError('Users must have a name')
 
         user = self.model(
             email=self.normalize_email(email),
-            first_name=first_name,
-            last_name=last_name,
+            name=name,
         )
 
         user.set_password(password)
-        if commit:
-            user.save(using=self.db)
+        user.save(using=self.db)
         return user
 
-    def create_superuser(self, email: str, first_name: str, last_name: str, password: str) -> Any:
+    def create_superuser(self, email: str, name: str, password: str) -> 'User':
         user = self.create_user(
             email,
             password=password,
-            first_name=first_name,
-            last_name=last_name,
-            commit=False,
+            name=name,
         )
         user.is_staff = True
         user.is_superuser = True
@@ -42,25 +35,20 @@ class UserManager(BaseUserManager["User"]):
 
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True)
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=150)
+    name = models.CharField(max_length=150)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    date_joined = models.DateTimeField(default=timezone.now)
+    create_date = models.DateTimeField(auto_now_add=True)
     verification = models.BooleanField(null=False, default=False)
     verification_key = models.CharField(max_length=128)
 
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name']
-
-    def get_full_name(self) -> str:
-        full_name = '%s%s' % (self.first_name, self.last_name)
-        return full_name.strip()
+    REQUIRED_FIELDS = ['name']
 
     def __str__(self) -> str:
-        return self.get_full_name()
+        return self.name
 
     def has_perm(self, perm: Any, obj: Any = None) -> bool:
 
