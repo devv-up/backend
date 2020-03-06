@@ -75,6 +75,6 @@ class CategoryAPI(APIView):
 
         if serializer.is_valid():
             serializer.update(category, {'is_active': False})
-            return Response(serializer.data)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
         raise ParseError(detail=serializer.errors)
