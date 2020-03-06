@@ -17,9 +17,13 @@ Including another URLconf
 from django.urls import path
 
 from post.api.category import CategoryAPI, CategoryList, CategoryPosting
+from post.api.tag import TagAPI, TagList, TagPosting
 
 urlpatterns = [
     path('category/', CategoryPosting.as_view()),
     path('category/<int:category_id>/', CategoryAPI.as_view()),
     path('categories/', CategoryList.as_view()),
+    path('tag/', TagPosting.as_view()),
+    path('tag/<int:tag_id>/', TagAPI.as_view()),
+    path('tags/', TagList.as_view()),
 ]
