@@ -38,14 +38,14 @@ class TestCategory(_Fixtures):
 
         assert response.status_code == 201
 
-    def test_create_ths_same_title_category(self, api_client, title, title_data):
+    def test_create_the_same_title_category(self, api_client, title, title_data):
         response1 = api_client.post('/category/', title_data)
         response2 = api_client.post('/category/', title_data)
 
         assert response1.status_code == 201
         assert response2.status_code == 400
 
-    def test_create_categoty_without_title(self, api_client):
+    def test_create_category_without_title(self, api_client):
         response = api_client.post('/category/')
 
         assert response.status_code == 400
