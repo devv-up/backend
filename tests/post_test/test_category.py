@@ -82,5 +82,5 @@ class TestCategory(_Fixtures):
         after_delete = api_client.get(f'/category/{category_id}/')
 
         assert before_delete.status_code == 200
-        assert response.status_code == 200
+        assert response.status_code == 204
         assert after_delete.status_code == 404
