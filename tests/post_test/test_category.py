@@ -38,6 +38,13 @@ class TestCategory(_Fixtures):
 
         assert response.status_code == 201
 
+    def test_create_ths_same_title_category(self, api_client, title, title_data):
+        response1 = api_client.post('/category/', title_data)
+        response2 = api_client.post('/category/', title_data)
+
+        assert response1.status_code == 201
+        assert response2.status_code == 400
+
     def test_create_categoty_without_title(self, api_client):
         response = api_client.post('/category/')
 
@@ -54,6 +61,11 @@ class TestCategory(_Fixtures):
 
         assert response.status_code == 200
         assert response.data.get('id') == category_id
+
+    def test_detail_missing_category(self, api_client):
+        response = api_client.get('/category/65535/')
+
+        assert response.status_code == 404
 
     def test_update_category(self, api_client, categories, category_id, title, title_data):
         before_update = api_client.get(f'/category/{category_id}/')
