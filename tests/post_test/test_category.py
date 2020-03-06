@@ -33,12 +33,12 @@ class _Fixtures:
 class TestCategory(_Fixtures):
     pytestmark = pytest.mark.django_db
 
-    def test_create_category(self, api_client, title, title_data):
+    def test_create_category(self, api_client, title_data):
         response = api_client.post('/category/', title_data)
 
         assert response.status_code == 201
 
-    def test_create_the_same_title_category(self, api_client, title, title_data):
+    def test_create_the_same_title_category(self, api_client, title_data):
         response1 = api_client.post('/category/', title_data)
         response2 = api_client.post('/category/', title_data)
 
@@ -56,7 +56,7 @@ class TestCategory(_Fixtures):
         assert response.status_code == 200
         assert len(response.data) > 1
 
-    def test_detail_category(self, api_client, categories, category_id, title):
+    def test_detail_category(self, api_client, categories, category_id):
         response = api_client.get(f'/category/{category_id}/')
 
         assert response.status_code == 200
@@ -67,7 +67,7 @@ class TestCategory(_Fixtures):
 
         assert response.status_code == 404
 
-    def test_update_category(self, api_client, categories, category_id, title, title_data):
+    def test_update_category(self, api_client, categories, category_id, title_data):
         before_update = api_client.get(f'/category/{category_id}/')
         response = api_client.put(f'/category/{category_id}/', data=title_data)
 
@@ -76,9 +76,9 @@ class TestCategory(_Fixtures):
         assert response.data.get('title') == title_data.get('title')
         assert before_update.data.get('title') != title_data.get('title')
 
-    def test_delete_category(self, api_client, categories, category_id, title, title_data):
+    def test_delete_category(self, api_client, categories, category_id):
         before_delete = api_client.get(f'/category/{category_id}/')
-        response = api_client.delete(f'/category/{category_id}/', data=title_data)
+        response = api_client.delete(f'/category/{category_id}/')
         after_delete = api_client.get(f'/category/{category_id}/')
 
         assert before_delete.status_code == 200
