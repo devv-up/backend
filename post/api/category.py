@@ -71,10 +71,7 @@ class CategoryAPI(APIView):
         Set a category disabled.
         """
         category = self.get_object(category_id)
-        serializer = CategorySerializer(category, request.data)
+        serializer = CategorySerializer(category)
+        serializer.update(category, {'is_active': False})
 
-        if serializer.is_valid():
-            serializer.update(category, {'is_active': False})
-            return Response(status=status.HTTP_204_NO_CONTENT)
-
-        raise ParseError(detail=serializer.errors)
+        return Response(status=status.HTTP_204_NO_CONTENT)
