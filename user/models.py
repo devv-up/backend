@@ -29,14 +29,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
-        self.objects = UserManager.getInstance()
+        self.objects = UserManager.get_instance()
 
 
 class UserManager(BaseUserManager):  # type: ignore
     __instance = None
 
     @staticmethod
-    def getInstance() -> Any:
+    def get_instance() -> Any:
         """ Static access method. """
         if UserManager.__instance is None:
             UserManager()
@@ -45,7 +45,7 @@ class UserManager(BaseUserManager):  # type: ignore
     def __init__(self) -> None:
         """ Virtually private constructor. """
         if UserManager.__instance is not None:
-            raise Exception("This class is a singleton!")
+            assert Exception("This class is a singleton!")
         else:
             UserManager.__instance = self
 
