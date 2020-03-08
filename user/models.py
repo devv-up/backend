@@ -1,10 +1,57 @@
 from typing import Any
 
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
+                                        PermissionsMixin)
 from django.db import models
 
 
-class UserManager(BaseUserManager["User"]):
+class User(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField(max_length=255, unique=True)
+    name = models.CharField(max_length=150)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    create_date = models.DateTimeField(auto_now_add=True)
+    verification = models.BooleanField(null=False, default=False)
+    verification_key = models.CharField(max_length=128)
+
+    # objects = UserManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['name']
+
+    def __str__(self) -> str:
+        return self.name
+
+    def has_perm(self, perm: Any, obj: Any = None) -> bool:
+
+        return True
+
+    def has_module_perms(self, app_label: Any) -> bool:
+
+        return True
+
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self.objects = UserManager.getInstance()  # UserManager를 Singleton 으로 만들어주세요
+
+
+class UserManager(BaseUserManager['User']):
+    __instance = None
+
+    @staticmethod
+    def getInstance() -> Any:
+        """ Static access method. """
+        if UserManager.__instance is None:
+            UserManager()
+        return UserManager.__instance
+
+    def __init__(self) -> None:
+        """ Virtually private constructor. """
+        if UserManager.__instance is not None:
+            raise Exception("This class is a singleton!")
+        else:
+            UserManager.__instance = self
+
     def create_user(self, email: str, name: str,
                     password: str = None) -> 'User':
         if not email:
@@ -31,37 +78,3 @@ class UserManager(BaseUserManager["User"]):
         user.is_superuser = True
         user.save(using=self.db)
         return user
-
-
-class User(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(max_length=255, unique=True)
-    name = models.CharField(max_length=150)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    create_date = models.DateTimeField(auto_now_add=True)
-    verification = models.BooleanField(null=False, default=False)
-    verification_key = models.CharField(max_length=128)
-
-    objects = UserManager()
-
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['name']
-
-    def __str__(self) -> str:
-        return self.name
-
-    def has_perm(self, perm: Any, obj: Any = None) -> bool:
-
-        return True
-
-    def has_module_perms(self, app_label: Any) -> bool:
-
-        return True
-
-
-class Photo(models.Model):
-    photo_name = models.CharField(max_length=255)
-    photo_info = models.IntegerField(null=True)
-
-    def __str__(self) -> str:
-        return self.photo_name
