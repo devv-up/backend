@@ -1,6 +1,7 @@
 from typing import Any
 
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
+                                        PermissionsMixin)
 from django.db import models
 
 
@@ -12,8 +13,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     create_date = models.DateTimeField(auto_now_add=True)
     verification = models.BooleanField(null=False, default=False)
     verification_key = models.CharField(max_length=128)
-
-    # objects = UserManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['name']
@@ -31,10 +30,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
-        self.objects = UserManager.getInstance()  # UserManager를 Singleton 으로 만들어주세요
+        self.objects = UserManager.getInstance()
 
 
-class UserManager(BaseUserManager['User']):
+class UserManager(BaseUserManager):  # type: ignore
     __instance = None
 
     @staticmethod
