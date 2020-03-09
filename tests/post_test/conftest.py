@@ -1,7 +1,7 @@
 from typing import List
 
-from model_mommy import mommy
 import pytest
+from model_mommy import mommy
 from rest_framework.test import APIClient
 
 from post.models import Category, Post, Tag
@@ -35,7 +35,7 @@ def title_data(title) -> dict:
 
 
 @pytest.fixture
-def users() -> User:
+def users() -> List[User]:
     return [mommy.make(User) for i in range(3)]
 
 
@@ -50,5 +50,5 @@ def tags() -> List[Tag]:
 
 
 @pytest.fixture
-def posts() -> Post:
+def posts() -> List[Post]:
     return [mommy.make(Post) for i in range(3)]
