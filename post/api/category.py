@@ -9,8 +9,26 @@ from post.models import Category
 from post.serializers import CategorySerializer
 
 
-class CategoryList(APIView):
-    def get(self, request: Any) -> Response:
+class CategoryAPI(APIView):
+    def get_object(self, category_id: int) -> Category:
+        """
+        Get a category object.
+        """
+        try:
+            return Category.objects.get(pk=category_id, is_active=True)
+        except Exception:
+            raise NotFound
+
+    def category_detail(self, category_id: int) -> Response:
+        """
+        Get a category.
+        """
+        category = self.get_object(category_id)
+        serializer = CategorySerializer(category)
+
+        return Response(serializer.data)
+
+    def category_list(self) -> Response:
         """
         Get a list of whole categories which are active.
         """
@@ -19,8 +37,14 @@ class CategoryList(APIView):
 
         return Response(serializer.data)
 
+    def get(self, request: Any, **parameter: Any) -> Response:
+        category_id = parameter.get('category_id')
 
-class CategoryPosting(APIView):
+        if category_id:
+            return self.category_detail(category_id)
+        else:
+            return self.category_list()
+
     def post(self, request: Any) -> Response:
         """
         Create a category.
@@ -32,26 +56,6 @@ class CategoryPosting(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         raise ParseError(detail=serializer.errors)
-
-
-class CategoryAPI(APIView):
-    def get_object(self, category_id: int) -> Category:
-        """
-        Get a category object.
-        """
-        try:
-            return Category.objects.get(pk=category_id, is_active=True)
-        except Exception:
-            raise NotFound
-
-    def get(self, request: Any, category_id: int) -> Response:
-        """
-        Get a category.
-        """
-        category = self.get_object(category_id)
-        serializer = CategorySerializer(category)
-
-        return Response(serializer.data)
 
     def put(self, request: Any, category_id: int) -> Response:
         """
