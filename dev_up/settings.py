@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'drf_yasg',
     'post',
 ]
 
@@ -85,7 +86,7 @@ DATABASES = {
         'NAME': os.environ.get('POSTGRESQL_NAME'),
         'USER': os.environ.get('POSTGRESQL_USER'),
         'PASSWORD': os.environ.get('POSTGRESQL_PASSWORD'),
-        'PORT': os.environ.get('POSTGRESQL_PORT')
+        'PORT': os.environ.get('POSTGRESQL_PORT'),
     }
 }
 

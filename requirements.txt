@@ -10,3 +10,4 @@ pytest-django
 djangorestframework
 psycopg2
 model_mommy
+drf-yasg==1.17.1
