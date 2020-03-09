@@ -52,9 +52,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.name
 
     def has_perm(self, perm: Any, obj: Any = None) -> bool:
-
         return True
 
     def has_module_perms(self, app_label: Any) -> bool:
-
         return True
