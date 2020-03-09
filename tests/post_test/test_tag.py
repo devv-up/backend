@@ -1,36 +1,8 @@
 import pytest
-from rest_framework.test import APIClient
-
-from post.models import Tag
-
-
-class _Fixtures:
-    @pytest.fixture
-    def api_client(self) -> APIClient:
-        return APIClient()
-
-    @pytest.fixture
-    def tag_id(self) -> int:
-        return 1
-
-    @pytest.fixture
-    def title(self) -> str:
-        return 'test_title'
-
-    @pytest.fixture
-    def title_data(self, title) -> dict:
-        return {'title': title}
-
-    @pytest.fixture
-    def tags(self, title) -> None:
-        return Tag.objects.bulk_create(
-            [Tag(title=f'{title} {i+1}')
-                for i in range(3)]
-        )
 
 
 @pytest.mark.django_db
-class TestTag(_Fixtures):
+class TestTag:
     pytestmark = pytest.mark.django_db
 
     def test_create_tag(self, api_client, title_data):
