@@ -9,8 +9,26 @@ from post.models import Tag
 from post.serializers import TagSerializer
 
 
-class TagList(APIView):
-    def get(self, request: Any) -> Response:
+class TagAPI(APIView):
+    def get_object(self, tag_id: int) -> Tag:
+        """
+        Get a tag object.
+        """
+        try:
+            return Tag.objects.get(pk=tag_id)
+        except Exception:
+            raise NotFound
+
+    def tag_detail(self, tag_id: int) -> Response:
+        """
+        Get a tag.
+        """
+        tag = self.get_object(tag_id)
+        serializer = TagSerializer(tag)
+
+        return Response(serializer.data)
+
+    def tag_list(self) -> Response:
         """
         Get a list of whole tags which are active.
         """
@@ -19,8 +37,14 @@ class TagList(APIView):
 
         return Response(serializer.data)
 
+    def get(self, request: Any, **parameter: Any) -> Response:
+        tag_id = parameter.get('tag_id')
 
-class TagPosting(APIView):
+        if tag_id:
+            return self.tag_detail(tag_id)
+        else:
+            return self.tag_list()
+
     def post(self, request: Any) -> Response:
         """
         Create a tag.
@@ -32,26 +56,6 @@ class TagPosting(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         raise ParseError(detail=serializer.errors)
-
-
-class TagAPI(APIView):
-    def get_object(self, tag_id: int) -> Tag:
-        """
-        Get a tag object.
-        """
-        try:
-            return Tag.objects.get(pk=tag_id)
-        except Exception:
-            raise NotFound
-
-    def get(self, request: Any, tag_id: int) -> Response:
-        """
-        Get a tag.
-        """
-        tag = self.get_object(tag_id)
-        serializer = TagSerializer(tag)
-
-        return Response(serializer.data)
 
     def put(self, request: Any, tag_id: int) -> Response:
         """
