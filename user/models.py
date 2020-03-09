@@ -45,7 +45,7 @@ class UserManager(BaseUserManager):  # type: ignore
     def __init__(self) -> None:
         """ Virtually private constructor. """
         if UserManager.__instance is not None:
-            assert Exception("This class is a singleton!")
+            assert UserManager.__instance is not None, ("UserManager is singleton")
         else:
             UserManager.__instance = self
 
