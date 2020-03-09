@@ -1,36 +1,8 @@
 import pytest
-from rest_framework.test import APIClient
-
-from post.models import Category
-
-
-class _Fixtures:
-    @pytest.fixture
-    def api_client(self) -> APIClient:
-        return APIClient()
-
-    @pytest.fixture
-    def category_id(self) -> int:
-        return 1
-
-    @pytest.fixture
-    def title(self) -> str:
-        return 'test_title'
-
-    @pytest.fixture
-    def title_data(self, title) -> dict:
-        return {'title': title}
-
-    @pytest.fixture
-    def categories(self, title) -> None:
-        return Category.objects.bulk_create(
-            [Category(title=f'{title} {i+1}')
-                for i in range(3)]
-        )
 
 
 @pytest.mark.django_db
-class TestCategory(_Fixtures):
+class TestCategory:
     pytestmark = pytest.mark.django_db
 
     def test_create_category(self, api_client, title_data):
