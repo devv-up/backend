@@ -48,7 +48,7 @@ class TestTag:
         assert response.data.get('title') == title_data.get('title')
         assert before_update.data.get('title') != title_data.get('title')
 
-    def test_delete_tag(self, api_client, tags, tag_id, title_data):
+    def test_delete_tag(self, api_client, tags, tag_id):
         before_delete = api_client.get(f'/tag/{tag_id}/')
         response = api_client.delete(f'/tag/{tag_id}/')
         after_delete = api_client.get(f'/tag/{tag_id}/')

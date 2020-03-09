@@ -1,7 +1,11 @@
+from typing import List
+
+from model_mommy import mommy
 import pytest
 from rest_framework.test import APIClient
 
-from post.models import Category, Tag
+from post.models import Category, Post, Tag
+from user.models import User
 
 
 @pytest.fixture
@@ -31,16 +35,20 @@ def title_data(title) -> dict:
 
 
 @pytest.fixture
-def categories(title) -> None:
-    return Category.objects.bulk_create(
-        [Category(title=f'{title} {i+1}')
-            for i in range(3)]
-    )
+def users() -> User:
+    return [mommy.make(User) for i in range(3)]
 
 
 @pytest.fixture
-def tags(title) -> None:
-    return Tag.objects.bulk_create(
-        [Tag(title=f'{title} {i+1}')
-            for i in range(3)]
-    )
+def categories() -> List[Category]:
+    return [mommy.make(Category) for i in range(3)]
+
+
+@pytest.fixture
+def tags() -> List[Tag]:
+    return [mommy.make(Tag) for i in range(3)]
+
+
+@pytest.fixture
+def posts() -> Post:
+    return [mommy.make(Post) for i in range(3)]
