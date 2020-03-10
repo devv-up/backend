@@ -1,7 +1,7 @@
 from typing import Any, List
 
-import pytest
 from model_mommy import mommy
+import pytest
 from rest_framework.test import APIClient
 
 from post.models import Category, Post, Tag
