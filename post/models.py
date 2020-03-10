@@ -26,7 +26,7 @@ class Post(models.Model):
     content = models.TextField()
     location = models.CharField(max_length=255)
     capacity = models.IntegerField()
-    date = models.DateTimeField()
+    date = models.DateField()
     time_of_day = models.IntegerField()
     is_active = models.BooleanField(default=True)
     created_date = models.DateTimeField(auto_now_add=True)
