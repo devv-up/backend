@@ -57,19 +57,6 @@ class TagAPI(APIView):
 
         raise ParseError(detail=serializer.errors)
 
-    def put(self, request: Any, tag_id: int) -> Response:
-        """
-        Update the tag title.
-        """
-        tag = self.get_object(tag_id)
-        serializer = TagSerializer(tag, request.data)
-
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-
-        raise ParseError(detail=serializer.errors)
-
     def delete(self, request: Any, tag_id: int) -> Response:
         """
         Delete a tag.
