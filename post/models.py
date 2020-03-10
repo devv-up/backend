@@ -1,5 +1,6 @@
-from django.contrib.auth.models import User
 from django.db import models
+
+from user.models import User
 
 
 # Create your models here.
@@ -32,8 +33,8 @@ class Post(models.Model):
     is_active = models.BooleanField(default=True)
     created_date = models.DateTimeField(auto_now_add=True)
 
-    author = models.ForeignKey(User, on_delete=models.SET_NULL)
-    category = models.ForeignKey('Category', on_delete=models.SET_NULL)
+    author = models.ForeignKey(User, on_delete=models.PROTECT)
+    category = models.ForeignKey('Category', on_delete=models.PROTECT)
     tags = models.ManyToManyField('Tag')
 
     def __str__(self) -> str:
@@ -50,9 +51,9 @@ class Comment(models.Model):
     is_active = models.BooleanField(default=True)
     created_date = models.DateTimeField(auto_now_add=True)
 
-    post = models.ForeignKey('Post', on_delete=models.SET_NULL)
+    post = models.ForeignKey('Post', on_delete=models.PROTECT)
     parent_comment = models.ForeignKey('self', on_delete=models.PROTECT, null=True)
-    author = models.ForeignKey(User, on_delete=models.SET_NULL)
+    author = models.ForeignKey(User, on_delete=models.PROTECT)
 
     def __str__(self) -> str:
         return f'Comment(id={self.id})'
