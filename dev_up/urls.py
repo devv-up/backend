@@ -15,8 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from drf_yasg import openapi  # type: ignore
-from drf_yasg.views import get_schema_view  # type: ignore
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
 from rest_framework import permissions  # type: ignore
 
 schema_view = get_schema_view(
@@ -26,7 +26,7 @@ schema_view = get_schema_view(
         description="A simple instruction manual for those who need the dev-up api.",
     ),
     public=True,
-    permission_classes=(permissions.AllowAny,),
+    permission_classes=(permissions.AllowAny,)
 )
 
 urlpatterns = [

@@ -8,6 +8,7 @@ mypy
 django-stubs
 pytest-django
 djangorestframework
+drf-yasg==1.17.1
+drf-yasg-stubs==0.1.0
 psycopg2
 model_mommy
-drf-yasg==1.17.1
