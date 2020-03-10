@@ -1,7 +1,7 @@
-from typing import List
+from typing import Any, List
 
-from model_mommy import mommy
 import pytest
+from model_mommy import mommy
 from rest_framework.test import APIClient
 
 from post.models import Category, Post, Tag
@@ -25,13 +25,34 @@ def tag_id() -> int:
 
 
 @pytest.fixture
-def title() -> str:
-    return 'test_title'
+def post_id() -> int:
+    return 1
 
 
 @pytest.fixture
-def title_data(title) -> dict:
-    return {'title': title}
+def title_data() -> dict:
+    return {'title': 'test_title'}
+
+
+@pytest.fixture
+def bad_data() -> dict:
+    return {'id': 1, 'author': 65535}
+
+
+@pytest.fixture
+def post_data() -> dict:
+    data: dict[str, Any] = {
+        'title': 'test_title',
+        'content': 'test_content',
+        'location': 'test_location',
+        'capacity': 10,
+        'date': '2020-01-01',
+        'time_of_day': 1,
+        'author': 1,
+        'category': 1,
+        'tags': [1, 2],
+    }
+    return data
 
 
 @pytest.fixture
