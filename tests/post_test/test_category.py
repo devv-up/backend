@@ -43,7 +43,7 @@ class TestCategory:
         before_update = api_client.get(f'/categories/{category_id}')
         response = api_client.put(f'/categories/{category_id}', data=title_data)
 
-        assert response.status_code == 200
+        assert response.status_code == 201
         assert response.data.get('id') == category_id
         assert response.data.get('title') == title_data.get('title')
         assert before_update.data.get('title') != title_data.get('title')
