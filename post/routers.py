@@ -17,6 +17,7 @@ Including another URLconf
 from django.urls import path
 
 from post.api.category import CategoryAPI
+from post.api.comment import CommentAPI
 from post.api.post import PostAPI
 from post.api.tag import TagAPI
 
@@ -27,4 +28,6 @@ urlpatterns = [
     path('tags', TagAPI.as_view()),
     path('posts/<int:post_id>', PostAPI.as_view()),
     path('posts', PostAPI.as_view()),
+    path('comments/<int:comment_id>', CommentAPI.as_view()),
+    path('comments', CommentAPI.as_view()),
 ]
