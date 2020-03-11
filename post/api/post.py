@@ -1,24 +1,16 @@
 from typing import Any
 
-from django.http import QueryDict
 from rest_framework import status  # type: ignore
-from rest_framework.exceptions import AuthenticationFailed  # type: ignore
-from rest_framework.exceptions import NotFound, ParseError
+from rest_framework.exceptions import NotFound, ParseError  # type: ignore
 from rest_framework.response import Response  # type: ignore
 from rest_framework.views import APIView  # type: ignore
 
+from post.api.utils import APIUtils
 from post.models import Post
 from post.serializers import PostListSerializer, PostSerializer
 
 
 class PostAPI(APIView):
-    def validate(self, data: QueryDict) -> bool:
-        vulnerable = [key for key in data if key in ('id', 'author',)]
-        if vulnerable:
-            raise AuthenticationFailed
-
-        return True
-
     def get_object(self, category_id: int) -> Post:
         """
         Get a post object.
@@ -61,6 +53,9 @@ class PostAPI(APIView):
         serializer = PostSerializer(data=request.data)
 
         if serializer.is_valid():
+            if not request.data.get('category'):
+                raise ParseError(detail='Category number is a required field')
+
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -68,16 +63,16 @@ class PostAPI(APIView):
 
     def put(self, request: Any, post_id: int) -> Response:
         """
-        Update the post title.
+        Update the post's data.
         """
-        self.validate(request.data)
+        APIUtils.validate(request.data)
 
         post = self.get_object(post_id)
         serializer = PostSerializer(post, request.data, partial=True)
 
         if serializer.is_valid():
             serializer.update(post, request.data)
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return ParseError(detail=serializer.errors)
 

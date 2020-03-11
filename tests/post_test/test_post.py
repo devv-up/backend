@@ -10,6 +10,11 @@ class TestPost:
 
         assert response.status_code == 201
 
+    def test_create_post_without_category_no(self, api_client, users, tags, bad_post_data):
+        response = api_client.post('/posts', bad_post_data)
+
+        assert response.status_code == 400
+
     def test_list_posts(self, api_client, posts):
         response = api_client.get('/posts')
 
@@ -31,13 +36,13 @@ class TestPost:
         before_update = api_client.get(f'/posts/{post_id}')
         response = api_client.put(f'/posts/{post_id}', data=title_data)
 
-        assert response.status_code == 200
+        assert response.status_code == 201
         assert response.data.get('id') == post_id
         assert response.data.get('title') == title_data.get('title')
         assert before_update.data.get('title') != title_data.get('title')
 
-    def test_update_post_with_bad_access(self, api_client, posts, post_id, bad_data):
-        response = api_client.put(f'/posts/{post_id}', data=bad_data)
+    def test_update_post_with_bad_access(self, api_client, posts, post_id, bad_post_data):
+        response = api_client.put(f'/posts/{post_id}', data=bad_post_data)
 
         assert response.status_code == 403
 
