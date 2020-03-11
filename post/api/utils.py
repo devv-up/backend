@@ -13,3 +13,5 @@ class APIUtils:
         vulnerable = [key for key in data if key in cls.vulnerable_fields]
         if vulnerable:
             raise AuthenticationFailed
+
+        return True
