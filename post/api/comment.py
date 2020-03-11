@@ -46,7 +46,7 @@ class CommentAPI(APIView):
         else:
             return self.comment_list()
 
-    def post(self, request) -> Response:
+    def post(self, request: Any) -> Response:
         """
         Create a comment.
         """
