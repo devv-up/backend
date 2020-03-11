@@ -39,6 +39,11 @@ class TestTag:
 
         assert response.status_code == 404
 
+    def test_update_tag_request(self, api_client, tags, tag_id, title_data):
+        response = api_client.put(f'/tags/{tag_id}', data=title_data)
+
+        assert response.status_code == 405
+
     def test_delete_tag(self, api_client, tags, tag_id):
         before_delete = api_client.get(f'/tags/{tag_id}')
         response = api_client.delete(f'/tags/{tag_id}')
