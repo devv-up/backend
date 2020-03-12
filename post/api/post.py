@@ -20,6 +20,20 @@ class PostAPI(APIView):
         except Exception:
             raise NotFound
 
+    def get_option_filtered_queryset(self, request: Any) -> Any:
+        queryset = Post.objects.all()
+
+        if 'category' in request.GET:
+            category_no = request.GET['category']
+            queryset = queryset.filter(category=category_no)
+
+        if 'tags' in request.GET:
+            tags = request.GET['tags']
+            for tag in tags:
+                queryset = queryset.filter(tags=tag)
+
+        return queryset
+
     def post_detail(self, post_id: int) -> Response:
         """
         Get a post.
@@ -29,11 +43,14 @@ class PostAPI(APIView):
 
         return Response(serializer.data)
 
-    def post_list(self) -> Response:
+    def post_list(self, request: Any) -> Response:
         """
         Get a list of whole posts which are active.
         """
-        posts = Post.objects.filter(is_active=True)
+
+        queryset = self.get_option_filtered_queryset(request)
+
+        posts = queryset.filter(is_active=True)
         serializer = PostListSerializer(posts, many=True)
 
         return Response(serializer.data)
@@ -44,7 +61,7 @@ class PostAPI(APIView):
         if post_id:
             return self.post_detail(post_id)
         else:
-            return self.post_list()
+            return self.post_list(request)
 
     def post(self, request: Any) -> Response:
         """
