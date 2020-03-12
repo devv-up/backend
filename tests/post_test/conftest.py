@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import List
 
 from model_mommy import mommy
 import pytest
@@ -50,8 +50,20 @@ def unauthorised_data() -> dict:
 
 
 @pytest.fixture
+def post_preset_data() -> dict:
+    return {
+        'title': 'post1_title',
+        'content': 'post1_content',
+        'location': 'post1_location',
+        'capacity': 5,
+        'date': '2020-01-01',
+        'time_of_day': 1,
+    }
+
+
+@pytest.fixture
 def post_data() -> dict:
-    data: dict[str, Any] = {
+    return {
         'title': 'test_title',
         'content': 'test_content',
         'location': 'test_location',
@@ -62,12 +74,11 @@ def post_data() -> dict:
         'category': 1,
         'tags': [1, 2],
     }
-    return data
 
 
 @pytest.fixture
 def bad_post_data() -> dict:
-    data: dict[str, Any] = {
+    return {
         'title': 'test_title',
         # 'content': 'test_content',
         'location': 'test_location',
@@ -78,27 +89,24 @@ def bad_post_data() -> dict:
         # 'category': 1,
         # 'tags': [1, 2],
     }
-    return data
 
 
 @pytest.fixture
 def comment_data() -> dict:
-    data: dict[str, Any] = {
+    return {
         'content': 'test_content',
         'post': 1,
         'author': 1,
     }
-    return data
 
 
 @pytest.fixture
 def bad_comment_data() -> dict:
-    data: dict[str, Any] = {
+    return {
         # 'content': 'test_content',
         'post': 1,
         # 'author': 1,
     }
-    return data
 
 
 @pytest.fixture
