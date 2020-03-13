@@ -28,26 +28,26 @@ class TestTag:
         assert response.status_code == 200
         assert len(response.data) > 1
 
-    def test_detail_tag(self, api_client, tags, tag_id):
-        response = api_client.get(f'/tags/{tag_id}')
+    def test_detail_tag(self, api_client, tags, dummy_id):
+        response = api_client.get(f'/tags/{dummy_id}')
 
         assert response.status_code == 200
-        assert response.data.get('id') == tag_id
+        assert response.data.get('id') == dummy_id
 
     def test_detail_missing_tag(self, api_client):
         response = api_client.get('/tags/65535')
 
         assert response.status_code == 404
 
-    def test_update_tag_request(self, api_client, tags, tag_id, title_data):
-        response = api_client.put(f'/tags/{tag_id}', data=title_data)
+    def test_update_tag_request(self, api_client, tags, dummy_id, title_data):
+        response = api_client.put(f'/tags/{dummy_id}', data=title_data)
 
         assert response.status_code == 405
 
-    def test_delete_tag(self, api_client, tags, tag_id):
-        before_delete = api_client.get(f'/tags/{tag_id}')
-        response = api_client.delete(f'/tags/{tag_id}')
-        after_delete = api_client.get(f'/tags/{tag_id}')
+    def test_delete_tag(self, api_client, tags, dummy_id):
+        before_delete = api_client.get(f'/tags/{dummy_id}')
+        response = api_client.delete(f'/tags/{dummy_id}')
+        after_delete = api_client.get(f'/tags/{dummy_id}')
 
         assert before_delete.status_code == 200
         assert response.status_code == 204
