@@ -28,30 +28,30 @@ class TestCategory:
         assert response.status_code == 200
         assert len(response.data) > 1
 
-    def test_detail_category(self, api_client, categories, category_id):
-        response = api_client.get(f'/categories/{category_id}')
+    def test_detail_category(self, api_client, categories, dummy_id):
+        response = api_client.get(f'/categories/{dummy_id}')
 
         assert response.status_code == 200
-        assert response.data.get('id') == category_id
+        assert response.data.get('id') == dummy_id
 
     def test_detail_missing_category(self, api_client):
         response = api_client.get('/categories/65535')
 
         assert response.status_code == 404
 
-    def test_update_category(self, api_client, categories, category_id, title_data):
-        before_update = api_client.get(f'/categories/{category_id}')
-        response = api_client.put(f'/categories/{category_id}', data=title_data)
+    def test_update_category(self, api_client, categories, dummy_id, title_data):
+        before_update = api_client.get(f'/categories/{dummy_id}')
+        response = api_client.put(f'/categories/{dummy_id}', data=title_data)
 
         assert response.status_code == 201
-        assert response.data.get('id') == category_id
+        assert response.data.get('id') == dummy_id
         assert response.data.get('title') == title_data.get('title')
         assert before_update.data.get('title') != title_data.get('title')
 
-    def test_delete_category(self, api_client, categories, category_id):
-        before_delete = api_client.get(f'/categories/{category_id}')
-        response = api_client.delete(f'/categories/{category_id}')
-        after_delete = api_client.get(f'/categories/{category_id}')
+    def test_delete_category(self, api_client, categories, dummy_id):
+        before_delete = api_client.get(f'/categories/{dummy_id}')
+        response = api_client.delete(f'/categories/{dummy_id}')
+        after_delete = api_client.get(f'/categories/{dummy_id}')
 
         assert before_delete.status_code == 200
         assert response.status_code == 204

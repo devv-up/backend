@@ -15,22 +15,7 @@ def api_client():
 
 
 @pytest.fixture
-def category_id() -> int:
-    return 1
-
-
-@pytest.fixture
-def tag_id() -> int:
-    return 1
-
-
-@pytest.fixture
-def post_id() -> int:
-    return 1
-
-
-@pytest.fixture
-def comment_id() -> int:
+def dummy_id() -> int:
     return 1
 
 
@@ -46,7 +31,7 @@ def content_data() -> dict:
 
 @pytest.fixture
 def unauthorised_data() -> dict:
-    return {'id': 1, 'author': 65535}
+    return {'id': 65535, 'author': 65535}
 
 
 @pytest.fixture
@@ -111,24 +96,24 @@ def bad_comment_data() -> dict:
 
 @pytest.fixture
 def users() -> List[User]:
-    return [mommy.make(User) for i in range(3)]
+    return mommy.make(User, _quantity=3)
 
 
 @pytest.fixture
 def categories() -> List[Category]:
-    return [mommy.make(Category) for i in range(3)]
+    return mommy.make(Category, _quantity=3)
 
 
 @pytest.fixture
 def tags() -> List[Tag]:
-    return [mommy.make(Tag) for i in range(3)]
+    return mommy.make(Tag, _quantity=3)
 
 
 @pytest.fixture
 def posts() -> List[Post]:
-    return [mommy.make(Post) for i in range(3)]
+    return mommy.make(Post, _quantity=3)
 
 
 @pytest.fixture
 def comments() -> List[Comment]:
-    return [mommy.make(Comment) for i in range(3)]
+    return mommy.make(Comment, _quantity=3)

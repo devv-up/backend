@@ -47,7 +47,6 @@ class PostAPI(APIView):
         """
         Get a list of whole posts which are active.
         """
-
         queryset = self.get_option_filtered_queryset(request)
 
         posts = queryset.filter(is_active=True)

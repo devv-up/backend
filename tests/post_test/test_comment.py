@@ -21,35 +21,35 @@ class TestComment:
         assert response.status_code == 200
         assert len(response.data) > 1
 
-    def test_detail_comments(self, api_client, comments, comment_id):
-        response = api_client.get(f'/comments/{comment_id}')
+    def test_detail_comments(self, api_client, comments, dummy_id):
+        response = api_client.get(f'/comments/{dummy_id}')
 
         assert response.status_code == 200
-        assert response.data.get('id') == comment_id
+        assert response.data.get('id') == dummy_id
 
     def test_detail_missing_comment(self, api_client):
         response = api_client.get('/comments/65535')
 
         assert response.status_code == 404
 
-    def test_update_comment(self, api_client, comments, comment_id, content_data):
-        before_update = api_client.get(f'/comments/{comment_id}')
-        response = api_client.put(f'/comments/{comment_id}', data=content_data)
+    def test_update_comment(self, api_client, comments, dummy_id, content_data):
+        before_update = api_client.get(f'/comments/{dummy_id}')
+        response = api_client.put(f'/comments/{dummy_id}', data=content_data)
 
         assert response.status_code == 201
-        assert response.data.get('id') == comment_id
+        assert response.data.get('id') == dummy_id
         assert response.data.get('content') == content_data.get('content')
         assert before_update.data.get('content') != content_data.get('content')
 
-    def test_update_comment_with_bad_access(self, api_client, comments, comment_id, bad_post_data):
-        response = api_client.put(f'/comments/{comment_id}', data=bad_post_data)
+    def test_update_comment_with_bad_access(self, api_client, comments, dummy_id, bad_post_data):
+        response = api_client.put(f'/comments/{dummy_id}', data=bad_post_data)
 
         assert response.status_code == 403
 
-    def test_delete_post(self, api_client, comments, comment_id):
-        before_delete = api_client.get(f'/comments/{comment_id}')
-        response = api_client.delete(f'/comments/{comment_id}')
-        after_delete = api_client.get(f'/comments/{comment_id}')
+    def test_delete_post(self, api_client, comments, dummy_id):
+        before_delete = api_client.get(f'/comments/{dummy_id}')
+        response = api_client.delete(f'/comments/{dummy_id}')
+        after_delete = api_client.get(f'/comments/{dummy_id}')
 
         assert before_delete.status_code == 200
         assert response.status_code == 204
