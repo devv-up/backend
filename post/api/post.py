@@ -32,6 +32,22 @@ class PostAPI(APIView):
             for tag in tags:
                 queryset = queryset.filter(tags=tag)
 
+        if 'startDate' in request.GET:
+            start_date = request.GET['startDate']
+            queryset = queryset.filter(date__gte=start_date)
+
+        if 'endDate' in request.GET:
+            end_date = request.GET['endDate']
+            queryset = queryset.filter(date__lte=end_date)
+
+        if 'timeOfDay' in request.GET:
+            time_of_day = request.GET['timeOfDay']
+            queryset = queryset.filter(time_of_day=time_of_day)
+
+        if 'location' in request.GET:
+            location = request.GET['location']
+            queryset = queryset.filter(location__contains=location)
+
         return queryset
 
     def post_detail(self, post_id: int) -> Response:
