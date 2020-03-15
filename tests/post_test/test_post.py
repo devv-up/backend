@@ -5,6 +5,15 @@ import pytest
 class TestPost:
     pytestmark = pytest.mark.django_db
 
+    def count_tags_of(self, result, *tag_no):
+        tag_count = 0
+        for tag in result.get('tags'):
+            if tag_no[0] == tag.get('id'):
+                tag_count += 1
+            elif len(tag_no) > 1 and tag_no[1] == tag.get('id'):
+                tag_count += 1
+        return tag_count
+
     def test_create_post(self, api_client, post_data, users, categories, tags):
         response = api_client.post('/posts', post_data)
 
@@ -95,17 +104,11 @@ class TestPost:
         (first_result, second_result) = (response.data[0], response.data[1])
         assert first_result.get('id') != second_result.get('id')
 
-        tag_count = 0
-        for tag in first_result.get('tags'):
-            if tag_no == tag.get('id'):
-                tag_count += 1
-        assert tag_count == 1
+        number_of_tags = self.count_tags_of(first_result, tag_no)
+        assert number_of_tags == 1
 
-        tag_count = 0
-        for tag in second_result.get('tags'):
-            if tag_no == tag.get('id'):
-                tag_count += 1
-        assert tag_count == 1
+        number_of_tags = self.count_tags_of(second_result, tag_no)
+        assert number_of_tags == 1
 
     def test_post_on_two_tag_filtering(self, api_client,
                                        users, categories, tags,
@@ -126,21 +129,11 @@ class TestPost:
         (first_result, second_result) = (response.data[0], response.data[1])
         assert first_result.get('id') != second_result.get('id')
 
-        tag_count = 0
-        for tag in first_result.get('tags'):
-            if tag_no1 == tag.get('id'):
-                tag_count += 1
-            elif tag_no2 == tag.get('id'):
-                tag_count += 1
-        assert tag_count == 2
+        number_of_tags = self.count_tags_of(first_result, tag_no1, tag_no2)
+        assert number_of_tags == 2
 
-        tag_count = 0
-        for tag in second_result.get('tags'):
-            if tag_no1 == tag.get('id'):
-                tag_count += 1
-            elif tag_no2 == tag.get('id'):
-                tag_count += 1
-        assert tag_count == 2
+        number_of_tags = self.count_tags_of(second_result, tag_no1, tag_no2)
+        assert number_of_tags == 2
 
     def test_post_on_two_option_filtering(self, api_client,
                                           users, categories, tags,
@@ -161,11 +154,8 @@ class TestPost:
         result = response.data[0]
         assert category_no == result.get('category').get('id')
 
-        tag_count = 0
-        for tag in result.get('tags'):
-            if tag_no == tag.get('id'):
-                tag_count += 1
-        assert tag_count == 1
+        number_of_tags = self.count_tags_of(result, tag_no)
+        assert number_of_tags == 1
 
     def test_post_on_date_filtering(self, api_client,
                                     users, categories, tags,
