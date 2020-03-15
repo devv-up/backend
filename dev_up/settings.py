@@ -72,12 +72,20 @@ SOCIALACCOUNT_PROVIDERS = {
         ],
         'AUTH_PARAMS': {
             'access_type': 'online',
-        }
+        },
+        'APP': {
+            'client_id': os.environ["Google_oauth_client_id"],
+            'secret': os.environ["Google_oauth_secret"],
+        },
     },
     'github': {
         'SCOPE': [
             'user',
         ],
+        'APP': {
+            'client_id': os.environ["Github_oauth_client_id"],
+            'secret': os.environ["Github_oauth_secret"],
+        },
     }
 }
 
