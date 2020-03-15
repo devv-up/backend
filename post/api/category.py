@@ -1,9 +1,10 @@
-from typing import Any
+from typing import Any, Optional
 
-from rest_framework import status  # type: ignore
-from rest_framework.exceptions import NotFound, ParseError  # type: ignore
-from rest_framework.response import Response  # type: ignore
-from rest_framework.views import APIView  # type: ignore
+from rest_framework import status
+from rest_framework.exceptions import NotFound, ParseError
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from post.models import Category
 from post.serializers import CategorySerializer
@@ -37,7 +38,7 @@ class CategoryAPI(APIView):
 
         return Response(serializer.data)
 
-    def get(self, request: Any, **parameter: Any) -> Response:
+    def get(self, request: Request, **parameter: Optional[Any]) -> Response:
         category_id = parameter.get('category_id')
 
         if category_id:
@@ -45,7 +46,7 @@ class CategoryAPI(APIView):
         else:
             return self.category_list()
 
-    def post(self, request: Any) -> Response:
+    def post(self, request: Request) -> Response:
         """
         Create a category.
         """
@@ -57,7 +58,7 @@ class CategoryAPI(APIView):
 
         raise ParseError(detail=serializer.errors)
 
-    def put(self, request: Any, category_id: int) -> Response:
+    def put(self, request: Request, category_id: int) -> Response:
         """
         Update the category title.
         """
@@ -70,7 +71,7 @@ class CategoryAPI(APIView):
 
         raise ParseError(detail=serializer.errors)
 
-    def delete(self, request: Any, category_id: int) -> Response:
+    def delete(self, request: Request, category_id: int) -> Response:
         """
         Set a category disabled.
         """

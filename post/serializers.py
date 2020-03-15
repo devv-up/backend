@@ -1,4 +1,4 @@
-from rest_framework import serializers  # type: ignore
+from rest_framework import serializers
 
 from post.models import Category, Comment, Post, Tag
 from user.models import User

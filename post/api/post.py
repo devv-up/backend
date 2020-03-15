@@ -1,9 +1,11 @@
-from typing import Any
+from typing import Any, Optional
 
-from rest_framework import status  # type: ignore
-from rest_framework.exceptions import NotFound, ParseError  # type: ignore
-from rest_framework.response import Response  # type: ignore
-from rest_framework.views import APIView  # type: ignore
+from django.db.models.query import QuerySet
+from rest_framework import status
+from rest_framework.exceptions import NotFound, ParseError
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from post.api.utils import APIUtils
 from post.models import Post
@@ -20,8 +22,8 @@ class PostAPI(APIView):
         except Exception:
             raise NotFound
 
-    def get_option_filtered_queryset(self, request: Any) -> Any:
-        queryset = Post.objects.all()
+    def get_option_filtered_queryset(self, request: Request) -> 'QuerySet[Post]':
+        queryset: 'QuerySet[Post]' = Post.objects.all()
 
         if 'category' in request.GET:
             category_no = request.GET['category']
@@ -59,7 +61,7 @@ class PostAPI(APIView):
 
         return Response(serializer.data)
 
-    def post_list(self, request: Any) -> Response:
+    def post_list(self, request: Request) -> Response:
         """
         Get a list of whole posts which are active.
         """
@@ -70,7 +72,7 @@ class PostAPI(APIView):
 
         return Response(serializer.data)
 
-    def get(self, request: Any, **parameter: Any) -> Response:
+    def get(self, request: Request, **parameter: Optional[Any]) -> Response:
         post_id = parameter.get('post_id')
 
         if post_id:
@@ -78,7 +80,7 @@ class PostAPI(APIView):
         else:
             return self.post_list(request)
 
-    def post(self, request: Any) -> Response:
+    def post(self, request: Request) -> Response:
         """
         Create a post.
         """
@@ -93,7 +95,7 @@ class PostAPI(APIView):
 
         raise ParseError(detail=serializer.errors)
 
-    def put(self, request: Any, post_id: int) -> Response:
+    def put(self, request: Request, post_id: int) -> Response:
         """
         Update the post's data.
         """
@@ -106,9 +108,9 @@ class PostAPI(APIView):
             serializer.update(post, request.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        return ParseError(detail=serializer.errors)
+        raise ParseError(detail=serializer.errors)
 
-    def delete(self, request: Any, post_id: int) -> Response:
+    def delete(self, request: Request, post_id: int) -> Response:
         """
         Set a post disabled.
         """
