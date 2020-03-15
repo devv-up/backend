@@ -52,12 +52,6 @@ class PostListSerializer(serializers.ModelSerializer):
                   'date', 'timeOfDay', 'createdDate', 'author', 'category', 'tags')
 
 
-class ParentCommentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Comment
-        fields = ('parent_comment')
-
-
 class CommentSerializer(serializers.ModelSerializer):
     parentComment = serializers.PrimaryKeyRelatedField(
         queryset=Comment.objects.all(), source='parent_comment', required=False)
