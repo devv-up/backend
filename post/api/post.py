@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Optional
 
 from django.db.models.query import QuerySet
 from rest_framework import status
@@ -15,7 +15,7 @@ from post.serializers import PostListSerializer, PostSerializer
 class PostAPI(APIView):
     def get_object(self, category_id: int) -> Post:
         """
-        Get a post object.
+        Returns a post object which is active.
         """
         try:
             return Post.objects.get(pk=category_id, is_active=True)
@@ -23,6 +23,9 @@ class PostAPI(APIView):
             raise NotFound
 
     def get_option_filtered_queryset(self, request: Request) -> 'QuerySet[Post]':
+        """
+        Returns filtered post queryset by given filtering options.
+        """
         queryset: 'QuerySet[Post]' = Post.objects.all()
 
         if 'category' in request.GET:
@@ -54,7 +57,7 @@ class PostAPI(APIView):
 
     def post_detail(self, post_id: int) -> Response:
         """
-        Get a post.
+        Gets a detailed post.
         """
         post = self.get_object(post_id)
         serializer = PostListSerializer(post)
@@ -63,7 +66,7 @@ class PostAPI(APIView):
 
     def post_list(self, request: Request) -> Response:
         """
-        Get a list of whole posts which are active.
+        Gets whole posts which are active.
         """
         queryset = self.get_option_filtered_queryset(request)
 
@@ -72,8 +75,19 @@ class PostAPI(APIView):
 
         return Response(serializer.data)
 
-    def get(self, request: Request, **parameter: Optional[Any]) -> Response:
-        post_id = parameter.get('post_id')
+    def get(self, request: Request, **url_resources: Optional[int]) -> Response:
+        """
+        Gets a post object or a list of posts.
+
+        Basically, this function returns a response that include data of
+        whole posts unless a specific post id is given
+        by uri resources.
+
+        If the request has any vaild parameters in the query string,
+        A response object that includes a filtered category object
+        by parameters will be returned.
+        """
+        post_id = url_resources.get('post_id')
 
         if post_id:
             return self.post_detail(post_id)
@@ -82,22 +96,24 @@ class PostAPI(APIView):
 
     def post(self, request: Request) -> Response:
         """
-        Create a post.
+        Creates a post.
+        A category number must be required.
         """
         serializer = PostSerializer(data=request.data)
 
         if serializer.is_valid():
             if not request.data.get('category'):
-                raise ParseError(detail='Category number is a required field')
+                raise ParseError(detail='A category number must be required')
 
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         raise ParseError(detail=serializer.errors)
 
-    def put(self, request: Request, post_id: int) -> Response:
+    def patch(self, request: Request, post_id: int) -> Response:
         """
-        Update the post's data.
+        Updates data of the post.
+        The specific post ID must be required by uri resources.
         """
         APIUtils.validate(request.data)
 
@@ -112,7 +128,8 @@ class PostAPI(APIView):
 
     def delete(self, request: Request, post_id: int) -> Response:
         """
-        Set a post disabled.
+        Makes the post disabled.
+        The specific post ID must be required by uri resources.
         """
         post = self.get_object(post_id)
         serializer = PostSerializer(post)

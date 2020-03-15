@@ -34,7 +34,7 @@ class TestPost:
 
     def test_update_post(self, api_client, posts, dummy_id, title_data):
         before_update = api_client.get(f'/posts/{dummy_id}')
-        response = api_client.put(f'/posts/{dummy_id}', data=title_data)
+        response = api_client.patch(f'/posts/{dummy_id}', data=title_data)
 
         assert response.status_code == 201
         assert response.data.get('id') == dummy_id
@@ -42,7 +42,7 @@ class TestPost:
         assert before_update.data.get('title') != title_data.get('title')
 
     def test_update_post_with_bad_access(self, api_client, posts, dummy_id, bad_post_data):
-        response = api_client.put(f'/posts/{dummy_id}', data=bad_post_data)
+        response = api_client.patch(f'/posts/{dummy_id}', data=bad_post_data)
 
         assert response.status_code == 403
 

@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Optional
 
 from rest_framework import status
 from rest_framework.exceptions import NotFound, ParseError
@@ -13,7 +13,7 @@ from post.serializers import CategorySerializer
 class CategoryAPI(APIView):
     def get_object(self, category_id: int) -> Category:
         """
-        Get a category object.
+        Returns a category object which is active.
         """
         try:
             return Category.objects.get(pk=category_id, is_active=True)
@@ -22,7 +22,7 @@ class CategoryAPI(APIView):
 
     def category_detail(self, category_id: int) -> Response:
         """
-        Get a category.
+        Gets a detailed category.
         """
         category = self.get_object(category_id)
         serializer = CategorySerializer(category)
@@ -31,15 +31,21 @@ class CategoryAPI(APIView):
 
     def category_list(self) -> Response:
         """
-        Get a list of whole categories which are active.
+        Gets whole categories which are active.
         """
         categories = Category.objects.filter(is_active=True)
         serializer = CategorySerializer(categories, many=True)
 
         return Response(serializer.data)
 
-    def get(self, request: Request, **parameter: Optional[Any]) -> Response:
-        category_id = parameter.get('category_id')
+    def get(self, request: Request, **url_resources: Optional[int]) -> Response:
+        """
+        Gets a category object or a list of categories.
+        Basically, this function returns a response that include data of
+        whole categories unless a specific category id is given
+        by uri resources.
+        """
+        category_id = url_resources.get('category_id')
 
         if category_id:
             return self.category_detail(category_id)
@@ -48,7 +54,7 @@ class CategoryAPI(APIView):
 
     def post(self, request: Request) -> Response:
         """
-        Create a category.
+        Creates a category.
         """
         serializer = CategorySerializer(data=request.data)
 
@@ -60,7 +66,8 @@ class CategoryAPI(APIView):
 
     def put(self, request: Request, category_id: int) -> Response:
         """
-        Update the category title.
+        Updates the category title.
+        The specific category ID must be required by uri resources.
         """
         category = self.get_object(category_id)
         serializer = CategorySerializer(category, request.data)
@@ -73,7 +80,8 @@ class CategoryAPI(APIView):
 
     def delete(self, request: Request, category_id: int) -> Response:
         """
-        Set a category disabled.
+        Makes the category disabled.
+        The specific category ID must be required by uri resources.
         """
         category = self.get_object(category_id)
         serializer = CategorySerializer(category)
