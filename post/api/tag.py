@@ -1,9 +1,10 @@
-from typing import Any
+from typing import Any, Optional
 
-from rest_framework import status  # type: ignore
-from rest_framework.exceptions import NotFound, ParseError  # type: ignore
-from rest_framework.response import Response  # type: ignore
-from rest_framework.views import APIView  # type: ignore
+from rest_framework import status
+from rest_framework.exceptions import NotFound, ParseError
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from post.models import Tag
 from post.serializers import TagSerializer
@@ -37,7 +38,7 @@ class TagAPI(APIView):
 
         return Response(serializer.data)
 
-    def get(self, request: Any, **parameter: Any) -> Response:
+    def get(self, request: Request, **parameter: Optional[Any]) -> Response:
         tag_id = parameter.get('tag_id')
 
         if tag_id:
@@ -45,7 +46,7 @@ class TagAPI(APIView):
         else:
             return self.tag_list()
 
-    def post(self, request: Any) -> Response:
+    def post(self, request: Request) -> Response:
         """
         Create a tag.
         """
@@ -57,7 +58,7 @@ class TagAPI(APIView):
 
         raise ParseError(detail=serializer.errors)
 
-    def delete(self, request: Any, tag_id: int) -> Response:
+    def delete(self, request: Request, tag_id: int) -> Response:
         """
         Delete a tag.
         """

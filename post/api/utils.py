@@ -1,5 +1,6 @@
-from django.http import QueryDict
-from rest_framework.exceptions import AuthenticationFailed  # type: ignore
+from typing import Any, Dict
+
+from rest_framework.exceptions import AuthenticationFailed
 
 
 class APIUtils:
@@ -9,7 +10,7 @@ class APIUtils:
     )
 
     @classmethod
-    def validate(cls, data: QueryDict) -> bool:
+    def validate(cls, data: Dict[str, Any]) -> bool:
         vulnerable = [key for key in data if key in cls.vulnerable_fields]
         if vulnerable:
             raise AuthenticationFailed

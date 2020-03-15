@@ -1,9 +1,10 @@
-from typing import Any
+from typing import Any, Optional
 
-from rest_framework import status  # type: ignore
-from rest_framework.exceptions import NotFound, ParseError  # type: ignore
-from rest_framework.response import Response  # type: ignore
-from rest_framework.views import APIView  # type: ignore
+from rest_framework import status
+from rest_framework.exceptions import NotFound, ParseError
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from post.api.utils import APIUtils
 from post.models import Comment
@@ -38,7 +39,7 @@ class CommentAPI(APIView):
 
         return Response(serializer.data)
 
-    def get(self, request: Any, **parameter: Any) -> Response:
+    def get(self, request: Request, **parameter: Optional[Any]) -> Response:
         comment_id = parameter.get('comment_id')
 
         if comment_id:
@@ -46,7 +47,7 @@ class CommentAPI(APIView):
         else:
             return self.comment_list()
 
-    def post(self, request: Any) -> Response:
+    def post(self, request: Request) -> Response:
         """
         Create a comment.
         """
@@ -57,7 +58,7 @@ class CommentAPI(APIView):
 
         raise ParseError(detail=serializer.errors)
 
-    def put(self, request: Any, comment_id: int) -> Response:
+    def put(self, request: Request, comment_id: int) -> Response:
         """
         Update the comment's data.
         """
@@ -70,9 +71,9 @@ class CommentAPI(APIView):
             serializer.update(comment, request.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        return ParseError(detail=serializer.errors)
+        raise ParseError(detail=serializer.errors)
 
-    def delete(self, request: Any, comment_id: int) -> Response:
+    def delete(self, request: Request, comment_id: int) -> Response:
         """
         Set a comment disabled
         """
