@@ -3,6 +3,7 @@ flake8
 isort
 pytest
 pytest-cov
+pytest-env
 autopep8
 mypy
 django-stubs
