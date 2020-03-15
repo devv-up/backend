@@ -7,6 +7,8 @@ class APIUtils:
     vulnerable_fields = (
         'id',
         'author',
+        'category',
+        'post',
         'parent_comment',
     )
 
