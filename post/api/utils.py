@@ -7,6 +7,7 @@ class APIUtils:
     vulnerable_fields = (
         'id',
         'author',
+        'parent_comment',
     )
 
     @classmethod

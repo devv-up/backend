@@ -46,6 +46,11 @@ class TestComment:
 
         assert response.status_code == 403
 
+    def test_update_parent_comment(self, api_client, comments, dummy_id):
+        response = api_client.put(f'/comments/{dummy_id}', data={"parent_comment": 65535})
+
+        assert response.status_code == 403
+
     def test_delete_post(self, api_client, comments, dummy_id):
         before_delete = api_client.get(f'/comments/{dummy_id}')
         response = api_client.delete(f'/comments/{dummy_id}')
