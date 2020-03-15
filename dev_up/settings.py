@@ -74,8 +74,8 @@ SOCIALACCOUNT_PROVIDERS = {
             'access_type': 'online',
         },
         'APP': {
-            'client_id': os.environ["Google_oauth_client_id"],
-            'secret': os.environ["Google_oauth_secret"],
+            'client_id': os.environ.get("Google_oauth_client_id", 'abcdegfddgffgg'),
+            'secret': os.environ.get("Google_oauth_secret", 'abcdegfddgffgg'),
         },
     },
     'github': {
@@ -83,8 +83,8 @@ SOCIALACCOUNT_PROVIDERS = {
             'user',
         ],
         'APP': {
-            'client_id': os.environ["Github_oauth_client_id"],
-            'secret': os.environ["Github_oauth_secret"],
+            'client_id': os.environ.get("Github_oauth_client_id", 'abcdegfddgffgg'),
+            'secret': os.environ.get("Github_oauth_secret", "abcdegfddgffgg"),
         },
     }
 }
