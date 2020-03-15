@@ -196,9 +196,9 @@ class TestPost:
                                            post_preset_data):
         [post1_data, post2_data, post3_data] = post_preset_data
 
-        post1_data['time_of_day'] = 0
-        post2_data['time_of_day'] = 1
-        post3_data['time_of_day'] = 1
+        post1_data['timeOfDay'] = 0
+        post2_data['timeOfDay'] = 1
+        post3_data['timeOfDay'] = 1
 
         post1 = api_client.post('/posts', post1_data).data
         post2 = api_client.post('/posts', post2_data).data
@@ -212,8 +212,8 @@ class TestPost:
         assert len(response.data) == 2
 
         (first_result, second_result) = (response.data[0], response.data[1])
-        assert first_result.get('time_of_day') == time_of_day
-        assert second_result.get('time_of_day') == time_of_day
+        assert first_result.get('timeOfDay') == time_of_day
+        assert second_result.get('timeOfDay') == time_of_day
 
     def test_post_on_location_filtering(self, api_client,
                                         users, categories, tags,
