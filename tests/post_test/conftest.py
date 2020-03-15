@@ -1,6 +1,6 @@
 from typing import List
 
-from model_mommy import mommy
+from model_bakery import baker
 import pytest
 from rest_framework.test import APIClient
 
@@ -107,24 +107,24 @@ def bad_comment_data() -> dict:
 
 @pytest.fixture
 def users() -> List[User]:
-    return mommy.make(User, _quantity=3)
+    return baker.make(User, _quantity=3)
 
 
 @pytest.fixture
 def categories() -> List[Category]:
-    return mommy.make(Category, _quantity=3)
+    return baker.make(Category, _quantity=3)
 
 
 @pytest.fixture
 def tags() -> List[Tag]:
-    return mommy.make(Tag, _quantity=3)
+    return baker.make(Tag, _quantity=3)
 
 
 @pytest.fixture
 def posts() -> List[Post]:
-    return mommy.make(Post, _quantity=3)
+    return baker.make(Post, _quantity=3)
 
 
 @pytest.fixture
 def comments() -> List[Comment]:
-    return mommy.make(Comment, _quantity=3)
+    return baker.make(Comment, _quantity=3)
