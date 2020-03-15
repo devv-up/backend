@@ -30,6 +30,7 @@ DEBUG = os.environ.get("DJANGO_MODE", "development") != "production"
 
 ALLOWED_HOSTS: List[str] = []
 
+AUTH_USER_MODEL = 'user.User'
 
 # Application definition
 
@@ -41,6 +42,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'drf_yasg',
+    'post',
+    'user',
 ]
 
 MIDDLEWARE = [
@@ -84,7 +88,7 @@ DATABASES = {
         'NAME': os.environ.get('POSTGRESQL_NAME'),
         'USER': os.environ.get('POSTGRESQL_USER'),
         'PASSWORD': os.environ.get('POSTGRESQL_PASSWORD'),
-        'PORT': os.environ.get('POSTGRESQL_PORT')
+        'PORT': os.environ.get('POSTGRESQL_PORT'),
     }
 }
 

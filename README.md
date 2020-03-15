@@ -6,20 +6,28 @@ pip install -r requirements.txt
 ```
 
 ## VSCode 설정
+`Python` 과 `RunOnSave` extension을 설치해주세요
 `.vscode` 폴더안에 `settings.json` 안에 다음과 같은 내용을 써주세요
 이미 내용이 있다면 추가시키세요
+
 ```javascript
 {
     "[python]": {
         "editor.formatOnSave": true,
-        "editor.formatOnPaste": false,
-        "editor.codeActionsOnSave": {
-            "source.organizeImports": true
-        }
+        "editor.formatOnPaste": false
     },
     "python.linting.mypyEnabled": true,
     "python.linting.flake8Enabled": true,
-    "python.jediEnabled": false
+    "runOnSave.commands": [
+        {
+            "match": ".*\\.py$",
+            "notMatch": "[\\\\\\/]_[^\\\\\\/]*\\.py$",
+            "command": "isort ${file}",
+            "runIn": "backend",
+            "runningStatusMessage": "Sortimg imports",
+            "finishStatusMessage": "Sorted imports"
+        }
+    ]
 }
 ```
 
