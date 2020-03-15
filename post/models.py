@@ -49,7 +49,7 @@ class Comment(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
 
     post = models.ForeignKey('Post', on_delete=models.CASCADE)
-    parent_comment = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
+    parent_comment = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, default=None)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
     def __str__(self) -> str:
