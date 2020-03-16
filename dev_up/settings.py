@@ -74,8 +74,8 @@ SOCIALACCOUNT_PROVIDERS = {
             'access_type': 'online',
         },
         'APP': {
-            'client_id': os.environ.get("GOOgle_OAUTH_ClIENT_ID", ''),
-            'secret': os.environ.get("GOOgle_OAUTH_SECRET", ''),
+            'client_id': os.environ.get("GOOGLE_OAUTH_ClIENT_ID", ''),
+            'secret': os.environ.get("GOOGLE_OAUTH_SECRET", ''),
         },
     },
     'github': {
