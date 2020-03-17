@@ -12,3 +12,4 @@ djangorestframework-stubs==1.1.0
 drf-yasg==1.17.1
 psycopg2==2.8.4
 model-bakery==1.1.0
+django-allauth==0.41.0
