@@ -7,12 +7,10 @@ class TestComment:
 
     def test_create_comment(self, api_client, users, posts, comment_data):
         response = api_client.post('/comments', comment_data)
-
         assert response.status_code == 201
 
     def test_create_comment_without_post_no(self, api_client, users, bad_comment_data):
         response = api_client.post('/comments', bad_comment_data)
-
         assert response.status_code == 400
 
     def test_list_commments(self, api_client, comments):
@@ -29,7 +27,6 @@ class TestComment:
 
     def test_detail_missing_comment(self, api_client):
         response = api_client.get('/comments/65535')
-
         assert response.status_code == 404
 
     def test_update_comment(self, api_client, comments, dummy_id, content_data):
@@ -43,12 +40,10 @@ class TestComment:
 
     def test_update_comment_with_bad_access(self, api_client, comments, dummy_id, bad_post_data):
         response = api_client.put(f'/comments/{dummy_id}', data=bad_post_data)
-
         assert response.status_code == 403
 
     def test_update_parent_comment(self, api_client, comments, dummy_id):
         response = api_client.put(f'/comments/{dummy_id}', data={"parent_comment": 65535})
-
         assert response.status_code == 403
 
     def test_delete_post(self, api_client, comments, dummy_id):

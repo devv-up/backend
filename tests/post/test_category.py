@@ -7,7 +7,6 @@ class TestCategory:
 
     def test_create_category(self, api_client, title_data):
         response = api_client.post('/categories', title_data)
-
         assert response.status_code == 201
 
     def test_create_the_same_title_category(self, api_client, title_data):
@@ -19,7 +18,6 @@ class TestCategory:
 
     def test_create_category_without_title(self, api_client):
         response = api_client.post('/categories')
-
         assert response.status_code == 400
 
     def test_list_categories(self, api_client, categories):
@@ -36,7 +34,6 @@ class TestCategory:
 
     def test_detail_missing_category(self, api_client):
         response = api_client.get('/categories/65535')
-
         assert response.status_code == 404
 
     def test_update_category(self, api_client, categories, dummy_id, title_data):
