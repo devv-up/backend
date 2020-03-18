@@ -35,7 +35,7 @@ class PostAPI(APIView):
         if 'tags' in request.GET:
             tags: List[str] = request.GET['tags'].split(',')
             for tag in tags:
-                queryset = queryset.filter(tags=tag.strip())
+                queryset = queryset.filter(tags=tag)
 
         if 'startDate' in request.GET:
             start_date = request.GET['startDate']
