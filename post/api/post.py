@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 
 from django.db.models.query import QuerySet
 from rest_framework import status
@@ -33,9 +33,9 @@ class PostAPI(APIView):
             queryset = queryset.filter(category=category_no)
 
         if 'tags' in request.GET:
-            tags = request.GET['tags']
+            tags: List[str] = request.GET['tags'].split(',')
             for tag in tags:
-                queryset = queryset.filter(tags=tag)
+                queryset = queryset.filter(tags=tag.strip())
 
         if 'startDate' in request.GET:
             start_date = request.GET['startDate']

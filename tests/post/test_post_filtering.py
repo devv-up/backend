@@ -82,6 +82,34 @@ class TestPostFiltering:
         assert post1 != post2 and post1 != post3 and post2 != post3
 
         (tag_id1, tag_id2) = (tags[0].id, tags[1].id)
+        response = api_client.get(f'/posts?tags={tag_id1},{tag_id2}')
+        assert response.status_code == 200
+        assert len(response.data) == 2
+
+        (first_result, second_result) = (response.data[0], response.data[1])
+        assert first_result.get('id') != second_result.get('id')
+
+        number_of_tags = self.count_tags_of(first_result, tag_id1, tag_id2)
+        assert number_of_tags == 2
+
+        number_of_tags = self.count_tags_of(second_result, tag_id1, tag_id2)
+        assert number_of_tags == 2
+
+    def test_post_on_two_tag_filtering2(self, api_client,
+                                        users, categories, tags,
+                                        post_preset_data):
+        [post1_data, post2_data, post3_data] = post_preset_data
+
+        post1_data['tags'] = [tags[0].id]
+        post2_data['tags'] = [tags[0].id, tags[1].id]
+        post3_data['tags'] = [tags[0].id, tags[1].id, tags[2].id]
+
+        post1 = api_client.post('/posts', post1_data).data
+        post2 = api_client.post('/posts', post2_data).data
+        post3 = api_client.post('/posts', post3_data).data
+        assert post1 != post2 and post1 != post3 and post2 != post3
+
+        (tag_id1, tag_id2) = (tags[0].id, tags[1].id)
         response = api_client.get(f'/posts?tags={tag_id1}&tags={tag_id2}')
         assert response.status_code == 200
         assert len(response.data) == 2
