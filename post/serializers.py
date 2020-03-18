@@ -36,14 +36,8 @@ class PostSerializer(serializers.ModelSerializer):
 
 
 class PostListSerializer(serializers.ModelSerializer):
-    timeOfDay = serializers.SerializerMethodField()
-    createdDate = serializers.SerializerMethodField()
-
-    def get_timeOfDay(self, obj: Post) -> int:
-        return obj.time_of_day
-
-    def get_createdDate(self, obj: Post) -> str:
-        return f'{obj.created_date}'
+    timeOfDay = serializers.IntegerField(source='time_of_day')
+    createdDate = serializers.DateTimeField(source='created_date')
 
     class Meta:
         model = Post
@@ -62,12 +56,9 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class CommentListSerializer(serializers.ModelSerializer):
-    createdDate = serializers.SerializerMethodField()
+    createdDate = serializers.DateTimeField(source='created_date')
     parentComment = serializers.PrimaryKeyRelatedField(
         queryset=Comment.objects.all(), source='parent_comment')
-
-    def get_createdDate(self, obj: Comment) -> str:
-        return f'{obj.created_date}'
 
     class Meta:
         model = Comment
