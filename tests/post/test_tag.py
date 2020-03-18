@@ -7,7 +7,6 @@ class TestTag:
 
     def test_create_tag(self, api_client, title_data):
         response = api_client.post('/tags', title_data)
-
         assert response.status_code == 201
 
     def test_create_the_same_title_tag(self, api_client, title_data):
@@ -19,7 +18,6 @@ class TestTag:
 
     def test_create_tag_without_title(self, api_client):
         response = api_client.post('/tags')
-
         assert response.status_code == 400
 
     def test_list_tags(self, api_client, tags):
@@ -36,12 +34,10 @@ class TestTag:
 
     def test_detail_missing_tag(self, api_client):
         response = api_client.get('/tags/65535')
-
         assert response.status_code == 404
 
     def test_update_tag_request(self, api_client, tags, dummy_id, title_data):
         response = api_client.put(f'/tags/{dummy_id}', data=title_data)
-
         assert response.status_code == 405
 
     def test_delete_tag(self, api_client, tags, dummy_id):
