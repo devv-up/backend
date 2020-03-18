@@ -106,6 +106,15 @@ def bad_comment_data() -> dict:
 
 
 @pytest.fixture
+def time_of_day() -> dict:
+    return {
+        'MORNING': 0,
+        'DAY': 1,
+        'NIGHT': 2,
+    }
+
+
+@pytest.fixture
 def users() -> List[User]:
     return baker.make(User, _quantity=3)
 
