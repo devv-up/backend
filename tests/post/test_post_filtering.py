@@ -177,15 +177,15 @@ class TestPostFiltering:
         [post1_data, post2_data, post3_data] = post_preset_data
 
         post1_data['timeOfDay'] = time_of_day['MORNING']
-        post2_data['timeOfDay'] = time_of_day['DAY']
-        post3_data['timeOfDay'] = time_of_day['DAY']
+        post2_data['timeOfDay'] = time_of_day['AFTERNOON']
+        post3_data['timeOfDay'] = time_of_day['AFTERNOON']
 
         post1 = api_client.post('/posts', post1_data).data
         post2 = api_client.post('/posts', post2_data).data
         post3 = api_client.post('/posts', post3_data).data
         assert post1 != post2 and post1 != post3 and post2 != post3
 
-        time_of_day = time_of_day['DAY']
+        time_of_day = time_of_day['AFTERNOON']
         response = api_client.get(f'/posts?timeOfDay={time_of_day}')
         assert response.status_code == 200
         assert len(response.data) == 2

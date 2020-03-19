@@ -109,8 +109,8 @@ def bad_comment_data() -> dict:
 def time_of_day() -> dict:
     return {
         'MORNING': 0,
-        'DAY': 1,
-        'NIGHT': 2,
+        'AFTERNOON': 1,
+        'EVENING': 2,
     }
 
 
