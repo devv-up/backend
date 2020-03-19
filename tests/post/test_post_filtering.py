@@ -111,17 +111,7 @@ class TestPostFiltering:
 
         (tag_id1, tag_id2) = (tags[0].id, tags[1].id)
         response = api_client.get(f'/posts?tags={tag_id1}&tags={tag_id2}')
-        assert response.status_code == 200
-        assert len(response.data) == 2
-
-        (first_result, second_result) = (response.data[0], response.data[1])
-        assert first_result.get('id') != second_result.get('id')
-
-        number_of_tags = self.count_tags_of(first_result, tag_id1, tag_id2)
-        assert number_of_tags == 2
-
-        number_of_tags = self.count_tags_of(second_result, tag_id1, tag_id2)
-        assert number_of_tags == 2
+        assert response.status_code == 400
 
     def test_post_on_two_option_filtering(self, api_client,
                                           users, categories, tags,
