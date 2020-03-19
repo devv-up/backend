@@ -15,26 +15,6 @@ def api_client():
 
 
 @pytest.fixture
-def dummy_id() -> int:
-    return 1
-
-
-@pytest.fixture
-def title_data() -> dict:
-    return {'title': 'test_title'}
-
-
-@pytest.fixture
-def content_data() -> dict:
-    return {'content': 'test_content'}
-
-
-@pytest.fixture
-def unauthorised_data() -> dict:
-    return {'id': 65535, 'author': 65535}
-
-
-@pytest.fixture
 def post_data() -> dict:
     return {
         'title': 'test_title',
@@ -70,48 +50,6 @@ def post_preset_data(users, categories, tags, post_data):
         'tags': [tags[0].id, tags[1].id, tags[2].id]
     }
     return [post1_data, post2_data, post3_data]
-
-
-@pytest.fixture
-def bad_post_data() -> dict:
-    return {
-        'title': 'test_title',
-        # 'content': 'test_content',
-        'location': 'test_location',
-        'capacity': 10,
-        # 'date': '2020-01-01',
-        'timeOfDay': 1,
-        'author': 1,
-        # 'category': 1,
-        # 'tags': [1, 2],
-    }
-
-
-@pytest.fixture
-def comment_data() -> dict:
-    return {
-        'content': 'test_content',
-        'post': 1,
-        'author': 1,
-    }
-
-
-@pytest.fixture
-def bad_comment_data() -> dict:
-    return {
-        # 'content': 'test_content',
-        'post': 1,
-        # 'author': 1,
-    }
-
-
-@pytest.fixture
-def time_of_day() -> dict:
-    return {
-        'MORNING': 0,
-        'AFTERNOON': 1,
-        'EVENING': 2,
-    }
 
 
 @pytest.fixture
