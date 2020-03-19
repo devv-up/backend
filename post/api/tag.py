@@ -1,43 +1,16 @@
 from typing import Optional
 
 from rest_framework import status
-from rest_framework.exceptions import NotFound, ParseError
+from rest_framework.exceptions import ParseError
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from post.models import Tag
+from post.api.utils import APIUtils
 from post.serializers import TagSerializer
 
 
 class TagAPI(APIView):
-    def get_object(self, tag_id: int) -> Tag:
-        """
-        Returns a tag object which is active.
-        """
-        try:
-            return Tag.objects.get(pk=tag_id)
-        except Exception:
-            raise NotFound
-
-    def tag_detail(self, tag_id: int) -> Response:
-        """
-        Gets a detailed tag.
-        """
-        tag = self.get_object(tag_id)
-        serializer = TagSerializer(tag)
-
-        return Response(serializer.data)
-
-    def tag_list(self) -> Response:
-        """
-        Gets whole tags which are active.
-        """
-        tags = Tag.objects.all()
-        serializer = TagSerializer(tags, many=True)
-
-        return Response(serializer.data)
-
     def get(self, request: Request, **url_resources: Optional[int]) -> Response:
         """
         Gets a tag object or a list of tags.
@@ -48,9 +21,13 @@ class TagAPI(APIView):
         tag_id = url_resources.get('tag_id')
 
         if tag_id:
-            return self.tag_detail(tag_id)
+            tag = APIUtils.get('Tag', id=tag_id)
+            serializer = TagSerializer(tag)
+            return Response(serializer.data)
         else:
-            return self.tag_list()
+            tags = APIUtils.get_list_of('Tag')
+            serializer = TagSerializer(tags, many=True)
+            return Response(serializer.data)
 
     def post(self, request: Request) -> Response:
         """
@@ -69,7 +46,7 @@ class TagAPI(APIView):
         Delete the tag.
         The specific tag ID must be required by uri resources.
         """
-        tag = self.get_object(tag_id)
+        tag = APIUtils.get('Tag', id=tag_id)
         tag.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
