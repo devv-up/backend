@@ -7,6 +7,10 @@ T = TypeVar('T', bound=models.Model)
 
 
 def get_one(model: Type[T], *args: Any, **kwargs: Any) -> T:
+    """
+        Example:
+        >>> get_one(Category, title="test")
+    """
     try:
         return model.objects.get(*args, **kwargs)
     except ObjectDoesNotExist:
@@ -16,6 +20,10 @@ def get_one(model: Type[T], *args: Any, **kwargs: Any) -> T:
 def filter(s: Union[Type[T], 'QuerySet[T]'],
            options: Dict[str, Any],
            **kwargs: str) -> 'QuerySet[T]':
+    """
+        Example:
+        >>> filter(Post, request.GET, date__gte='startDate', date__lte='endDate', ....)
+    """
     if isinstance(s, QuerySet):
         qs = s
     else:
