@@ -1,43 +1,16 @@
 from typing import Optional
 
 from rest_framework import status
-from rest_framework.exceptions import NotFound, ParseError
+from rest_framework.exceptions import ParseError
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from post.models import Category
+from post.api.utils import APIUtils
 from post.serializers import CategorySerializer
 
 
 class CategoryAPI(APIView):
-    def get_object(self, category_id: int) -> Category:
-        """
-        Returns a category object which is active.
-        """
-        try:
-            return Category.objects.get(pk=category_id, is_active=True)
-        except Exception:
-            raise NotFound
-
-    def category_detail(self, category_id: int) -> Response:
-        """
-        Gets a detailed category.
-        """
-        category = self.get_object(category_id)
-        serializer = CategorySerializer(category)
-
-        return Response(serializer.data)
-
-    def category_list(self) -> Response:
-        """
-        Gets whole categories which are active.
-        """
-        categories = Category.objects.filter(is_active=True)
-        serializer = CategorySerializer(categories, many=True)
-
-        return Response(serializer.data)
-
     def get(self, request: Request, **url_resources: Optional[int]) -> Response:
         """
         Gets a category object or a list of categories.
@@ -48,9 +21,13 @@ class CategoryAPI(APIView):
         category_id = url_resources.get('category_id')
 
         if category_id:
-            return self.category_detail(category_id)
+            category = APIUtils.get('Category', id=category_id)
+            serializer = CategorySerializer(category)
+            return Response(serializer.data)
         else:
-            return self.category_list()
+            categories = APIUtils.get_list_of('Category')
+            serializer = CategorySerializer(categories, many=True)
+            return Response(serializer.data)
 
     def post(self, request: Request) -> Response:
         """
@@ -69,7 +46,7 @@ class CategoryAPI(APIView):
         Updates the category title.
         The specific category ID must be required by uri resources.
         """
-        category = self.get_object(category_id)
+        category = APIUtils.get('Category', id=category_id)
         serializer = CategorySerializer(category, request.data)
 
         if serializer.is_valid():
@@ -83,7 +60,7 @@ class CategoryAPI(APIView):
         Makes the category disabled.
         The specific category ID must be required by uri resources.
         """
-        category = self.get_object(category_id)
+        category = APIUtils.get('Category', id=category_id)
         serializer = CategorySerializer(category)
         serializer.update(category, {'is_active': False})
 
