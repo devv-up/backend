@@ -2,8 +2,7 @@ from typing import Any, Dict, List
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.query import QuerySet
-from rest_framework.exceptions import (AuthenticationFailed, NotFound,
-                                       ParseError)
+from rest_framework.exceptions import AuthenticationFailed, NotFound, ParseError
 from rest_framework.request import Request
 
 from post.models import Category, Comment, Post, Tag
