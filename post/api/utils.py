@@ -45,8 +45,8 @@ class APIUtils:
         if 'tags' in options:
             if len(options.getlist('tags')) > 1:
                 raise ParseError(detail='This type of tag parameters are not supported.')
-            else:
-                tags: List[str] = options['tags'].split(',')
+
+            tags: List[str] = options['tags'].split(',')
             for tag in tags:
                 queryset = queryset.filter(tags=tag)
 
