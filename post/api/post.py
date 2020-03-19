@@ -33,7 +33,10 @@ class PostAPI(APIView):
             queryset = queryset.filter(category=category_no)
 
         if 'tags' in request.GET:
-            tags: List[str] = request.GET['tags'].split(',')
+            if len(request.GET.getlist('tags')) > 1:
+                raise ParseError(detail='This type of tag parameters are not supported.')
+            else:
+                tags: List[str] = request.GET['tags'].split(',')
             for tag in tags:
                 queryset = queryset.filter(tags=tag)
 
