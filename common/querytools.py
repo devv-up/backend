@@ -1,8 +1,10 @@
-from typing import Type, TypeVar, Any, Dict, Union
-from django.db import models
+from typing import Any, Dict, Type, TypeVar, Union
+
 from django.core.exceptions import ObjectDoesNotExist
-from rest_framework.exceptions import NotFound
+from django.db import models
 from django.db.models.query import QuerySet
+from rest_framework.exceptions import NotFound
+
 T = TypeVar('T', bound=models.Model)
 
 
