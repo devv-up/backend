@@ -1,7 +1,6 @@
 import pytest
 
 
-@pytest.mark.django_db
 class TestComment:
     pytestmark = pytest.mark.django_db
 
@@ -13,23 +12,21 @@ class TestComment:
         })
         assert response.status_code == 201
 
-    def test_create_comment_without_post_id(self, api_client, users):
+        # Create a comment without a post ID
         response = api_client.post('/posts/comments', data={'content': 'no_post_id'})
         assert response.status_code == 400
 
     def test_list_commments(self, api_client, comments):
         response = api_client.get('/posts/comments')
-
         assert response.status_code == 200
         assert len(response.data) > 1
 
     def test_detail_comments(self, api_client, comments):
         response = api_client.get('/posts/comments/1')
-
         assert response.status_code == 200
         assert response.data['id'] == 1
 
-    def test_detail_missing_comment(self, api_client):
+        # Get a comment that doesn't exist.
         response = api_client.get('/posts/comments/65535')
         assert response.status_code == 404
 
@@ -42,7 +39,7 @@ class TestComment:
         assert response.data['content'] == 'after'
         assert before_update.data['content'] != 'after'
 
-    def test_update_comment_with_bad_access(self, api_client, comments):
+        # Update the author of the comment.
         unauthroized_data = {
             'content': 'trying_to_update_author_of_comment',
             'post': 2,
@@ -51,7 +48,7 @@ class TestComment:
         response = api_client.put('/posts/comments/1', data=unauthroized_data)
         assert response.status_code == 403
 
-    def test_update_parent_comment(self, api_client, comments):
+        # Update the parent comment of the comment.
         response = api_client.put('/posts/comments/1', data={"parent_comment": 65535})
         assert response.status_code == 403
 

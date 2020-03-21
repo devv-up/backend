@@ -1,9 +1,19 @@
 import pytest
 
 
-@pytest.mark.django_db
 class TestPostFiltering:
     pytestmark = pytest.mark.django_db
+    preset_data = {
+        'title': 'test_title',
+        'content': 'test_content',
+        'location': 'test_location',
+        'capacity': 10,
+        'date': '2020-01-01',
+        'timeOfDay': 1,
+        'author': 1,
+        'category': 1,
+        'tags': [1, 2],
+    }
 
     def count_tags_of(self, result, *tag_id):
         tag_count = 0
@@ -14,19 +24,16 @@ class TestPostFiltering:
                 tag_count += 1
         return tag_count
 
-    def test_post_on_category_filtering(self, api_client,
-                                        users, categories, tags,
-                                        post_preset_data):
+    def test_post_on_category_filtering(self, api_client, users, categories, tags):
+        post1_data, post2_data, post3_data = [{**self.preset_data} for i in range(3)]
 
-        post1_data, post2_data, post3_data = post_preset_data
+        post1_data['category'] = categories[0].id
+        post2_data['category'] = categories[1].id
+        post3_data['category'] = categories[0].id
 
-        post1_data['categories'] = categories[0].id
-        post2_data['categories'] = categories[1].id
-        post3_data['categories'] = categories[0].id
-
-        post1 = api_client.post('/posts', post1_data).data
-        post2 = api_client.post('/posts', post2_data).data
-        post3 = api_client.post('/posts', post3_data).data
+        post1 = api_client.post('/posts', data=post1_data).data
+        post2 = api_client.post('/posts', data=post2_data).data
+        post3 = api_client.post('/posts', data=post3_data).data
         assert post1 != post2 and post1 != post3 and post2 != post3
 
         category_id = categories[0].id
@@ -39,10 +46,8 @@ class TestPostFiltering:
         assert first_result['category']['id'] == category_id
         assert second_result['category']['id'] == category_id
 
-    def test_post_on_a_tag_filtering(self, api_client,
-                                     users, categories, tags,
-                                     post_preset_data):
-        post1_data, post2_data, post3_data = post_preset_data
+    def test_post_on_tag_filtering(self, api_client, users, categories, tags):
+        post1_data, post2_data, post3_data = [{**self.preset_data} for i in range(3)]
 
         post1_data['tags'] = [tags[0].id]
         post2_data['tags'] = [tags[0].id, tags[1].id]
@@ -67,20 +72,7 @@ class TestPostFiltering:
         number_of_tags = self.count_tags_of(second_result, tag_id)
         assert number_of_tags == 1
 
-    def test_post_on_two_tag_filtering(self, api_client,
-                                       users, categories, tags,
-                                       post_preset_data):
-        post1_data, post2_data, post3_data = post_preset_data
-
-        post1_data['tags'] = [tags[0].id]
-        post2_data['tags'] = [tags[0].id, tags[1].id]
-        post3_data['tags'] = [tags[0].id, tags[1].id, tags[2].id]
-
-        post1 = api_client.post('/posts', post1_data).data
-        post2 = api_client.post('/posts', post2_data).data
-        post3 = api_client.post('/posts', post3_data).data
-        assert post1 != post2 and post1 != post3 and post2 != post3
-
+        # Filter the posts by more than one tag.
         tag_id1, tag_id2 = tags[0].id, tags[1].id
         response = api_client.get(f'/posts?tags={tag_id1},{tag_id2}')
         assert response.status_code == 200
@@ -95,39 +87,23 @@ class TestPostFiltering:
         number_of_tags = self.count_tags_of(second_result, tag_id1, tag_id2)
         assert number_of_tags == 2
 
-    def test_post_on_two_tag_filtering2(self, api_client,
-                                        users, categories, tags,
-                                        post_preset_data):
-        post1_data, post2_data, post3_data = post_preset_data
-
-        post1_data['tags'] = [tags[0].id]
-        post2_data['tags'] = [tags[0].id, tags[1].id]
-        post3_data['tags'] = [tags[0].id, tags[1].id, tags[2].id]
-
-        post1 = api_client.post('/posts', post1_data).data
-        post2 = api_client.post('/posts', post2_data).data
-        post3 = api_client.post('/posts', post3_data).data
-        assert post1 != post2 and post1 != post3 and post2 != post3
-
-        tag_id1, tag_id2 = tags[0].id, tags[1].id
+        # This type of tag filtering is not supported.
         response = api_client.get(f'/posts?tags={tag_id1}&tags={tag_id2}')
         assert response.status_code == 400
 
-    def test_post_on_two_option_filtering(self, api_client,
-                                          users, categories, tags,
-                                          post_data):
+    def test_post_on_category_tag_filtering(self, api_client, users, categories, tags):
         post1_data = {
-            **post_data,
+            **self.preset_data,
             'category': categories[0].id,
             'tags': [tags[0].id]
         }
         post2_data = {
-            **post_data,
+            **self.preset_data,
             'category': categories[1].id,
             'tags': [tags[0].id, tags[1].id]
         }
         post3_data = {
-            **post_data,
+            **self.preset_data,
             'category': categories[0].id,
             'tags': [tags[0].id, tags[1].id, tags[2].id]
         }
@@ -148,10 +124,8 @@ class TestPostFiltering:
         number_of_tags = self.count_tags_of(result, tag_id)
         assert number_of_tags == 1
 
-    def test_post_on_date_filtering(self, api_client,
-                                    users, categories, tags,
-                                    post_preset_data):
-        post1_data, post2_data, post3_data = post_preset_data
+    def test_post_on_date_filtering(self, api_client, users, categories, tags):
+        post1_data, post2_data, post3_data = [{**self.preset_data} for i in range(3)]
 
         post1_data['date'] = '2020-01-01'
         post2_data['date'] = '2020-02-02'
@@ -171,10 +145,9 @@ class TestPostFiltering:
         assert first_result['date'] >= start_date and first_result['date'] <= end_date
         assert second_result['date'] >= start_date and second_result['date'] <= end_date
 
-    def test_post_on_time_of_day_filtering(self, api_client,
-                                           users, categories, tags,
-                                           post_preset_data):
-        post1_data, post2_data, post3_data = post_preset_data
+    def test_post_on_time_of_day_filtering(self, api_client, users, categories, tags):
+        post1_data, post2_data, post3_data = [{**self.preset_data} for i in range(3)]
+
         time_of_day = {
             'MORNING': 0,
             'AFTERNOON': 1,
@@ -199,10 +172,8 @@ class TestPostFiltering:
         assert first_result.get('timeOfDay') == time_of_day
         assert second_result.get('timeOfDay') == time_of_day
 
-    def test_post_on_location_filtering(self, api_client,
-                                        users, categories, tags,
-                                        post_preset_data):
-        post1_data, post2_data, post3_data = post_preset_data
+    def test_post_on_location_filtering(self, api_client, users, categories, tags):
+        post1_data, post2_data, post3_data = [{**self.preset_data} for i in range(3)]
 
         post1_data['location'] = 'location1'
         post2_data['location'] = 'seoul'

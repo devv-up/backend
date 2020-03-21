@@ -1,7 +1,6 @@
 import pytest
 
 
-@pytest.mark.django_db
 class TestTag:
     pytestmark = pytest.mark.django_db
 
@@ -9,30 +8,25 @@ class TestTag:
         response = api_client.post('/posts/tags', data={'title': 'creating'})
         assert response.status_code == 201
 
-    def test_create_the_same_title_tag(self, api_client):
-        response1 = api_client.post('/posts/tags', data={'title': 'duplicates'})
-        response2 = api_client.post('/posts/tags', data={'title': 'duplicates'})
+        # Create a tag with the title that already exists.
+        response = api_client.post('/posts/tags', data={'title': 'creating'})
+        assert response.status_code == 400
 
-        assert response1.status_code == 201
-        assert response2.status_code == 400
-
-    def test_create_tag_without_title(self, api_client):
+        # Create a tag without a title.
         response = api_client.post('/posts/tags')
         assert response.status_code == 400
 
     def test_list_tags(self, api_client, tags):
         response = api_client.get('/posts/tags')
-
         assert response.status_code == 200
         assert len(response.data) > 1
 
     def test_detail_tag(self, api_client, tags):
         response = api_client.get('/posts/tags/1')
-
         assert response.status_code == 200
         assert response.data['id'] == 1
 
-    def test_detail_missing_tag(self, api_client):
+        # Get a tag that doesn't exist.
         response = api_client.get('/posts/tags/65535')
         assert response.status_code == 404
 
