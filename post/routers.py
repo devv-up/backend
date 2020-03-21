@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-from django.urls import path
+from django.urls import path, re_path
 
 from post.api.category import CategoryAPI
 from post.api.comment import CommentAPI
@@ -22,11 +22,12 @@ from post.api.post import PostAPI
 from post.api.tag import TagAPI
 
 urlpatterns = [
-    path('<int:post_id>', PostAPI.as_view()),
-    path('categories/<int:category_id>', CategoryAPI.as_view()),
-    path('categories', CategoryAPI.as_view()),
-    path('tags/<int:tag_id>', TagAPI.as_view()),
-    path('tags', TagAPI.as_view()),
-    path('comments/<int:comment_id>', CommentAPI.as_view()),
-    path('comments', CommentAPI.as_view()),
+    path('/categories/<int:category_id>', CategoryAPI.as_view()),
+    path('/categories', CategoryAPI.as_view()),
+    path('/tags/<int:tag_id>', TagAPI.as_view()),
+    path('/tags', TagAPI.as_view()),
+    path('/comments/<int:comment_id>', CommentAPI.as_view()),
+    path('/comments', CommentAPI.as_view()),
+    path('/<int:post_id>', PostAPI.as_view()),
+    re_path(r'^$', PostAPI.as_view()),
 ]

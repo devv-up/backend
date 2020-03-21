@@ -18,8 +18,6 @@ from django.urls import include, path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 
-from post.api.post import PostAPI
-
 schema_view = get_schema_view(
     openapi.Info(
         title="Dev-Up API",
@@ -35,6 +33,5 @@ urlpatterns = [
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('user/', include('user.routers')),
-    path('posts', PostAPI.as_view()),
-    path('posts/', include('post.routers')),
+    path('posts', include('post.routers')),
 ]
