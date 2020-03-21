@@ -1,7 +1,6 @@
 import pytest
 
 
-@pytest.mark.django_db
 class TestCategory:
     pytestmark = pytest.mark.django_db
 
@@ -9,30 +8,25 @@ class TestCategory:
         response = api_client.post('/posts/categories', data={'title': 'creating'})
         assert response.status_code == 201
 
-    def test_create_the_same_title_category(self, api_client):
-        response1 = api_client.post('/posts/categories', data={'title': 'duplicates'})
-        response2 = api_client.post('/posts/categories', data={'title': 'duplicates'})
+        # Create a category with the title that already exists.
+        response = api_client.post('/posts/categories', data={'title': 'creating'})
+        assert response.status_code == 400
 
-        assert response1.status_code == 201
-        assert response2.status_code == 400
-
-    def test_create_category_without_title(self, api_client):
+        # Create a category without a title.
         response = api_client.post('/posts/categories')
         assert response.status_code == 400
 
     def test_list_categories(self, api_client, categories):
         response = api_client.get('/posts/categories')
-
         assert response.status_code == 200
         assert len(response.data) > 1
 
     def test_detail_category(self, api_client, categories):
         response = api_client.get('/posts/categories/1')
-
         assert response.status_code == 200
         assert response.data['id'] == 1
 
-    def test_detail_missing_category(self, api_client):
+        # Get a category that doesn't exist.
         response = api_client.get('/posts/categories/65535')
         assert response.status_code == 404
 
