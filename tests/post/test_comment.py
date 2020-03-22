@@ -9,11 +9,12 @@ class TestComment:
             'content': 'creating',
             'post': 1,
             'author': 1,
-        })
+        }, format='json')
         assert response.status_code == 201
 
         # Create a comment without a post ID
-        response = api_client.post('/posts/comments', data={'content': 'no_post_id'})
+        response = api_client.post(
+            '/posts/comments', data={'content': 'no_post_id'}, format='json')
         assert response.status_code == 400
 
     def test_list_commments(self, api_client, comments):
@@ -32,7 +33,8 @@ class TestComment:
 
     def test_update_comment(self, api_client, comments):
         before_update = api_client.get('/posts/comments/1')
-        response = api_client.put('/posts/comments/1', data={'content': 'after'})
+        response = api_client.put(
+            '/posts/comments/1', data={'content': 'after'}, format='json')
 
         assert response.status_code == 201
         assert response.data['id'] == 1
@@ -45,11 +47,12 @@ class TestComment:
             'post': 2,
             'author': 2,
         }
-        response = api_client.put('/posts/comments/1', data=unauthroized_data)
+        response = api_client.put('/posts/comments/1', data=unauthroized_data, format='json')
         assert response.status_code == 403
 
         # Update the parent comment of the comment.
-        response = api_client.put('/posts/comments/1', data={"parent_comment": 65535})
+        response = api_client.put(
+            '/posts/comments/1', data={"parent_comment": 65535}, format='json')
         assert response.status_code == 403
 
     def test_delete_post(self, api_client, comments):
