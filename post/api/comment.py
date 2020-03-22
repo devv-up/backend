@@ -1,5 +1,3 @@
-from typing import Optional
-
 from rest_framework import status
 from rest_framework.exceptions import ParseError
 from rest_framework.request import Request
@@ -11,15 +9,13 @@ from post.serializers import CommentListSerializer, CommentSerializer
 
 
 class CommentAPI(APIView):
-    def get(self, request: Request, **url_resources: Optional[int]) -> Response:
+    def get(self, request: Request, comment_id: int = None) -> Response:
         """
-        Gets a comment object or a list of categories.
-        Basically, this function returns a response that include data of
-        whole comments unless a specific comment id is given
+        Get a comment object or the list of categories.
+        Basically, this function returns a response that includes data of
+        whole comments unless a specific comment ID is given
         by uri resources.
         """
-        comment_id = url_resources.get('comment_id')
-
         if comment_id:
             comment = APIUtils.get('Comment', id=comment_id)
             serializer = CommentListSerializer(comment)
@@ -31,7 +27,8 @@ class CommentAPI(APIView):
 
     def post(self, request: Request) -> Response:
         """
-        Creates a comment.
+        Create a comment.
+        A post ID in request data must be required.
         """
         serializer = CommentSerializer(data=request.data)
 
@@ -43,8 +40,8 @@ class CommentAPI(APIView):
 
     def put(self, request: Request, comment_id: int) -> Response:
         """
-        Update the comment's data.
-        The specific comment ID must be required by uri resources.
+        Update data of the comment.
+        A specific comment ID must be required by uri resources.
         """
         APIUtils.validate(request.data)
 
@@ -59,8 +56,8 @@ class CommentAPI(APIView):
 
     def delete(self, request: Request, comment_id: int) -> Response:
         """
-        Makes the comment disabled.
-        The specific comment ID must be required by uri resources.
+        Make the comment disabled.
+        A specific comment ID must be required by uri resources.
         """
         comment = APIUtils.get('Comment', id=comment_id)
         serializer = CommentSerializer(comment)
