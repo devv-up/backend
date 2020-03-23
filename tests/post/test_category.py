@@ -8,12 +8,3 @@ class TestCategory:
         response = api_client.get('/posts/categories')
         assert response.status_code == 200
         assert len(response.data) > 1
-
-    def test_detail_category(self, api_client, categories):
-        response = api_client.get('/posts/categories/1')
-        assert response.status_code == 200
-        assert response.data['id'] == 1
-
-        # Get a category that doesn't exist.
-        response = api_client.get('/posts/categories/65535')
-        assert response.status_code == 404
