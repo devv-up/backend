@@ -7,18 +7,10 @@ from post.serializers import TagSerializer
 
 
 class TagAPI(APIView):
-    def get(self, request: Request, tag_id: int = None) -> Response:
+    def get(self, request: Request) -> Response:
         """
-        Get a tag object or the list of tags.
-        Basically, this function returns a response that includes data of
-        whole tags unless a specific tag ID is given
-        by uri resources.
+        Get the list of tags.
         """
-        if tag_id:
-            tag = APIUtils.get('Tag', id=tag_id)
-            serializer = TagSerializer(tag)
-            return Response(serializer.data)
-        else:
-            tags = APIUtils.get_list_of('Tag')
-            serializer = TagSerializer(tags, many=True)
-            return Response(serializer.data)
+        tags = APIUtils.get_list_of('Tag')
+        serializer = TagSerializer(tags, many=True)
+        return Response(serializer.data)
