@@ -22,9 +22,7 @@ from post.api.post import PostAPI
 from post.api.tag import TagAPI
 
 urlpatterns = [
-    path('/categories/<int:category_id>', CategoryAPI.as_view()),
     path('/categories', CategoryAPI.as_view()),
-    path('/tags/<int:tag_id>', TagAPI.as_view()),
     path('/tags', TagAPI.as_view()),
     path('/comments/<int:comment_id>', CommentAPI.as_view()),
     path('/comments', CommentAPI.as_view()),
