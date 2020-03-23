@@ -10,8 +10,7 @@ from user.models import User
 
 @pytest.fixture
 def api_client():
-    api_client = APIClient()
-    return api_client
+    return APIClient()
 
 
 @pytest.fixture
