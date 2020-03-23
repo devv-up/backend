@@ -12,7 +12,7 @@ class TestPostFiltering:
         'timeOfDay': 1,
         'author': 1,
         'category': 1,
-        'tags': [1, 2],
+        'tagTitles': ['tag1', 'tag2'],
     }
 
     def count_tags_of(self, result, *tag_id):
@@ -31,9 +31,9 @@ class TestPostFiltering:
         post2_data['category'] = categories[1].id
         post3_data['category'] = categories[0].id
 
-        post1 = api_client.post('/posts', data=post1_data).data
-        post2 = api_client.post('/posts', data=post2_data).data
-        post3 = api_client.post('/posts', data=post3_data).data
+        post1 = api_client.post('/posts', post1_data, format='json').data
+        post2 = api_client.post('/posts', post2_data, format='json').data
+        post3 = api_client.post('/posts', post3_data, format='json').data
         assert post1 != post2 and post1 != post3 and post2 != post3
 
         category_id = categories[0].id
@@ -49,13 +49,13 @@ class TestPostFiltering:
     def test_post_on_tag_filtering(self, api_client, users, categories, tags):
         post1_data, post2_data, post3_data = [{**self.preset_data} for i in range(3)]
 
-        post1_data['tags'] = [tags[0].id]
-        post2_data['tags'] = [tags[0].id, tags[1].id]
-        post3_data['tags'] = [tags[0].id, tags[1].id, tags[2].id]
+        post1_data['tagTitles'] = [tags[0].title]
+        post2_data['tagTitles'] = [tags[0].title, tags[1].title]
+        post3_data['tagTitles'] = [tags[0].title, tags[1].title, tags[2].title]
 
-        post1 = api_client.post('/posts', post1_data).data
-        post2 = api_client.post('/posts', post2_data).data
-        post3 = api_client.post('/posts', post3_data).data
+        post1 = api_client.post('/posts', post1_data, format='json').data
+        post2 = api_client.post('/posts', post2_data, format='json').data
+        post3 = api_client.post('/posts', post3_data, format='json').data
         assert post1 != post2 and post1 != post3 and post2 != post3
 
         tag_id = tags[1].id
@@ -95,22 +95,22 @@ class TestPostFiltering:
         post1_data = {
             **self.preset_data,
             'category': categories[0].id,
-            'tags': [tags[0].id]
+            'tagTitles': [tags[0].title]
         }
         post2_data = {
             **self.preset_data,
             'category': categories[1].id,
-            'tags': [tags[0].id, tags[1].id]
+            'tagTitles': [tags[0].title, tags[1].title]
         }
         post3_data = {
             **self.preset_data,
             'category': categories[0].id,
-            'tags': [tags[0].id, tags[1].id, tags[2].id]
+            'tagTitles': [tags[0].title, tags[1].title, tags[2].title]
         }
 
-        post1 = api_client.post('/posts', post1_data).data
-        post2 = api_client.post('/posts', post2_data).data
-        post3 = api_client.post('/posts', post3_data).data
+        post1 = api_client.post('/posts', post1_data, format='json').data
+        post2 = api_client.post('/posts', post2_data, format='json').data
+        post3 = api_client.post('/posts', post3_data, format='json').data
         assert post1 != post2 and post1 != post3 and post2 != post3
 
         category_id, tag_id = categories[0].id, tags[1].id
@@ -131,9 +131,9 @@ class TestPostFiltering:
         post2_data['date'] = '2020-02-02'
         post3_data['date'] = '2020-03-03'
 
-        post1 = api_client.post('/posts', post1_data).data
-        post2 = api_client.post('/posts', post2_data).data
-        post3 = api_client.post('/posts', post3_data).data
+        post1 = api_client.post('/posts', post1_data, format='json').data
+        post2 = api_client.post('/posts', post2_data, format='json').data
+        post3 = api_client.post('/posts', post3_data, format='json').data
         assert post1 != post2 and post1 != post3 and post2 != post3
 
         start_date, end_date = '2020-01-01', '2020-02-02'
@@ -158,9 +158,9 @@ class TestPostFiltering:
         post2_data['timeOfDay'] = time_of_day['AFTERNOON']
         post3_data['timeOfDay'] = time_of_day['AFTERNOON']
 
-        post1 = api_client.post('/posts', post1_data).data
-        post2 = api_client.post('/posts', post2_data).data
-        post3 = api_client.post('/posts', post3_data).data
+        post1 = api_client.post('/posts', post1_data, format='json').data
+        post2 = api_client.post('/posts', post2_data, format='json').data
+        post3 = api_client.post('/posts', post3_data, format='json').data
         assert post1 != post2 and post1 != post3 and post2 != post3
 
         time_of_day = time_of_day['AFTERNOON']
@@ -179,9 +179,9 @@ class TestPostFiltering:
         post2_data['location'] = 'seoul'
         post3_data['location'] = 'test_location3'
 
-        post1 = api_client.post('/posts', post1_data).data
-        post2 = api_client.post('/posts', post2_data).data
-        post3 = api_client.post('/posts', post3_data).data
+        post1 = api_client.post('/posts', post1_data, format='json').data
+        post2 = api_client.post('/posts', post2_data, format='json').data
+        post3 = api_client.post('/posts', post3_data, format='json').data
         assert post1 != post2 and post1 != post3 and post2 != post3
 
         location = 'location'

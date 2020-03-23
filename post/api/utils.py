@@ -28,7 +28,7 @@ class APIUtils:
     @staticmethod
     def filter_by(request: Request) -> 'QuerySet[Post]':
         """
-        Returns filtered post queryset by given filtering options.
+        Return a filtered post queryset by given filtering options.
         """
         options = request.GET
         queryset: 'QuerySet[Post]' = Post.objects.all()
@@ -55,7 +55,7 @@ class APIUtils:
     @staticmethod
     def get(obj: str, id: int) -> Any:
         """
-        Returns an object which is active.
+        Return an object which is active.
         """
         try:
             if obj == 'Category':
@@ -75,7 +75,7 @@ class APIUtils:
     @classmethod
     def get_list_of(cls, obj: str, *request: Request) -> 'QuerySet[Any]':
         """
-        Gets list of objects which are active.
+        Get list of objects which are active.
         """
         if obj == 'Category':
             return Category.objects.filter(is_active=True)
