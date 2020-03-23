@@ -13,7 +13,7 @@ from post.serializers import PostListSerializer, PostSerializer
 
 
 class PostAPI(APIView):
-    def create_tags_with(self, titles: List[str]) -> List[Tag]:
+    def _create_tags_with(self, titles: List[str]) -> List[Tag]:
         """
         Create tags before creating a post.
         If the same title tags exists,
@@ -60,7 +60,7 @@ class PostAPI(APIView):
 
         tag_titles = request.data.get('tagTitles')
         if tag_titles:
-            tags = self.create_tags_with(tag_titles)
+            tags = self._create_tags_with(tag_titles)
             post_data.update(tags=[tag.id for tag in tags])
 
         serializer = PostSerializer(data=post_data)
@@ -87,7 +87,7 @@ class PostAPI(APIView):
 
         tag_titles = request.data.get('tagTitles')
         if tag_titles:
-            tags = self.create_tags_with(tag_titles)
+            tags = self._create_tags_with(tag_titles)
             patch_data.update(tags=[tag.id for tag in tags])
 
         post = APIUtils.get('Post', id=post_id)
