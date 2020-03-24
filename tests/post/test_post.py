@@ -110,10 +110,8 @@ class TestPost:
         assert before_update.data['tags'][0]['title'] != after_update.data['tags'][0]['title']
 
     def test_delete_post(self, api_client, posts):
-        before_delete = api_client.get('/posts/1')
         response = api_client.delete('/posts/1')
         after_delete = api_client.get('/posts/1')
 
-        assert before_delete.status_code == 200
         assert response.status_code == 204
         assert after_delete.status_code == 404
