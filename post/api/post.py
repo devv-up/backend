@@ -21,10 +21,7 @@ class PostAPI(APIView):
         """
         tags: List[Tag] = list()
         for title in titles:
-            if Tag.objects.filter(title=title).exists():
-                tags.append(Tag.objects.get(title=title))
-            else:
-                tags.append(Tag.objects.create(title=title))
+            tags.append(Tag.objects.get_or_create(title=title)[0])
         return tags
 
     def get(self, request: Request, post_id: int = None) -> Response:
@@ -60,11 +57,10 @@ class PostAPI(APIView):
         Create a post.
         A category ID in request data must be required.
         """
-        key_filter = ('tags', 'tagTitles')
         post_data: Dict[str, Any] = {k: v for k, v in request.data.items()
-                                     if k not in key_filter}
+                                     if k not in 'tags'}
 
-        tag_titles = request.data.get('tagTitles')
+        tag_titles = request.data.get('tags')
         if tag_titles:
             tags = self._create_tags_with(tag_titles)
             post_data.update(tags=[tag.id for tag in tags])
@@ -87,11 +83,10 @@ class PostAPI(APIView):
         """
         APIUtils.validate(request.data)
 
-        key_filter = ('tags', 'tagTitles')
         patch_data: Dict[str, Any] = {k: v for k, v in request.data.items()
-                                      if k not in key_filter}
+                                      if k not in 'tags'}
 
-        tag_titles = request.data.get('tagTitles')
+        tag_titles = request.data.get('tags')
         if tag_titles:
             tags = self._create_tags_with(tag_titles)
             patch_data.update(tags=[tag.id for tag in tags])

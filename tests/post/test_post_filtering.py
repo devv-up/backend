@@ -12,7 +12,7 @@ class TestPostFiltering:
         'timeOfDay': 1,
         'author': 1,
         'category': 1,
-        'tagTitles': ['tag1', 'tag2'],
+        'tags': ['tag1', 'tag2'],
     }
 
     def count_tags_of(self, result, *tag_id):
@@ -49,9 +49,9 @@ class TestPostFiltering:
     def test_post_on_tag_filtering(self, api_client, users, categories, tags):
         post1_data, post2_data, post3_data = [{**self.preset_data} for i in range(3)]
 
-        post1_data['tagTitles'] = [tags[0].title]
-        post2_data['tagTitles'] = [tags[0].title, tags[1].title]
-        post3_data['tagTitles'] = [tags[0].title, tags[1].title, tags[2].title]
+        post1_data['tags'] = [tags[0].title]
+        post2_data['tags'] = [tags[0].title, tags[1].title]
+        post3_data['tags'] = [tags[0].title, tags[1].title, tags[2].title]
 
         post1 = api_client.post('/posts', post1_data, format='json').data
         post2 = api_client.post('/posts', post2_data, format='json').data
@@ -95,17 +95,17 @@ class TestPostFiltering:
         post1_data = {
             **self.preset_data,
             'category': categories[0].id,
-            'tagTitles': [tags[0].title]
+            'tags': [tags[0].title]
         }
         post2_data = {
             **self.preset_data,
             'category': categories[1].id,
-            'tagTitles': [tags[0].title, tags[1].title]
+            'tags': [tags[0].title, tags[1].title]
         }
         post3_data = {
             **self.preset_data,
             'category': categories[0].id,
-            'tagTitles': [tags[0].title, tags[1].title, tags[2].title]
+            'tags': [tags[0].title, tags[1].title, tags[2].title]
         }
 
         post1 = api_client.post('/posts', post1_data, format='json').data
