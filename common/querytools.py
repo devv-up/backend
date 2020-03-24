@@ -19,17 +19,19 @@ def get_one(model: Type[T], *args: Any, **kwargs: Any) -> T:
         raise NotFound
 
 
-def filter_exists(s: Union[Type[T], 'QuerySet[T]'],
+def filter_exists(target: Union[Type[T], 'QuerySet[T]'],
                   options: Dict[str, Any],
                   **kwargs: str) -> 'QuerySet[T]':
     """
         Example:
-        >>> filter(Post, request.GET, date__gte='startDate', date__lte='endDate', ....)
+        >>> filter_exists(Post, request.GET, date__gte='startDate', date__lte='endDate', ....)
+        or
+        >>> filter_exists(queryset, request.GET, date__gte='startDate', ...)
     """
-    if isinstance(s, QuerySet):
-        qs = s
+    if isinstance(target, QuerySet):
+        qs = target
     else:
-        qs = s.objects.all()
+        qs = target.objects.all()
     filters = {}
     for k, v in kwargs.items():
         if v in options:
