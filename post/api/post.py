@@ -8,8 +8,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from post.api.utils import APIUtils
-from post.models import Tag
-from post.serializers import PostListSerializer, PostSerializer
+from post.models import Comment, Tag
+from post.serializers import CommentListSerializer, PostListSerializer, PostSerializer
 
 
 class PostAPI(APIView):
@@ -42,7 +42,13 @@ class PostAPI(APIView):
         if post_id:
             post = APIUtils.get('Post', id=post_id)
             serializer = PostListSerializer(post)
-            return Response(serializer.data)
+            post_data = serializer.data
+
+            comments_of_post = Comment.objects.filter(post=post_id)
+            comments = CommentListSerializer(comments_of_post, many=True)
+            post_data.update(comments=comments.data)
+
+            return Response(post_data)
         else:
             posts = APIUtils.get_list_of('Post', request)
             serializer = PostListSerializer(posts, many=True)
