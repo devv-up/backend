@@ -37,7 +37,7 @@ class TestPost:
         response = api_client.post('/posts', data=bad_post_data, format='json')
         assert response.status_code == 400
 
-        # Cause an error of creating post after successfully creating tags
+        # Cause an error of creating post after creating tags successfully
         # in order to test transaction.
         before_transaction = api_client.get('/posts/tags')
         post_data['tags'] = ['tag3', 'tag4']
