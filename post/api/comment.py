@@ -5,26 +5,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from post.api.utils import APIUtils
-from post.serializers import CommentListSerializer, CommentSerializer
+from post.serializers import CommentSerializer
 
 
 class CommentAPI(APIView):
-    def get(self, request: Request, comment_id: int = None) -> Response:
-        """
-        Get a comment object or the list of categories.
-        Basically, this function returns a response that includes data of
-        whole comments unless a specific comment ID is given
-        by uri resources.
-        """
-        if comment_id:
-            comment = APIUtils.get('Comment', id=comment_id)
-            serializer = CommentListSerializer(comment)
-            return Response(serializer.data)
-        else:
-            comments = APIUtils.get_list_of('Comment')
-            serializer = CommentListSerializer(comments, many=True)
-            return Response(serializer.data)
-
     def post(self, request: Request) -> Response:
         """
         Create a comment.
