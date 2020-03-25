@@ -1,5 +1,7 @@
 import pytest
 
+from post.models import Comment
+
 
 class TestComment:
     pytestmark = pytest.mark.django_db
@@ -17,29 +19,15 @@ class TestComment:
             '/posts/comments', data={'content': 'no_post_id'}, format='json')
         assert response.status_code == 400
 
-    def test_list_commments(self, api_client, comments):
-        response = api_client.get('/posts/comments')
-        assert response.status_code == 200
-        assert len(response.data) > 1
-
-    def test_detail_comments(self, api_client, comments):
-        response = api_client.get('/posts/comments/1')
-        assert response.status_code == 200
-        assert response.data['id'] == 1
-
-        # Get a comment that doesn't exist.
-        response = api_client.get('/posts/comments/65535')
-        assert response.status_code == 404
-
     def test_update_comment(self, api_client, comments):
-        before_update = api_client.get('/posts/comments/1')
+        content_before_update = Comment.objects.get(id=1).content
         response = api_client.put(
             '/posts/comments/1', data={'content': 'after'}, format='json')
 
         assert response.status_code == 201
         assert response.data['id'] == 1
         assert response.data['content'] == 'after'
-        assert before_update.data['content'] != 'after'
+        assert response.data['content'] != content_before_update
 
         # Update the author of the comment.
         unauthroized_data = {
@@ -55,11 +43,11 @@ class TestComment:
             '/posts/comments/1', data={"parent_comment": 65535}, format='json')
         assert response.status_code == 403
 
-    def test_delete_post(self, api_client, comments):
-        before_delete = api_client.get('/posts/comments/1')
+    def test_delete_comment(self, api_client, comments):
+        comments_length_before = len(Comment.objects.filter(is_active=True))
         response = api_client.delete('/posts/comments/1')
-        after_delete = api_client.get('/posts/comments/1')
+        comments_length_after = len(Comment.objects.filter(is_active=True))
 
-        assert before_delete.status_code == 200
+        assert comments_length_before == 3
         assert response.status_code == 204
-        assert after_delete.status_code == 404
+        assert comments_length_after == 2
