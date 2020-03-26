@@ -34,5 +34,10 @@ def posts() -> List[Post]:
 
 
 @pytest.fixture
+def many_posts() -> List[Post]:
+    return baker.make(Post, _quantity=100)
+
+
+@pytest.fixture
 def comments() -> List[Comment]:
     return baker.make(Comment, _quantity=3)
