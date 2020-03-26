@@ -1,5 +1,6 @@
 from typing import Any, Dict, List
 
+from django.core.paginator import Page, Paginator
 from django.db import transaction
 from rest_framework import status
 from rest_framework.exceptions import ParseError
@@ -7,8 +8,8 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from post.api.utils import APIUtils
-from post.models import Comment, Tag
+from common.querytools import filter_exists, get_one
+from post.models import Comment, Post, Tag
 from post.serializers import CommentListSerializer, PostListSerializer, PostSerializer
 
 
@@ -37,7 +38,7 @@ class PostAPI(APIView):
         will be returned.
         """
         if post_id:
-            post = APIUtils.get('Post', id=post_id)
+            post = get_one(Post, id=post_id, is_active=True)
             serializer = PostListSerializer(post)
             post_data = serializer.data
 
@@ -46,9 +47,33 @@ class PostAPI(APIView):
             post_data.update(comments=comments.data)
 
             return Response(post_data)
+
         else:
-            posts = APIUtils.get_list_of('Post', request)
+            posts = filter_exists(Post, request.GET.dict(),
+                                  date__gte='startDate',
+                                  date__lte='endDate',
+                                  time_of_day='timeOfDay',
+                                  location__contains='location',
+                                  category__title='category',
+                                  ).order_by('id')
+
+            if 'tags' in request.GET.dict():
+                if len(request.GET.getlist('tags')) > 1:
+                    raise ParseError(detail='This type of tag parameters are not supported.')
+
+                tags: List[str] = request.GET['tags'].split(',')
+                for tag in tags:
+                    posts = posts.filter(tags__title=tag)
+
+            posts.filter(is_active=True)
             serializer = PostListSerializer(posts, many=True)
+
+            if 'page' in request.GET.dict():
+                no = int(request.GET['page'])
+                per_page = request.GET['perPage'] if 'perPage' in request.GET.dict() else 20
+                paginated_posts: Page = Paginator(posts, per_page).get_page(no)
+                serializer = PostListSerializer(paginated_posts, many=True)
+
             return Response(serializer.data)
 
     @transaction.atomic
@@ -81,17 +106,22 @@ class PostAPI(APIView):
         Update data of the post.
         A specific post ID must be required by uri resources.
         """
-        APIUtils.validate(request.data)
-
+        patch_list = (
+            'title', 'content', 'location', 'capacity',
+            'date', 'timeOfDay',
+        )
         patch_data: Dict[str, Any] = {k: v for k, v in request.data.items()
-                                      if k not in 'tags'}
+                                      if k in patch_list}
 
         tag_titles = request.data.get('tags')
         if tag_titles:
             tags = self._create_tags_with(tag_titles)
             patch_data.update(tags=[tag.id for tag in tags])
 
-        post = APIUtils.get('Post', id=post_id)
+        if not patch_data:
+            raise ParseError(detail='At least one field must be required to update the post.')
+
+        post = get_one(Post, id=post_id, is_active=True)
         serializer = PostSerializer(post, patch_data, partial=True)
 
         if serializer.is_valid():
@@ -105,7 +135,7 @@ class PostAPI(APIView):
         Make the post disabled.
         A specific post ID must be required by uri resources.
         """
-        post = APIUtils.get('Post', id=post_id)
+        post = get_one(Post, id=post_id, is_active=True)
         serializer = PostSerializer(post)
         serializer.update(post, {'is_active': False})
 
