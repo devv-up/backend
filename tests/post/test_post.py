@@ -41,17 +41,28 @@ class TestPost:
         # in order to test transaction.
         before_transaction = api_client.get('/posts/tags')
         post_data['tags'] = ['tag3', 'tag4']
-        post_data['title'] = '1234567890123456789012345678901234567890123456\
-                                78901234567890123456789012345678901234567890'
+        post_data['title'] = '1'*100
+
         response = api_client.post('/posts', data=post_data, format='json')
         after_transaction = api_client.get('/posts/tags')
         assert response.status_code == 400
         assert before_transaction.data == after_transaction.data
 
-    def test_list_posts(self, api_client, posts):
-        response = api_client.get('/posts')
-        assert response.status_code == 200
-        assert len(response.data) > 1
+    def test_list_posts(self, api_client, many_posts):
+        response1 = api_client.get('/posts')
+        response1_data_length = len(response1.data)
+        assert response1.status_code == 200
+        assert response1_data_length > 1
+
+        # Pagination
+        response2 = api_client.get('/posts?page=2')
+        assert response2.status_code == 200
+        assert response1_data_length > len(response2.data)
+
+        # Pagination by specific number per page
+        response3 = api_client.get('/posts?page=1&perPage=30')
+        assert response3.status_code == 200
+        assert len(response3.data) == 30
 
     def test_detail_post(self, api_client, posts):
         response = api_client.get('/posts/1')
@@ -75,17 +86,6 @@ class TestPost:
         assert response.data['title'] == 'after'
         assert before_update.data['title'] != 'after'
 
-        # Update the author of the post.
-        bad_post_data = {
-            'title': 'test_title',
-            'location': 'test_location',
-            'capacity': 10,
-            'timeOfDay': 1,
-            'author': 65535,
-        }
-        response = api_client.patch('/posts/1', data=bad_post_data, format='json')
-        assert response.status_code == 403
-
         # Update the created date of the post.
         bad_post_data = {
             'title': 'test_title',
@@ -108,6 +108,10 @@ class TestPost:
         after_update = api_client.get('/posts/1')
         assert response.status_code == 201
         assert before_update.data['tags'][0]['title'] != after_update.data['tags'][0]['title']
+
+        # Update the comment without any data.
+        response = api_client.patch('/posts/1')
+        assert response.status_code == 400
 
     def test_delete_post(self, api_client, posts):
         response = api_client.delete('/posts/1')
