@@ -29,25 +29,12 @@ class TestComment:
         assert response.data['content'] == 'after'
         assert response.data['content'] != content_before_update
 
-        # Update the author of the comment.
-        unauthroized_data = {
-            'content': 'trying_to_update_author_of_comment',
-            'post': 2,
-            'author': 2,
-        }
-        response = api_client.put('/posts/comments/1', data=unauthroized_data, format='json')
-        assert response.status_code == 403
-
-        # Update the parent comment of the comment.
-        response = api_client.put(
-            '/posts/comments/1', data={"parent_comment": 65535}, format='json')
-        assert response.status_code == 403
+        # Update the comment without any data.
+        response = api_client.put('/posts/comments/1')
+        assert response.status_code == 400
 
     def test_delete_comment(self, api_client, comments):
-        comments_length_before = len(Comment.objects.filter(is_active=True))
         response = api_client.delete('/posts/comments/1')
-        comments_length_after = len(Comment.objects.filter(is_active=True))
 
-        assert comments_length_before == 3
         assert response.status_code == 204
-        assert comments_length_after == 2
+        assert not response.data['is_active']
