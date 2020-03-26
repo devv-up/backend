@@ -4,8 +4,9 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from post.api.utils import APIUtils
-from post.serializers import CommentSerializer
+from common.querytools import get_one
+from post.models import Comment
+from post.serializers import CommentListSerializer, CommentSerializer
 
 
 class CommentAPI(APIView):
@@ -27,10 +28,13 @@ class CommentAPI(APIView):
         Update data of the comment.
         A specific comment ID must be required by uri resources.
         """
-        APIUtils.validate(request.data)
+        try:
+            comment_data = {'content': request.data.get('content')}
+        except Exception:
+            raise ParseError(detail='The content field must be required.')
 
-        comment = APIUtils.get('Comment', id=comment_id)
-        serializer = CommentSerializer(comment, request.data, partial=True)
+        comment = get_one(Comment, id=comment_id, is_active=True)
+        serializer = CommentSerializer(comment, comment_data, partial=True)
 
         if serializer.is_valid():
             serializer.update(comment, request.data)
@@ -43,8 +47,10 @@ class CommentAPI(APIView):
         Make the comment disabled.
         A specific comment ID must be required by uri resources.
         """
-        comment = APIUtils.get('Comment', id=comment_id)
+        comment = get_one(Comment, id=comment_id, is_active=True)
         serializer = CommentSerializer(comment)
         serializer.update(comment, {'is_active': False})
 
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        deleted_comment = CommentListSerializer(comment).data
+
+        return Response(deleted_comment, status=status.HTTP_204_NO_CONTENT)
