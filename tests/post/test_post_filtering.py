@@ -23,11 +23,8 @@ class TestPostFiltering:
     pytestmark = pytest.mark.django_db
 
     def count_tags_of(self, result, *title_filters):
-        tag_count = 0
-        for tag in result['tags']:
-            if tag['title'] in title_filters:
-                tag_count += 1
-        return tag_count
+        tags = [tag for tag in result['tags'] if tag['title'] in title_filters]
+        return len(tags)
 
     def set_posts_with(self, api_client, *post_data):
         api_client.post('/posts', post_data[0], format='json')
