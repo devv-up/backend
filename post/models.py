@@ -20,7 +20,7 @@ class Post(models.Model):
     """
     A post model which has simple information.
     meeting_time_of_day have integer value
-    :0=morning, 1=afternoon, 2=evening
+    >>> 0=morning, 1=afternoon, 2=evening
     """
     title = models.CharField(max_length=50)
     content = models.TextField()
