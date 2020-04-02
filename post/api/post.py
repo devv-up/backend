@@ -32,10 +32,6 @@ class PostListCreateAPI(mixins.ListModelMixin,
         """
         Get the list of posts.
 
-        Basically, this function returns a response that includes data of
-        whole posts unless a specific post ID is given
-        by uri resources.
-
         If the request has any vaild parameters in the query string,
         A response that includes a filtered category object by parameters
         will be returned.
@@ -101,13 +97,7 @@ class PostAPI(mixins.RetrieveModelMixin,
         """
         Get a post object.
 
-        Basically, this function returns a response that includes data of
-        whole posts unless a specific post ID is given
-        by uri resources.
-
-        If the request has any vaild parameters in the query string,
-        A response that includes a filtered category object by parameters
-        will be returned.
+        A specific post ID must be required by uri resources.
         """
         post = get_one(Post, id=post_id, is_active=True)
         serializer = PostSerializer(post)
