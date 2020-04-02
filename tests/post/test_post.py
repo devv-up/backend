@@ -81,7 +81,7 @@ class TestPost:
         before_update = api_client.get('/posts/1')
         response = api_client.patch('/posts/1', data=data, format='json')
 
-        assert response.status_code == 201
+        assert response.status_code == 200
         assert response.data['id'] == 1
         assert response.data['title'] == 'after'
         assert before_update.data['title'] != 'after'
@@ -106,7 +106,7 @@ class TestPost:
         before_update = api_client.get('/posts/1')
         response = api_client.patch('/posts/1', data=tags, format='json')
         after_update = api_client.get('/posts/1')
-        assert response.status_code == 201
+        assert response.status_code == 200
         assert before_update.data['tags'][0]['title'] != after_update.data['tags'][0]['title']
 
         # Update the comment without any data.

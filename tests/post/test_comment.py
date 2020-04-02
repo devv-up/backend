@@ -24,7 +24,7 @@ class TestComment:
         response = api_client.put(
             '/posts/comments/1', data={'content': 'after'}, format='json')
 
-        assert response.status_code == 201
+        assert response.status_code == 200
         assert response.data['id'] == 1
         assert response.data['content'] == 'after'
         assert response.data['content'] != content_before_update
