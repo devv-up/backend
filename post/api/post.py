@@ -28,7 +28,6 @@ def create_tags_with(titles: List[str]) -> List[Tag]:
 class PostListCreateAPI(mixins.ListModelMixin,
                         mixins.CreateModelMixin,
                         APIView):
-
     def get(self, request: Request) -> Response:
         """
         Get the list of posts.
@@ -147,7 +146,7 @@ class PostAPI(mixins.RetrieveModelMixin,
 
         if serializer.is_valid():
             serializer.update(post, patch_data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.data)
 
         raise ParseError(detail=serializer.errors)
 
