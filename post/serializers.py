@@ -26,7 +26,7 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ('id', 'title')
 
 
-class PostSerializer(serializers.ModelSerializer):
+class PostCreateSerializer(serializers.ModelSerializer):
     timeOfDay = serializers.IntegerField(source='time_of_day')
 
     class Meta:
@@ -35,7 +35,7 @@ class PostSerializer(serializers.ModelSerializer):
                   'date', 'timeOfDay', 'author', 'category', 'tags')
 
 
-class PostListSerializer(serializers.ModelSerializer):
+class PostSerializer(serializers.ModelSerializer):
     timeOfDay = serializers.IntegerField(source='time_of_day')
     createdDate = serializers.DateTimeField(source='created_date')
 
@@ -46,7 +46,7 @@ class PostListSerializer(serializers.ModelSerializer):
                   'date', 'timeOfDay', 'createdDate', 'author', 'category', 'tags')
 
 
-class CommentSerializer(serializers.ModelSerializer):
+class CommentCreateSerializer(serializers.ModelSerializer):
     parentComment = serializers.PrimaryKeyRelatedField(
         queryset=Comment.objects.all(), source='parent_comment', required=False)
 
@@ -55,7 +55,7 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ('id', 'content', 'post', 'parentComment', 'author')
 
 
-class CommentListSerializer(serializers.ModelSerializer):
+class CommentSerializer(serializers.ModelSerializer):
     createdDate = serializers.DateTimeField(source='created_date')
     parentComment = serializers.PrimaryKeyRelatedField(
         queryset=Comment.objects.all(), source='parent_comment')

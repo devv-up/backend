@@ -17,15 +17,15 @@ Including another URLconf
 from django.urls import path, re_path
 
 from post.api.category import CategoryAPI
-from post.api.comment import CommentAPI
-from post.api.post import PostAPI
+from post.api.comment import CommentAPI, CommentCreateAPI
+from post.api.post import PostAPI, PostListCreateAPI
 from post.api.tag import TagAPI
 
 urlpatterns = [
     path('/categories', CategoryAPI.as_view()),
     path('/tags', TagAPI.as_view()),
     path('/comments/<int:comment_id>', CommentAPI.as_view()),
-    path('/comments', CommentAPI.as_view()),
+    path('/comments', CommentCreateAPI.as_view()),
     path('/<int:post_id>', PostAPI.as_view()),
-    re_path(r'^$', PostAPI.as_view()),
+    re_path(r'^$', PostListCreateAPI.as_view()),
 ]
