@@ -110,7 +110,7 @@ class TestPostFiltering:
         assert len(response.data) == 2
 
         for result in response.data:
-            assert result['date'] >= start_date and result['date'] <= end_date
+            assert start_date <= result['date'] and result['date'] <= end_date
 
     def test_post_on_time_of_day_filtering(self, api_client, posts):
         time_of_day = TIME_OF_DAY['AFTERNOON']
