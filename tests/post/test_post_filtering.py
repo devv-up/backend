@@ -1,5 +1,5 @@
-from model_bakery.recipe import Recipe
 import pytest
+from model_bakery.recipe import Recipe
 
 from post.models import Post
 
@@ -67,14 +67,12 @@ class TestPostFiltering:
         assert response.status_code == 200
         assert len(response.data) == 2
 
-        first_result, second_result = response.data[0], response.data[1]
-        assert first_result['id'] != second_result['id']
-
-        number_of_tags = self.__count_tags_of(first_result, tag_title)
-        assert number_of_tags == 1
-
-        number_of_tags = self.__count_tags_of(second_result, tag_title)
-        assert number_of_tags == 1
+        ids = set()
+        for result in response.data:
+            ids.add(result['id'])
+            number_of_tags = self.__count_tags_of(result, tag_title)
+            assert number_of_tags == 1
+        assert len(ids) == len(response.data)
 
         # Filter the posts by more than one tag.
         tag_title1, tag_title2 = tags[0].title, tags[1].title
@@ -82,14 +80,12 @@ class TestPostFiltering:
         assert response.status_code == 200
         assert len(response.data) == 2
 
-        first_result, second_result = response.data[0], response.data[1]
-        assert first_result['id'] != second_result['id']
-
-        number_of_tags = self.__count_tags_of(first_result, tag_title1, tag_title2)
-        assert number_of_tags == 2
-
-        number_of_tags = self.__count_tags_of(second_result, tag_title1, tag_title2)
-        assert number_of_tags == 2
+        ids = set()
+        for result in response.data:
+            ids.add(result['id'])
+            number_of_tags = self.__count_tags_of(result, tag_title1, tag_title2)
+            assert number_of_tags == 2
+        assert len(ids) == len(response.data)
 
         # This type of tag filtering is not supported.
         response = api_client.get(f'/posts?tags={tag_title1}&tags={tag_title2}')
@@ -113,9 +109,8 @@ class TestPostFiltering:
         assert response.status_code == 200
         assert len(response.data) == 2
 
-        first_result, second_result = response.data[0], response.data[1]
-        assert first_result['date'] >= start_date and first_result['date'] <= end_date
-        assert second_result['date'] >= start_date and second_result['date'] <= end_date
+        for result in response.data:
+            assert result['date'] >= start_date and result['date'] <= end_date
 
     def test_post_on_time_of_day_filtering(self, api_client, posts):
         time_of_day = TIME_OF_DAY['AFTERNOON']
@@ -123,9 +118,8 @@ class TestPostFiltering:
         assert response.status_code == 200
         assert len(response.data) == 2
 
-        first_result, second_result = response.data[0], response.data[1]
-        assert first_result.get('timeOfDay') == time_of_day
-        assert second_result.get('timeOfDay') == time_of_day
+        for result in response.data:
+            assert result.get('timeOfDay') == time_of_day
 
     def test_post_on_location_filtering(self, api_client, posts):
         location = 'location'
@@ -133,6 +127,5 @@ class TestPostFiltering:
         assert response.status_code == 200
         assert len(response.data) == 2
 
-        first_result, second_result = response.data[0], response.data[1]
-        assert location in first_result['location']
-        assert location in second_result['location']
+        for result in response.data:
+            assert location in result['location']
