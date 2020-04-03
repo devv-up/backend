@@ -69,9 +69,9 @@ class PostQuerySerializer(serializers.Serializer):
         required=False,
         help_text='A page number within the paginated result set.\n\n ex) page=1',
     )
-    perPage = serializers.IntegerField(
+    pageSize = serializers.IntegerField(
         required=False,
-        help_text='Number of results to return per page.\n\n ex) perPage=30',
+        help_text='Number of results to return per page.\n\n ex) pageSize=30',
     )
     category = serializers.CharField(
         required=False,
@@ -99,7 +99,7 @@ class PostQuerySerializer(serializers.Serializer):
     )
 
     class Meta:
-        fields = ('page', 'perPage', 'category', 'tags',
+        fields = ('page', 'pageSize', 'category', 'tags',
                   'startDate', 'endDate', 'timeOfDay', 'location')
 
 
