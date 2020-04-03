@@ -4,6 +4,8 @@ from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models.query import QuerySet
 from django.http.request import QueryDict
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, viewsets
 from rest_framework.exceptions import ParseError, ValidationError
 from rest_framework.request import Request
@@ -11,11 +13,17 @@ from rest_framework.response import Response
 
 from common.querytools import filter_exists, get_one
 from post.models import Post, Tag
-from post.serializers import (PostCreateSerializer, PostDetailSerializer, PostPatchSerializer,
+from post.serializers import (PostBodySerializer, PostCreateSerializer, PostDetailSerializer,
+                              PostPatchBodySerializer, PostPatchSerializer, PostQuerySerializer,
                               PostSerializer)
 
 
 class PostAPI(viewsets.ViewSet):
+    list_response = openapi.Response('Success', PostSerializer(many=True))
+    create_response = openapi.Response('Success', PostSerializer(many=True))
+    retrieve_response = openapi.Response('Success', PostSerializer)
+    patch_response = openapi.Response('Success', PostSerializer(many=True))
+
     def _tag_filter(self, posts: 'QuerySet[Post]', params: QueryDict) -> 'QuerySet[Post]':
         if len(params.getlist('tags')) > 1:
             raise ParseError(detail='This type of tag parameters are not supported.')
@@ -34,6 +42,8 @@ class PostAPI(viewsets.ViewSet):
             return [tag.id for tag in tags]
         return None
 
+    @swagger_auto_schema(query_serializer=PostQuerySerializer,
+                         responses={200: list_response, 400: 'Parameter Error'})
     def list(self, request: Request) -> Response:
         """
         Get the list of posts.
@@ -67,6 +77,8 @@ class PostAPI(viewsets.ViewSet):
         return Response(serializer.data)
 
     @transaction.atomic
+    @swagger_auto_schema(request_body=PostBodySerializer,
+                         responses={201: create_response, 400: 'Parameter Error'})
     def create(self, request: Request) -> Response:
         """
         Create a post.
@@ -83,6 +95,8 @@ class PostAPI(viewsets.ViewSet):
 
         raise ValidationError(detail=serializer.errors)
 
+    @swagger_auto_schema(
+        responses={200: retrieve_response, 400: 'Parameter Error', 404: 'Not Found'})
     def retrieve(self, request: Request, post_id: int = None) -> Response:
         """
         Get a post object.
@@ -94,6 +108,8 @@ class PostAPI(viewsets.ViewSet):
         return Response(serializer.data)
 
     @transaction.atomic
+    @swagger_auto_schema(request_body=PostPatchBodySerializer,
+                         responses={200: patch_response, 400: 'Parameter Error', 404: 'Not Found'})
     def partial_update(self, request: Request, post_id: int) -> Response:
         """
         Update data of the post.
@@ -122,6 +138,7 @@ class PostAPI(viewsets.ViewSet):
 
         raise ValidationError(detail=serializer.errors)
 
+    @swagger_auto_schema(responses={204: 'Success', 404: 'Not Found'})
     def destroy(self, request: Request, post_id: int) -> Response:
         """
         Make the post disabled.

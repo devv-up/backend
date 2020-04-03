@@ -1,3 +1,5 @@
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, viewsets
 from rest_framework.exceptions import ParseError, ValidationError
 from rest_framework.request import Request
@@ -5,10 +7,16 @@ from rest_framework.response import Response
 
 from common.querytools import get_one
 from post.models import Comment
-from post.serializers import CommentCreateSerializer, CommentPutSerializer, CommentSerializer
+from post.serializers import (CommentBodySerializer, CommentCreateBodySerializer,
+                              CommentCreateSerializer, CommentPutSerializer, CommentSerializer)
 
 
 class CommentAPI(viewsets.ViewSet):
+    create_response = openapi.Response('Success', CommentSerializer(many=True))
+    put_response = openapi.Response('Success', CommentSerializer(many=True))
+
+    @swagger_auto_schema(request_body=CommentCreateBodySerializer,
+                         responses={201: create_response, 400: 'Parameter Error'})
     def create(self, request: Request) -> Response:
         """
         Create a comment.
@@ -24,6 +32,8 @@ class CommentAPI(viewsets.ViewSet):
 
         raise ValidationError(detail=serializer.errors)
 
+    @swagger_auto_schema(request_body=CommentBodySerializer,
+                         responses={200: put_response, 400: 'Parameter Error', 404: 'Not Found'})
     def update(self, request: Request, comment_id: int) -> Response:
         """
         Update data of the comment.
@@ -43,6 +53,7 @@ class CommentAPI(viewsets.ViewSet):
 
         raise ValidationError(detail=serializer.errors)
 
+    @swagger_auto_schema(responses={204: 'Success', 400: 'Parameter Error', 404: 'Not Found'})
     def destroy(self, request: Request, comment_id: int) -> Response:
         """
         Make the comment disabled.
