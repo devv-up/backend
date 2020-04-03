@@ -26,6 +26,26 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ('id', 'title')
 
 
+class CommentCreateSerializer(serializers.ModelSerializer):
+    parentComment = serializers.PrimaryKeyRelatedField(
+        queryset=Comment.objects.all(), source='parent_comment', required=False)
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'content', 'post', 'parentComment', 'author')
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    createdDate = serializers.DateTimeField(source='created_date')
+    parentComment = serializers.PrimaryKeyRelatedField(
+        queryset=Comment.objects.all(), source='parent_comment')
+
+    class Meta:
+        model = Comment
+        depth = 1
+        fields = ('id', 'content', 'createdDate', 'parentComment', 'author', 'is_active')
+
+
 class PostCreateSerializer(serializers.ModelSerializer):
     timeOfDay = serializers.IntegerField(source='time_of_day')
 
@@ -46,21 +66,14 @@ class PostSerializer(serializers.ModelSerializer):
                   'date', 'timeOfDay', 'createdDate', 'author', 'category', 'tags')
 
 
-class CommentCreateSerializer(serializers.ModelSerializer):
-    parentComment = serializers.PrimaryKeyRelatedField(
-        queryset=Comment.objects.all(), source='parent_comment', required=False)
-
-    class Meta:
-        model = Comment
-        fields = ('id', 'content', 'post', 'parentComment', 'author')
-
-
-class CommentSerializer(serializers.ModelSerializer):
+class PostCommentSerializer(serializers.ModelSerializer):
+    timeOfDay = serializers.IntegerField(source='time_of_day')
     createdDate = serializers.DateTimeField(source='created_date')
-    parentComment = serializers.PrimaryKeyRelatedField(
-        queryset=Comment.objects.all(), source='parent_comment')
+    comments = CommentSerializer(many=True)
 
     class Meta:
-        model = Comment
+        model = Post
         depth = 1
-        fields = ('id', 'content', 'createdDate', 'parentComment', 'author', 'is_active')
+        ref_name = None
+        fields = ('id', 'title', 'content', 'location', 'capacity',
+                  'date', 'timeOfDay', 'createdDate', 'author', 'category', 'tags', 'comments')

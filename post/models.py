@@ -48,7 +48,7 @@ class Comment(models.Model):
     is_active = models.BooleanField(default=True)
     created_date = models.DateTimeField(auto_now_add=True)
 
-    post = models.ForeignKey('Post', on_delete=models.CASCADE)
+    post = models.ForeignKey('Post', on_delete=models.CASCADE, related_name='comments')
     parent_comment = models.ForeignKey('self', on_delete=models.PROTECT, null=True, default=None)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
