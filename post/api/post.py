@@ -9,8 +9,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.querytools import filter_exists, get_one
-from post.models import Comment, Post, Tag
-from post.serializers import CommentSerializer, PostCreateSerializer, PostSerializer
+from post.models import Post, Tag
+from post.serializers import PostCommentSerializer, PostCreateSerializer, PostSerializer
 
 
 def create_tags_with(titles: List[str]) -> List[Tag]:
@@ -52,13 +52,14 @@ class PostListCreateAPI(mixins.ListModelMixin,
             for tag in tags:
                 posts = posts.filter(tags__title=tag)
 
-        posts.filter(is_active=True)
+        posts = posts.filter(is_active=True)
         serializer = PostSerializer(posts, many=True)
 
         if 'page' in request.GET.dict():
             no = int(request.GET['page'])
-            per_page = request.GET['perPage'] if 'perPage' in request.GET.dict() else 20
-            paginated_posts: Page = Paginator(posts, per_page).get_page(no)
+            page_size = request.GET['pageSize'] if 'pageSize' in request.GET.dict() else 20
+
+            paginated_posts: Page = Paginator(posts, page_size).get_page(no)
             serializer = PostSerializer(paginated_posts, many=True)
 
         return Response(serializer.data)
@@ -100,14 +101,9 @@ class PostAPI(mixins.RetrieveModelMixin,
         A specific post ID must be required by uri resources.
         """
         post = get_one(Post, id=post_id, is_active=True)
-        serializer = PostSerializer(post)
-        post_data = serializer.data
+        serializer = PostCommentSerializer(post)
 
-        comments_of_post = Comment.objects.filter(post=post_id)
-        comments = CommentSerializer(comments_of_post, many=True)
-        post_data.update(comments=comments.data)
-
-        return Response(post_data)
+        return Response(serializer.data)
 
     @transaction.atomic
     def patch(self, request: Request, post_id: int) -> Response:
@@ -132,10 +128,10 @@ class PostAPI(mixins.RetrieveModelMixin,
             raise ParseError(detail='At least one field must be required to update the post.')
 
         post = get_one(Post, id=post_id, is_active=True)
-        serializer = PostCreateSerializer(post, patch_data, partial=True)
+        serializer = PostCreateSerializer(post, data=patch_data, partial=True)
 
         if serializer.is_valid():
-            serializer.update(post, patch_data)
+            serializer.update(post, validated_data=patch_data)
             return Response(serializer.data)
 
         raise ParseError(detail=serializer.errors)
@@ -147,7 +143,7 @@ class PostAPI(mixins.RetrieveModelMixin,
         A specific post ID must be required by uri resources.
         """
         post = get_one(Post, id=post_id, is_active=True)
-        serializer = PostCreateSerializer(post)
+        serializer = PostSerializer(post)
         serializer.update(post, {'is_active': False})
 
         return Response(status=status.HTTP_204_NO_CONTENT)
