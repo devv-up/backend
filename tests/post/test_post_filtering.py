@@ -49,18 +49,19 @@ class TestPostFiltering:
         tags = [tag for tag in result['tags'] if tag['title'] in title_filters]
         return len(tags)
 
-    def test_post_on_category_filtering(self, api_client, users, posts, categories, tags):
+    def test_post_on_category_filtering(self, api_client, posts, categories):
         category_title = categories[0].title
         response = api_client.get(f'/posts?category={category_title}')
         assert response.status_code == 200
         assert len(response.data) == 2
 
-        first_result, second_result = response.data[0], response.data[1]
-        assert first_result['id'] != second_result['id']
-        assert first_result['category']['title'] == category_title
-        assert second_result['category']['title'] == category_title
+        ids = set()
+        for data in response.data:
+            ids.add(data['id'])
+            assert data['category']['title'] == category_title
+        assert len(ids) == len(response.data)
 
-    def test_post_on_tag_filtering(self, api_client, users, posts, categories, tags):
+    def test_post_on_tag_filtering(self, api_client, posts, tags):
         tag_title = tags[1].title
         response = api_client.get(f'/posts?tags={tag_title}')
         assert response.status_code == 200
@@ -94,7 +95,7 @@ class TestPostFiltering:
         response = api_client.get(f'/posts?tags={tag_title1}&tags={tag_title2}')
         assert response.status_code == 400
 
-    def test_post_on_category_tag_filtering(self, api_client, users, posts, categories, tags):
+    def test_post_on_category_tag_filtering(self, api_client, posts, categories, tags):
         category_title, tag_title = categories[0].title, tags[1].title
         response = api_client.get(f'/posts?category={category_title}&tags={tag_title}')
         assert response.status_code == 200
@@ -106,7 +107,7 @@ class TestPostFiltering:
         number_of_tags = self.__count_tags_of(result, tag_title)
         assert number_of_tags == 1
 
-    def test_post_on_date_filtering(self, api_client, users, posts, categories, tags):
+    def test_post_on_date_filtering(self, api_client, posts):
         start_date, end_date = '2020-01-01', '2020-02-02'
         response = api_client.get(f'/posts?startDate={start_date}&endDate={end_date}')
         assert response.status_code == 200
@@ -116,7 +117,7 @@ class TestPostFiltering:
         assert first_result['date'] >= start_date and first_result['date'] <= end_date
         assert second_result['date'] >= start_date and second_result['date'] <= end_date
 
-    def test_post_on_time_of_day_filtering(self, api_client, users, posts, categories, tags):
+    def test_post_on_time_of_day_filtering(self, api_client, posts):
         time_of_day = TIME_OF_DAY['AFTERNOON']
         response = api_client.get(f'/posts?timeOfDay={time_of_day}')
         assert response.status_code == 200
@@ -126,7 +127,7 @@ class TestPostFiltering:
         assert first_result.get('timeOfDay') == time_of_day
         assert second_result.get('timeOfDay') == time_of_day
 
-    def test_post_on_location_filtering(self, api_client, users, posts, categories, tags):
+    def test_post_on_location_filtering(self, api_client, posts):
         location = 'location'
         response = api_client.get(f'/posts?location={location}')
         assert response.status_code == 200
