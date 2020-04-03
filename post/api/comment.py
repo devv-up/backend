@@ -55,7 +55,7 @@ class CommentAPI(mixins.UpdateModelMixin,
         A specific comment ID must be required by uri resources.
         """
         comment = get_one(Comment, id=comment_id, is_active=True)
-        serializer = CommentCreateSerializer(comment)
+        serializer = CommentSerializer(comment)
         serializer.update(comment, {'is_active': False})
 
         deleted_comment = CommentSerializer(comment).data
