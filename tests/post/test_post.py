@@ -63,7 +63,7 @@ class TestPost:
         assert response1_data_length > len(response2.data)
 
         # Pagination by specific number per page
-        response3 = api_client.get('/posts?page=1&perPage=30')
+        response3 = api_client.get('/posts?page=1&pageSize=30')
         assert response3.status_code == 200
         assert len(response3.data) == 30
 
