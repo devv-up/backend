@@ -30,15 +30,15 @@ class CommentAPI(viewsets.ViewSet):
         A specific comment ID must be required by uri resources.
         """
         try:
-            comment_data = {'content': request.data.get('content')}
+            comment_data = {'content': request.data['content']}
         except Exception:
             raise ParseError(detail='The content field must be required.')
 
         comment = get_one(Comment, id=comment_id, is_active=True)
-        serializer = CommentCreateSerializer(comment, comment_data, partial=True)
+        serializer = CommentCreateSerializer(comment, data=comment_data, partial=True)
 
         if serializer.is_valid():
-            serializer.update(comment, request.data)
+            serializer.update(comment, validated_data=request.data)
             return Response(serializer.data)
 
         raise ParseError(detail=serializer.errors)
@@ -54,5 +54,4 @@ class CommentAPI(viewsets.ViewSet):
         serializer.update(comment, {'is_active': False})
 
         deleted_comment = CommentSerializer(comment).data
-
         return Response(deleted_comment, status=status.HTTP_204_NO_CONTENT)
