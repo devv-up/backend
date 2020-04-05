@@ -49,17 +49,26 @@ class TestPostFiltering:
         tags = [tag for tag in result['tags'] if tag['title'] in title_filters]
         return len(tags)
 
+    def __count_tags_of_multiple(self, response, *tag_titles):
+        for result in response.data:
+            number_of_tags = self.__count_tags_of(result, *tag_titles)
+            assert number_of_tags == len(tag_titles)
+
+    def __check_data_duplication_of(self, response):
+        ids = set()
+        for result in response.data:
+            ids.add(result['id'])
+        assert len(ids) == len(response.data)
+
     def test_post_on_category_filtering(self, api_client, posts, categories):
         category_title = categories[0].title
         response = api_client.get(f'/posts?category={category_title}')
         assert response.status_code == 200
         assert len(response.data) == 2
 
-        ids = set()
+        self.__check_data_duplication_of(response)
         for data in response.data:
-            ids.add(data['id'])
             assert data['category']['title'] == category_title
-        assert len(ids) == len(response.data)
 
     def test_post_on_tag_filtering(self, api_client, posts, tags):
         tag_title = tags[1].title
@@ -67,12 +76,8 @@ class TestPostFiltering:
         assert response.status_code == 200
         assert len(response.data) == 2
 
-        ids = set()
-        for result in response.data:
-            ids.add(result['id'])
-            number_of_tags = self.__count_tags_of(result, tag_title)
-            assert number_of_tags == 1
-        assert len(ids) == len(response.data)
+        self.__check_data_duplication_of(response)
+        self.__count_tags_of_multiple(response, tag_title)
 
         # Filter the posts by more than one tag.
         tag_title1, tag_title2 = tags[0].title, tags[1].title
@@ -80,12 +85,8 @@ class TestPostFiltering:
         assert response.status_code == 200
         assert len(response.data) == 2
 
-        ids = set()
-        for result in response.data:
-            ids.add(result['id'])
-            number_of_tags = self.__count_tags_of(result, tag_title1, tag_title2)
-            assert number_of_tags == 2
-        assert len(ids) == len(response.data)
+        self.__check_data_duplication_of(response)
+        self.__count_tags_of_multiple(response, tag_title1, tag_title2)
 
         # This type of tag filtering is not supported.
         response = api_client.get(f'/posts?tags={tag_title1}&tags={tag_title2}')
@@ -119,7 +120,7 @@ class TestPostFiltering:
         assert len(response.data) == 2
 
         for result in response.data:
-            assert result.get('timeOfDay') == time_of_day
+            assert result['timeOfDay'] == time_of_day
 
     def test_post_on_location_filtering(self, api_client, posts):
         location = 'location'
