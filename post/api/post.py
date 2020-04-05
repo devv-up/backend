@@ -2,11 +2,10 @@ from typing import Any, Dict, List
 
 from django.core.paginator import Page, Paginator
 from django.db import transaction
-from rest_framework import mixins, status
+from rest_framework import status, viewsets
 from rest_framework.exceptions import ParseError
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from common.querytools import filter_exists, get_one
 from post.models import Post, Tag
@@ -25,10 +24,8 @@ def create_tags_with(titles: List[str]) -> List[Tag]:
     return tags
 
 
-class PostListCreateAPI(mixins.ListModelMixin,
-                        mixins.CreateModelMixin,
-                        APIView):
-    def get(self, request: Request) -> Response:
+class PostAPI(viewsets.ViewSet):
+    def list(self, request: Request) -> Response:
         """
         Get the list of posts.
 
@@ -65,7 +62,7 @@ class PostListCreateAPI(mixins.ListModelMixin,
         return Response(serializer.data)
 
     @transaction.atomic
-    def post(self, request: Request) -> Response:
+    def create(self, request: Request) -> Response:
         """
         Create a post.
 
@@ -89,12 +86,7 @@ class PostListCreateAPI(mixins.ListModelMixin,
 
         raise ParseError(detail=serializer.errors)
 
-
-class PostAPI(mixins.RetrieveModelMixin,
-              mixins.UpdateModelMixin,
-              mixins.DestroyModelMixin,
-              APIView):
-    def get(self, request: Request, post_id: int = None) -> Response:
+    def retrieve(self, request: Request, post_id: int = None) -> Response:
         """
         Get a post object.
 
@@ -106,7 +98,7 @@ class PostAPI(mixins.RetrieveModelMixin,
         return Response(serializer.data)
 
     @transaction.atomic
-    def patch(self, request: Request, post_id: int) -> Response:
+    def partial_update(self, request: Request, post_id: int) -> Response:
         """
         Update data of the post.
 
@@ -136,7 +128,7 @@ class PostAPI(mixins.RetrieveModelMixin,
 
         raise ParseError(detail=serializer.errors)
 
-    def delete(self, request: Request, post_id: int) -> Response:
+    def destroy(self, request: Request, post_id: int) -> Response:
         """
         Make the post disabled.
 

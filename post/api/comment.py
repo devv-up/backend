@@ -1,16 +1,15 @@
-from rest_framework import mixins, status
+from rest_framework import status, viewsets
 from rest_framework.exceptions import ParseError
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from common.querytools import get_one
 from post.models import Comment
 from post.serializers import CommentCreateSerializer, CommentSerializer
 
 
-class CommentCreateAPI(mixins.CreateModelMixin, APIView):
-    def post(self, request: Request) -> Response:
+class CommentAPI(viewsets.ViewSet):
+    def create(self, request: Request) -> Response:
         """
         Create a comment.
 
@@ -24,11 +23,7 @@ class CommentCreateAPI(mixins.CreateModelMixin, APIView):
 
         raise ParseError(detail=serializer.errors)
 
-
-class CommentAPI(mixins.UpdateModelMixin,
-                 mixins.DestroyModelMixin,
-                 APIView):
-    def put(self, request: Request, comment_id: int) -> Response:
+    def update(self, request: Request, comment_id: int) -> Response:
         """
         Update data of the comment.
 
@@ -48,7 +43,7 @@ class CommentAPI(mixins.UpdateModelMixin,
 
         raise ParseError(detail=serializer.errors)
 
-    def delete(self, request: Request, comment_id: int) -> Response:
+    def destroy(self, request: Request, comment_id: int) -> Response:
         """
         Make the comment disabled.
 
