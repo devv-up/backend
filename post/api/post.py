@@ -12,19 +12,18 @@ from post.models import Post, Tag
 from post.serializers import PostCommentSerializer, PostCreateSerializer, PostSerializer
 
 
-def create_tags_with(titles: List[str]) -> List[Tag]:
-    """
-    Create tags before creating a post.
-    If the same title tags exists,
-    the tag objects will be returned.
-    """
-    tags: List[Tag] = list()
-    for title in titles:
-        tags.append(Tag.objects.get_or_create(title=title)[0])
-    return tags
-
-
 class PostAPI(viewsets.ViewSet):
+    def __create_tags_with(self, titles: List[str]) -> List[Tag]:
+        """
+        Create tags before creating a post.
+        If the same title tags exists,
+        the tag objects will be returned.
+        """
+        tags: List[Tag] = list()
+        for title in titles:
+            tags.append(Tag.objects.get_or_create(title=title)[0])
+        return tags
+
     def list(self, request: Request) -> Response:
         """
         Get the list of posts.
@@ -73,7 +72,7 @@ class PostAPI(viewsets.ViewSet):
 
         tag_titles = request.data.get('tags')
         if tag_titles:
-            tags = create_tags_with(tag_titles)
+            tags = self.__create_tags_with(tag_titles)
             post_data.update(tags=[tag.id for tag in tags])
 
         serializer = PostCreateSerializer(data=post_data)
@@ -113,7 +112,7 @@ class PostAPI(viewsets.ViewSet):
 
         tag_titles = request.data.get('tags')
         if tag_titles:
-            tags = create_tags_with(tag_titles)
+            tags = self.__create_tags_with(tag_titles)
             patch_data.update(tags=[tag.id for tag in tags])
 
         if not patch_data:
