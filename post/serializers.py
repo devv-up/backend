@@ -1,3 +1,5 @@
+from typing import Any
+
 from rest_framework import serializers
 
 from post.models import Category, Comment, Post, Tag
@@ -26,54 +28,56 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ('id', 'title')
 
 
-class CommentCreateSerializer(serializers.ModelSerializer):
-    parentComment = serializers.PrimaryKeyRelatedField(
-        queryset=Comment.objects.all(), source='parent_comment', required=False)
-
-    class Meta:
-        model = Comment
-        fields = ('id', 'content', 'post', 'parentComment', 'author')
-
-
 class CommentSerializer(serializers.ModelSerializer):
     createdDate = serializers.DateTimeField(source='created_date')
     parentComment = serializers.PrimaryKeyRelatedField(
-        queryset=Comment.objects.all(), source='parent_comment')
+        queryset=Comment.objects.all(),
+        source='parent_comment',
+        required=False)
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        # Don't pass the 'fields' arg up to the superclass
+        fields = kwargs.pop('fields', None)
+
+        # Instantiate the superclass normally
+        super(CommentSerializer, self).__init__(*args, **kwargs)
+
+        if fields is not None:
+            # Drop any fields that are not specified in the `fields` argument.
+            allowed = set(fields)
+            existing = set(self.fields)
+            for field_name in existing - allowed:
+                self.fields.pop(field_name)
 
     class Meta:
         model = Comment
-        depth = 1
-        fields = ('id', 'content', 'createdDate', 'parentComment', 'author', 'is_active')
-
-
-class PostCreateSerializer(serializers.ModelSerializer):
-    timeOfDay = serializers.IntegerField(source='time_of_day')
-
-    class Meta:
-        model = Post
-        fields = ('id', 'title', 'content', 'location', 'capacity',
-                  'date', 'timeOfDay', 'author', 'category', 'tags')
+        fields = ('id', 'content', 'post', 'createdDate',
+                  'parentComment', 'author', 'is_active')
 
 
 class PostSerializer(serializers.ModelSerializer):
     timeOfDay = serializers.IntegerField(source='time_of_day')
     createdDate = serializers.DateTimeField(source='created_date')
-
-    class Meta:
-        model = Post
-        depth = 1
-        fields = ('id', 'title', 'content', 'location', 'capacity',
-                  'date', 'timeOfDay', 'createdDate', 'author', 'category', 'tags')
-
-
-class PostCommentSerializer(serializers.ModelSerializer):
-    timeOfDay = serializers.IntegerField(source='time_of_day')
-    createdDate = serializers.DateTimeField(source='created_date')
     comments = CommentSerializer(many=True)
 
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        # Don't pass the 'fields' arg up to the superclass
+        fields = kwargs.pop('fields', None)
+
+        # Instantiate the superclass normally
+        super(PostSerializer, self).__init__(*args, **kwargs)
+
+        if fields is not None:
+            # Drop any fields that are not specified in the `fields` argument.
+            allowed = set(fields)
+            existing = set(self.fields)
+            for field_name in existing - allowed:
+                self.fields.pop(field_name)
+
     class Meta:
         model = Post
         depth = 1
-        ref_name = None
         fields = ('id', 'title', 'content', 'location', 'capacity',
-                  'date', 'timeOfDay', 'createdDate', 'author', 'category', 'tags', 'comments')
+                  'date', 'timeOfDay', 'createdDate', 'author',
+                  'category', 'tags', 'comments')
+        read_only_fields = ['comments']
