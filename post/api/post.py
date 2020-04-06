@@ -2,6 +2,8 @@ from typing import List
 
 from django.core.paginator import Page, Paginator
 from django.db import transaction
+from django.db.models.query import QuerySet
+from django.http.request import QueryDict
 from rest_framework import status, viewsets
 from rest_framework.exceptions import ParseError
 from rest_framework.request import Request
@@ -39,6 +41,16 @@ class PostAPI(viewsets.ViewSet):
             tags.append(Tag.objects.get_or_create(title=title)[0])
         return tags
 
+    def __tag_filter(self, posts: 'QuerySet[Post]', params: QueryDict) -> 'QuerySet[Post]':
+        if len(params.getlist('tags')) > 1:
+            raise ParseError(detail='This type of tag parameters are not supported.')
+
+        tags: List[str] = params['tags'].split(',')
+        for tag in tags:
+            posts = posts.filter(tags__title=tag)
+
+        return posts
+
     def list(self, request: Request) -> Response:
         """
         Get the list of posts.
@@ -57,12 +69,7 @@ class PostAPI(viewsets.ViewSet):
                               ).order_by('id')
 
         if 'tags' in params:
-            if len(params.getlist('tags')) > 1:
-                raise ParseError(detail='This type of tag parameters are not supported.')
-
-            tags: List[str] = params['tags'].split(',')
-            for tag in tags:
-                posts = posts.filter(tags__title=tag)
+            posts = self.__tag_filter(posts, params=params)
 
         allowed_fields = POST_FIELDS - {'comments'}
         posts = posts.filter(is_active=True)
@@ -114,17 +121,16 @@ class PostAPI(viewsets.ViewSet):
 
         A specific post ID must be required by uri resources.
         """
-        allowed_fields = POST_FIELDS - {'createdDate', 'author', 'category', 'comments'}
+        if not request.data:
+            raise ParseError(detail='At least one field must be required to update the post.')
 
         tag_titles = request.data.get('tags')
         if tag_titles is not None:
             tags = self.__create_tags_with(tag_titles)
             request.data.update(tags=[tag.id for tag in tags])
 
-        if not request.data:
-            raise ParseError(detail='At least one field must be required to update the post.')
-
         post = get_one(Post, id=post_id, is_active=True)
+        allowed_fields = POST_FIELDS - {'createdDate', 'author', 'category', 'comments'}
         serializer = PostSerializer(
             post, data=request.data, fields=allowed_fields, partial=True)
 
