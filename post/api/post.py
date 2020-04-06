@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import List
 
 from django.core.paginator import Page, Paginator
 from django.db import transaction
@@ -9,7 +9,22 @@ from rest_framework.response import Response
 
 from common.querytools import filter_exists, get_one
 from post.models import Post, Tag
-from post.serializers import PostCommentSerializer, PostCreateSerializer, PostSerializer
+from post.serializers import PostSerializer
+
+POST_FIELDS = set([
+    'id',
+    'title',
+    'content',
+    'location',
+    'capacity',
+    'date',
+    'timeOfDay',
+    'createdDate',
+    'author',
+    'category',
+    'tags',
+    'comments',
+])
 
 
 class PostAPI(viewsets.ViewSet):
@@ -49,15 +64,16 @@ class PostAPI(viewsets.ViewSet):
             for tag in tags:
                 posts = posts.filter(tags__title=tag)
 
+        allowed_fields = POST_FIELDS - {'comments'}
         posts = posts.filter(is_active=True)
-        serializer = PostSerializer(posts, many=True)
+        serializer = PostSerializer(posts, many=True, fields=allowed_fields)
 
         if 'page' in params:
             no = int(params['page'])
             page_size = params['pageSize'] if 'pageSize' in params else 20
 
             paginated_posts: Page = Paginator(posts, page_size).get_page(no)
-            serializer = PostSerializer(paginated_posts, many=True)
+            serializer = PostSerializer(paginated_posts, many=True, fields=allowed_fields)
 
         return Response(serializer.data)
 
@@ -68,19 +84,14 @@ class PostAPI(viewsets.ViewSet):
 
         A category ID in request data must be required.
         """
-        post_data: Dict[str, Any] = {k: v for k, v in request.data.items()
-                                     if k not in 'tags'}
-
         tag_titles = request.data.get('tags')
-        if tag_titles:
+        if tag_titles is not None:
             tags = self.__create_tags_with(tag_titles)
-            post_data.update(tags=[tag.id for tag in tags])
+            request.data.update(tags=[tag.id for tag in tags])
 
-        serializer = PostCreateSerializer(data=post_data)
+        allowed_fields = POST_FIELDS - {'createdDate', 'comments'}
+        serializer = PostSerializer(data=request.data, fields=allowed_fields)
         if serializer.is_valid():
-            if not request.data.get('category'):
-                raise ParseError(detail='A category number must be required')
-
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -93,8 +104,7 @@ class PostAPI(viewsets.ViewSet):
         A specific post ID must be required by uri resources.
         """
         post = get_one(Post, id=post_id, is_active=True)
-        serializer = PostCommentSerializer(post)
-
+        serializer = PostSerializer(post)
         return Response(serializer.data)
 
     @transaction.atomic
@@ -104,26 +114,22 @@ class PostAPI(viewsets.ViewSet):
 
         A specific post ID must be required by uri resources.
         """
-        patch_list = (
-            'title', 'content', 'location', 'capacity',
-            'date', 'timeOfDay',
-        )
-        patch_data: Dict[str, Any] = {k: v for k, v in request.data.items()
-                                      if k in patch_list}
+        allowed_fields = POST_FIELDS - {'createdDate', 'author', 'category', 'comments'}
 
         tag_titles = request.data.get('tags')
-        if tag_titles:
+        if tag_titles is not None:
             tags = self.__create_tags_with(tag_titles)
-            patch_data.update(tags=[tag.id for tag in tags])
+            request.data.update(tags=[tag.id for tag in tags])
 
-        if not patch_data:
+        if not request.data:
             raise ParseError(detail='At least one field must be required to update the post.')
 
         post = get_one(Post, id=post_id, is_active=True)
-        serializer = PostCreateSerializer(post, data=patch_data, partial=True)
+        serializer = PostSerializer(
+            post, data=request.data, fields=allowed_fields, partial=True)
 
         if serializer.is_valid():
-            serializer.update(post, validated_data=patch_data)
+            serializer.update(post, validated_data=request.data)
             return Response(serializer.data)
 
         raise ParseError(detail=serializer.errors)
