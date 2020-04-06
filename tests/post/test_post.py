@@ -52,20 +52,20 @@ class TestPost:
         assert before_transaction.data == after_transaction.data
 
     def test_list_posts(self, api_client, many_posts):
-        response1 = api_client.get('/posts')
-        response1_data_length = len(response1.data)
-        assert response1.status_code == 200
-        assert response1_data_length > 1
+        response = api_client.get('/posts')
+        original_data_length = len(response.data)
+        assert response.status_code == 200
+        assert original_data_length > 1
 
         # Pagination
-        response2 = api_client.get('/posts?page=2')
-        assert response2.status_code == 200
-        assert response1_data_length > len(response2.data)
+        response = api_client.get('/posts?page=2')
+        assert response.status_code == 200
+        assert original_data_length > len(response.data)
 
         # Pagination by specific number per page
-        response3 = api_client.get('/posts?page=1&pageSize=30')
-        assert response3.status_code == 200
-        assert len(response3.data) == 30
+        response = api_client.get('/posts?page=1&pageSize=30')
+        assert response.status_code == 200
+        assert len(response.data) == 30
 
     def test_detail_post(self, api_client, posts):
         response = api_client.get('/posts/1')
