@@ -114,7 +114,7 @@ class TestPost:
         after_update = api_client.get('/posts/1')
         assert before_update.data['tags'][0]['title'] != after_update.data['tags'][0]['title']
 
-        # Update the comment without any data.
+        # Update the post without any data.
         response = api_client.patch('/posts/1')
         assert response.status_code == 400
 
