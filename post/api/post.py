@@ -32,7 +32,8 @@ class PostAPI(viewsets.ViewSet):
         A response that includes a filtered category object by parameters
         will be returned.
         """
-        posts = filter_exists(Post, request.GET.dict(),
+        params = request.GET
+        posts = filter_exists(Post, params.dict(),
                               date__gte='startDate',
                               date__lte='endDate',
                               time_of_day='timeOfDay',
@@ -40,20 +41,20 @@ class PostAPI(viewsets.ViewSet):
                               category__title='category',
                               ).order_by('id')
 
-        if 'tags' in request.GET.dict():
-            if len(request.GET.getlist('tags')) > 1:
+        if 'tags' in params:
+            if len(params.getlist('tags')) > 1:
                 raise ParseError(detail='This type of tag parameters are not supported.')
 
-            tags: List[str] = request.GET['tags'].split(',')
+            tags: List[str] = params['tags'].split(',')
             for tag in tags:
                 posts = posts.filter(tags__title=tag)
 
         posts = posts.filter(is_active=True)
         serializer = PostSerializer(posts, many=True)
 
-        if 'page' in request.GET.dict():
-            no = int(request.GET['page'])
-            page_size = request.GET['pageSize'] if 'pageSize' in request.GET.dict() else 20
+        if 'page' in params:
+            no = int(params['page'])
+            page_size = params['pageSize'] if 'pageSize' in params else 20
 
             paginated_posts: Page = Paginator(posts, page_size).get_page(no)
             serializer = PostSerializer(paginated_posts, many=True)
