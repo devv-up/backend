@@ -16,8 +16,7 @@ class CommentAPI(viewsets.ViewSet):
         A post ID in request data must be required.
         """
         allowed_fields = [
-            'id', 'content', 'post', 'parentComment',
-            'author'
+            'id', 'content', 'post', 'parentComment', 'author'
         ]
         serializer = CommentSerializer(data=request.data, fields=allowed_fields)
 
