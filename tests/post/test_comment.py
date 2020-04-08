@@ -8,7 +8,7 @@ class TestComment:
 
     def test_create_comment(self, api_client, users, posts):
         response = api_client.post('/posts/comments', data={
-            'content': 'creating',
+            'content': 'created',
             'post': 1,
             'author': 1,
         }, format='json')

@@ -41,7 +41,6 @@ class CommentAPI(viewsets.ViewSet):
         if serializer.is_valid():
             serializer.update(comment, validated_data=request.data)
             return Response(serializer.data)
-
         raise ParseError(detail=serializer.errors)
 
     def destroy(self, request: Request, comment_id: int) -> Response:
