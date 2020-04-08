@@ -25,7 +25,7 @@ POST_FIELDS = set([
     'author',
     'category',
     'tags',
-    'comments',
+    'comments'
 ])
 
 

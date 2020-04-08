@@ -105,7 +105,7 @@ class TestPostFiltering:
         assert number_of_tags == 1
 
     def test_post_on_date_filtering(self, api_client, posts):
-        start_date, end_date = '2020-01-01', '2020-02-02'
+        start_date, end_date = '2020-01-01', '2020-02-03'
         response = api_client.get(f'/posts?startDate={start_date}&endDate={end_date}')
         assert response.status_code == 200
         assert len(response.data) == 2

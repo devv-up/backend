@@ -58,7 +58,7 @@ class TestPost:
         assert original_data_length > 1
 
         # Pagination
-        response = api_client.get('/posts?page=2')
+        response = api_client.get('/posts?page=3')
         assert response.status_code == 200
         assert original_data_length > len(response.data)
 

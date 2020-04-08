@@ -8,7 +8,7 @@ from user.models import User
 
 class TempUserSerializer(serializers.ModelSerializer):
     """
-    This class will be used until the UserSerializer from
+    This serializer will be used until the UserSerializer from
     the user app is created.
     """
     class Meta:
