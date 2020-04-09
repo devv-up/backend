@@ -1,73 +1,103 @@
-from typing import Any, Dict, TypeVar
-
-from django.db import models
 from rest_framework import serializers
 
-from post.api.comment import CommentSerializer
+from common.serializers import FilteredSerializer
 from post.models import Category, Comment, Post
+from post.serializers import CommentSerializer
 from user.models import User
 
-T = TypeVar('T', bound=models.Model)
+
+class CommentCreateSerializer(FilteredSerializer):
+    createdDate = serializers.DateTimeField(source='created_date')
+    parentComment = serializers.PrimaryKeyRelatedField(
+        queryset=Comment.objects.all(),
+        source='parent_comment',
+        required=False)
+
+    class Meta:
+        model = Comment
+        ref_name = None
+        fields = ('id', 'content', 'post', 'createdDate',
+                  'parentComment', 'author', 'is_active')
 
 
-class PostSerializer(serializers.ModelSerializer):
+class CommentCreateBodySerializer(serializers.Serializer):
+    content = serializers.CharField(
+        required=True,
+        help_text='The content of the comment',
+    )
+    post = serializers.PrimaryKeyRelatedField(
+        required=True,
+        queryset=Post.objects.all(),
+        help_text='The post ID of the comment',
+    )
+    author = serializers.PrimaryKeyRelatedField(
+        required=True,
+        queryset=User.objects.all(),
+        help_text='The author ID of the comment',
+    )
+
+    class Meta:
+        ref_name = None
+        fields = ('content', 'post', 'author')
+
+
+class CommentBodySerializer(serializers.Serializer):
+    content = serializers.CharField(
+        required=True,
+        help_text='The content of the comment',
+    )
+
+    class Meta:
+        ref_name = None
+        fields = ('content')
+
+
+class PostCreateSerializer(FilteredSerializer):
     timeOfDay = serializers.IntegerField(source='time_of_day')
     createdDate = serializers.DateTimeField(source='created_date')
+    comments = CommentSerializer(many=True)
 
     class Meta:
         model = Post
         depth = 1
-        fields = ('id', 'title', 'content', 'location',
-                  'capacity', 'date', 'timeOfDay', 'createdDate',
-                  'author', 'category', 'tags')
+        ref_name = None
+        fields = ('id', 'title', 'content', 'location', 'capacity',
+                  'date', 'timeOfDay', 'createdDate', 'author',
+                  'category', 'tags', 'comments')
+        read_only_fields = ['comments']
 
 
-class PostDetailSerializer(serializers.ModelSerializer):
+class PostDetailSerializer(FilteredSerializer):
     timeOfDay = serializers.IntegerField(source='time_of_day')
     createdDate = serializers.DateTimeField(source='created_date')
-    comments = serializers.SerializerMethodField()
-
-    def get_comments(self, obj: Post) -> Dict[str, Any]:
-        comments = Comment.objects.filter(post=obj.id, is_active=True)
-        serializer = CommentSerializer(comments, many=True)
-        return serializer.data
+    comments = CommentSerializer(many=True)
 
     class Meta:
         model = Post
         depth = 1
-        fields = ('id', 'title', 'content', 'location',
-                  'capacity', 'date', 'timeOfDay', 'createdDate',
-                  'author', 'category', 'tags', 'comments')
+        ref_name = None
+        fields = ('id', 'title', 'content', 'location', 'capacity',
+                  'date', 'timeOfDay', 'createdDate', 'author',
+                  'category', 'tags', 'comments')
+        read_only_fields = ['comments']
 
 
-class PostCreateSerializer(serializers.ModelSerializer):
-    timeOfDay = serializers.IntegerField(source='time_of_day')
-
-    class Meta:
-        model = Post
-        fields = ('id', 'title', 'content', 'location',
-                  'capacity', 'date', 'timeOfDay', 'author',
-                  'category', 'tags')
-
-
-class PostPatchSerializer(serializers.ModelSerializer):
-    timeOfDay = serializers.IntegerField(source='time_of_day')
-
-    def update(self, instance: T, validated_data: Dict[str, Any]) -> Post:
-        time_of_day = validated_data.get('timeOfDay')
-        if time_of_day is not None:
-            validated_data.update(time_of_day=time_of_day)
-        return super().update(instance, validated_data)
+class PostPatchSerializer(FilteredSerializer):
+    timeOfDay = serializers.IntegerField(source='time_of_day', required=False)
+    createdDate = serializers.DateTimeField(source='created_date', required=False)
 
     class Meta:
         model = Post
-        fields = ('id', 'title', 'content', 'location',
-                  'capacity', 'date', 'timeOfDay', 'tags')
+        depth = 1
+        ref_name = None
+        fields = ('id', 'title', 'content', 'location', 'capacity',
+                  'date', 'timeOfDay', 'createdDate', 'author',
+                  'category', 'tags', 'comments')
 
 
 class PostQuerySerializer(serializers.Serializer):
     page = serializers.IntegerField(
-        required=False,
+        required=True,
         help_text='A page number within the paginated result set.\n\n ex) page=1',
     )
     pageSize = serializers.IntegerField(
@@ -152,7 +182,7 @@ class PostBodySerializer(serializers.Serializer):
 
 class PostPatchBodySerializer(serializers.Serializer):
     title = serializers.CharField(
-        required=True,
+        required=False,
         help_text='The title of the post',
     )
     content = serializers.CharField(
@@ -160,19 +190,19 @@ class PostPatchBodySerializer(serializers.Serializer):
         help_text='The content of the post',
     )
     location = serializers.CharField(
-        required=True,
+        required=False,
         help_text='The location of the meeting',
     )
     capacity = serializers.IntegerField(
-        required=True,
+        required=False,
         help_text='The capacity of the meeting',
     )
     date = serializers.DateField(
-        required=True,
+        required=False,
         help_text='The start date of the meeting',
     )
     timeOfDay = serializers.IntegerField(
-        required=True,
+        required=False,
         help_text='Time of the day of the meeting',
     )
     tags = serializers.CharField(
