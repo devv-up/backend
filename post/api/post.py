@@ -71,7 +71,19 @@ class PostAPI(viewsets.ViewSet):
         if 'tags' in params:
             posts = self.__tag_filter(posts, params=params)
 
-        allowed_fields = POST_FIELDS - {'comments'}
+        allowed_fields = {
+            'id',
+            'title',
+            'content',
+            'location',
+            'capacity',
+            'date',
+            'timeOfDay',
+            'createdDate',
+            'author',
+            'category',
+            'tags',
+        }
         posts = posts.filter(is_active=True)
         serializer = PostSerializer(posts, many=True, fields=allowed_fields)
 
@@ -104,7 +116,18 @@ class PostAPI(viewsets.ViewSet):
             tags = self.__create_tags_with(tag_titles)
             post_data.update(tags=[tag.id for tag in tags])
 
-        allowed_fields = POST_FIELDS - {'createdDate', 'comments'}
+        allowed_fields = {
+            'id',
+            'title',
+            'content',
+            'location',
+            'capacity',
+            'date',
+            'timeOfDay',
+            'author',
+            'category',
+            'tags',
+        }
         serializer = PostSerializer(data=post_data, fields=allowed_fields)
         if serializer.is_valid():
             serializer.save()
@@ -140,7 +163,16 @@ class PostAPI(viewsets.ViewSet):
             patch_data.update(tags=[tag.id for tag in tags])
 
         post = get_one(Post, id=post_id, is_active=True)
-        allowed_fields = POST_FIELDS - {'createdDate', 'author', 'category', 'comments'}
+        allowed_fields = {
+            'id',
+            'title',
+            'content',
+            'location',
+            'capacity',
+            'date',
+            'timeOfDay',
+            'tags',
+        }
         serializer = PostSerializer(
             post, data=patch_data, fields=allowed_fields, partial=True)
 
