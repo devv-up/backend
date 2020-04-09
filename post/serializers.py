@@ -1,7 +1,6 @@
-from typing import Any
-
 from rest_framework import serializers
 
+from common.serializers import SerializerFieldAdjuster
 from post.models import Category, Comment, Post, Tag
 from user.models import User
 
@@ -28,26 +27,12 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ('id', 'title')
 
 
-class CommentSerializer(serializers.ModelSerializer):
+class CommentSerializer(SerializerFieldAdjuster):
     createdDate = serializers.DateTimeField(source='created_date')
     parentComment = serializers.PrimaryKeyRelatedField(
         queryset=Comment.objects.all(),
         source='parent_comment',
         required=False)
-
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        # Don't pass the 'fields' arg up to the superclass
-        fields = kwargs.pop('fields', None)
-
-        # Instantiate the superclass normally
-        super(CommentSerializer, self).__init__(*args, **kwargs)
-
-        if fields is not None:
-            # Drop any fields that are not specified in the `fields` argument.
-            allowed = set(fields)
-            existing = set(self.fields)
-            for field_name in existing - allowed:
-                self.fields.pop(field_name)
 
     class Meta:
         model = Comment
@@ -55,24 +40,10 @@ class CommentSerializer(serializers.ModelSerializer):
                   'parentComment', 'author', 'is_active')
 
 
-class PostSerializer(serializers.ModelSerializer):
+class PostSerializer(SerializerFieldAdjuster):
     timeOfDay = serializers.IntegerField(source='time_of_day')
     createdDate = serializers.DateTimeField(source='created_date')
     comments = CommentSerializer(many=True)
-
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        # Don't pass the 'fields' arg up to the superclass
-        fields = kwargs.pop('fields', None)
-
-        # Instantiate the superclass normally
-        super(PostSerializer, self).__init__(*args, **kwargs)
-
-        if fields is not None:
-            # Drop any fields that are not specified in the `fields` argument.
-            allowed = set(fields)
-            existing = set(self.fields)
-            for field_name in existing - allowed:
-                self.fields.pop(field_name)
 
     class Meta:
         model = Post
