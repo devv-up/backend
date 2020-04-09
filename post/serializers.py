@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from common.serializers import SerializerFieldAdjuster
+from common.serializers import FilteredSerializer
 from post.models import Category, Comment, Post, Tag
 from user.models import User
 
@@ -27,7 +27,7 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ('id', 'title')
 
 
-class CommentSerializer(SerializerFieldAdjuster):
+class CommentSerializer(FilteredSerializer):
     createdDate = serializers.DateTimeField(source='created_date')
     parentComment = serializers.PrimaryKeyRelatedField(
         queryset=Comment.objects.all(),
@@ -40,7 +40,7 @@ class CommentSerializer(SerializerFieldAdjuster):
                   'parentComment', 'author', 'is_active')
 
 
-class PostSerializer(SerializerFieldAdjuster):
+class PostSerializer(FilteredSerializer):
     timeOfDay = serializers.IntegerField(source='time_of_day')
     createdDate = serializers.DateTimeField(source='created_date')
     comments = CommentSerializer(many=True)

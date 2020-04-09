@@ -3,13 +3,13 @@ from typing import Any
 from rest_framework import serializers
 
 
-class SerializerFieldAdjuster(serializers.ModelSerializer):
+class FilteredSerializer(serializers.ModelSerializer):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         # Don't pass the 'fields' arg up to the superclass
         fields = kwargs.pop('fields', None)
 
         # Instantiate the superclass normally
-        super(SerializerFieldAdjuster, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         if fields is not None:
             # Drop any fields that are not specified in the `fields` argument.
