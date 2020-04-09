@@ -7,6 +7,14 @@ from common.querytools import get_one
 from post.models import Comment
 from post.serializers import CommentSerializer
 
+CREATE_FIELDS = {
+    'id',
+    'content',
+    'post',
+    'parentComment',
+    'author',
+}
+
 
 class CommentAPI(viewsets.ViewSet):
     def create(self, request: Request) -> Response:
@@ -15,11 +23,8 @@ class CommentAPI(viewsets.ViewSet):
 
         A post ID in request data must be required.
         """
-        allowed_fields = [
-            'id', 'content', 'post', 'parentComment', 'author'
-        ]
         comment_data = {**request.data}
-        serializer = CommentSerializer(data=comment_data, fields=allowed_fields)
+        serializer = CommentSerializer(data=comment_data, fields=CREATE_FIELDS)
 
         if serializer.is_valid():
             serializer.save()

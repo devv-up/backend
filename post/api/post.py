@@ -13,6 +13,44 @@ from common.querytools import filter_exists, get_one
 from post.models import Post, Tag
 from post.serializers import PostSerializer
 
+LIST_FIELDS = {
+    'id',
+    'title',
+    'content',
+    'location',
+    'capacity',
+    'date',
+    'timeOfDay',
+    'createdDate',
+    'author',
+    'category',
+    'tags',
+}
+
+CREATE_FIELDS = {
+    'id',
+    'title',
+    'content',
+    'location',
+    'capacity',
+    'date',
+    'timeOfDay',
+    'author',
+    'category',
+    'tags',
+}
+
+PATCH_FIELDS = {
+    'id',
+    'title',
+    'content',
+    'location',
+    'capacity',
+    'date',
+    'timeOfDay',
+    'tags',
+}
+
 
 class PostAPI(viewsets.ViewSet):
     def __create_tags_with(self, titles: List[str]) -> List[Tag]:
@@ -56,21 +94,8 @@ class PostAPI(viewsets.ViewSet):
         if 'tags' in params:
             posts = self.__tag_filter(posts, params=params)
 
-        allowed_fields = {
-            'id',
-            'title',
-            'content',
-            'location',
-            'capacity',
-            'date',
-            'timeOfDay',
-            'createdDate',
-            'author',
-            'category',
-            'tags',
-        }
         posts = posts.filter(is_active=True)
-        serializer = PostSerializer(posts, many=True, fields=allowed_fields)
+        serializer = PostSerializer(posts, many=True, fields=LIST_FIELDS)
 
         if 'page' in params:
             try:
@@ -81,7 +106,7 @@ class PostAPI(viewsets.ViewSet):
                 raise ParseError(detail='Page or page size should be integer.')
 
             paginated_posts: Page = Paginator(posts, page_size).get_page(no)
-            serializer = PostSerializer(paginated_posts, many=True, fields=allowed_fields)
+            serializer = PostSerializer(paginated_posts, many=True, fields=LIST_FIELDS)
 
         else:
             raise ValidationError(detail='Page parameter must be required.')
@@ -101,19 +126,7 @@ class PostAPI(viewsets.ViewSet):
             tags = self.__create_tags_with(tag_titles)
             post_data.update(tags=[tag.id for tag in tags])
 
-        allowed_fields = {
-            'id',
-            'title',
-            'content',
-            'location',
-            'capacity',
-            'date',
-            'timeOfDay',
-            'author',
-            'category',
-            'tags',
-        }
-        serializer = PostSerializer(data=post_data, fields=allowed_fields)
+        serializer = PostSerializer(data=post_data, fields=CREATE_FIELDS)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -148,18 +161,9 @@ class PostAPI(viewsets.ViewSet):
             patch_data.update(tags=[tag.id for tag in tags])
 
         post = get_one(Post, id=post_id, is_active=True)
-        allowed_fields = {
-            'id',
-            'title',
-            'content',
-            'location',
-            'capacity',
-            'date',
-            'timeOfDay',
-            'tags',
-        }
+
         serializer = PostSerializer(
-            post, data=patch_data, fields=allowed_fields, partial=True)
+            post, data=patch_data, fields=PATCH_FIELDS, partial=True)
 
         if serializer.is_valid():
             serializer.update(post, validated_data=patch_data)
