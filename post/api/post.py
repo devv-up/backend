@@ -5,7 +5,7 @@ from django.db import transaction
 from django.db.models.query import QuerySet
 from django.http.request import QueryDict
 from rest_framework import status, viewsets
-from rest_framework.exceptions import ParseError
+from rest_framework.exceptions import ParseError, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -13,7 +13,7 @@ from common.querytools import filter_exists, get_one
 from post.models import Post, Tag
 from post.serializers import PostSerializer
 
-POST_FIELDS = set([
+POST_FIELDS = {
     'id',
     'title',
     'content',
@@ -26,7 +26,7 @@ POST_FIELDS = set([
     'category',
     'tags',
     'comments',
-])
+}
 
 
 class PostAPI(viewsets.ViewSet):
@@ -76,11 +76,18 @@ class PostAPI(viewsets.ViewSet):
         serializer = PostSerializer(posts, many=True, fields=allowed_fields)
 
         if 'page' in params:
-            no = int(params['page'])
-            page_size = params['pageSize'] if 'pageSize' in params else 20
+            try:
+                no = int(params['page'])
+                page_size = params.get('pageSize', 20)
+                page_size = 50 if int(page_size) > 50 else page_size
+            except TypeError:
+                raise ParseError(detail='Page or page size should be integer.')
 
             paginated_posts: Page = Paginator(posts, page_size).get_page(no)
             serializer = PostSerializer(paginated_posts, many=True, fields=allowed_fields)
+
+        else:
+            raise ValidationError(detail='Page parameter must be required.')
 
         return Response(serializer.data)
 
@@ -91,13 +98,14 @@ class PostAPI(viewsets.ViewSet):
 
         A category ID in request data must be required.
         """
+        post_data = {**request.data}
         tag_titles = request.data.get('tags')
         if tag_titles is not None:
             tags = self.__create_tags_with(tag_titles)
-            request.data.update(tags=[tag.id for tag in tags])
+            post_data.update(tags=[tag.id for tag in tags])
 
         allowed_fields = POST_FIELDS - {'createdDate', 'comments'}
-        serializer = PostSerializer(data=request.data, fields=allowed_fields)
+        serializer = PostSerializer(data=post_data, fields=allowed_fields)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -124,18 +132,20 @@ class PostAPI(viewsets.ViewSet):
         if not request.data:
             raise ParseError(detail='At least one field must be required to update the post.')
 
+        patch_data = {**request.data}
+
         tag_titles = request.data.get('tags')
         if tag_titles is not None:
             tags = self.__create_tags_with(tag_titles)
-            request.data.update(tags=[tag.id for tag in tags])
+            patch_data.update(tags=[tag.id for tag in tags])
 
         post = get_one(Post, id=post_id, is_active=True)
         allowed_fields = POST_FIELDS - {'createdDate', 'author', 'category', 'comments'}
         serializer = PostSerializer(
-            post, data=request.data, fields=allowed_fields, partial=True)
+            post, data=patch_data, fields=allowed_fields, partial=True)
 
         if serializer.is_valid():
-            serializer.update(post, validated_data=request.data)
+            serializer.update(post, validated_data=patch_data)
             return Response(serializer.data)
 
         raise ParseError(detail=serializer.errors)
