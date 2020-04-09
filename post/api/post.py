@@ -20,9 +20,9 @@ from post.serializers import (PostBodySerializer, PostCreateSerializer, PostDeta
 
 class PostAPI(viewsets.ViewSet):
     list_response = openapi.Response('Success', PostSerializer(many=True))
-    create_response = openapi.Response('Success', PostSerializer)
-    retrieve_response = openapi.Response('Success', PostSerializer)
-    patch_response = openapi.Response('Success', PostSerializer)
+    create_response = openapi.Response('Success', PostCreateSerializer)
+    retrieve_response = openapi.Response('Success', PostDetailSerializer)
+    patch_response = openapi.Response('Success', PostPatchSerializer)
 
     def _tag_filter(self, posts: 'QuerySet[Post]', params: QueryDict) -> 'QuerySet[Post]':
         if len(params.getlist('tags')) > 1:

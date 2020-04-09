@@ -1,12 +1,11 @@
 from rest_framework import serializers
 
-from common.serializers import FilteredSerializer
 from post.models import Category, Comment, Post
 from post.serializers import CommentSerializer
 from user.models import User
 
 
-class CommentCreateSerializer(FilteredSerializer):
+class CommentCreateSerializer(serializers.ModelSerializer):
     createdDate = serializers.DateTimeField(source='created_date')
     parentComment = serializers.PrimaryKeyRelatedField(
         queryset=Comment.objects.all(),
@@ -52,7 +51,7 @@ class CommentBodySerializer(serializers.Serializer):
         fields = ('content')
 
 
-class PostCreateSerializer(FilteredSerializer):
+class PostCreateSerializer(serializers.ModelSerializer):
     timeOfDay = serializers.IntegerField(source='time_of_day')
     createdDate = serializers.DateTimeField(source='created_date')
     comments = CommentSerializer(many=True)
@@ -67,7 +66,7 @@ class PostCreateSerializer(FilteredSerializer):
         read_only_fields = ['comments']
 
 
-class PostDetailSerializer(FilteredSerializer):
+class PostDetailSerializer(serializers.ModelSerializer):
     timeOfDay = serializers.IntegerField(source='time_of_day')
     createdDate = serializers.DateTimeField(source='created_date')
     comments = CommentSerializer(many=True)
@@ -82,7 +81,7 @@ class PostDetailSerializer(FilteredSerializer):
         read_only_fields = ['comments']
 
 
-class PostPatchSerializer(FilteredSerializer):
+class PostPatchSerializer(serializers.ModelSerializer):
     timeOfDay = serializers.IntegerField(source='time_of_day', required=False)
     createdDate = serializers.DateTimeField(source='created_date', required=False)
 

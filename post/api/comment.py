@@ -12,8 +12,8 @@ from post.serializers import (CommentBodySerializer, CommentCreateBodySerializer
 
 
 class CommentAPI(viewsets.ViewSet):
-    create_response = openapi.Response('Success', CommentSerializer(many=True))
-    put_response = openapi.Response('Success', CommentSerializer(many=True))
+    create_response = openapi.Response('Success', CommentCreateSerializer())
+    put_response = openapi.Response('Success', CommentSerializer)
 
     @swagger_auto_schema(request_body=CommentCreateBodySerializer,
                          responses={201: create_response, 400: 'Parameter Error'})
