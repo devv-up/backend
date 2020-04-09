@@ -13,21 +13,6 @@ from common.querytools import filter_exists, get_one
 from post.models import Post, Tag
 from post.serializers import PostSerializer
 
-POST_FIELDS = {
-    'id',
-    'title',
-    'content',
-    'location',
-    'capacity',
-    'date',
-    'timeOfDay',
-    'createdDate',
-    'author',
-    'category',
-    'tags',
-    'comments',
-}
-
 
 class PostAPI(viewsets.ViewSet):
     def __create_tags_with(self, titles: List[str]) -> List[Tag]:
