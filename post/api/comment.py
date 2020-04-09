@@ -18,7 +18,8 @@ class CommentAPI(viewsets.ViewSet):
         allowed_fields = [
             'id', 'content', 'post', 'parentComment', 'author'
         ]
-        serializer = CommentSerializer(data=request.data, fields=allowed_fields)
+        comment_data = {**request.data}
+        serializer = CommentSerializer(data=comment_data, fields=allowed_fields)
 
         if serializer.is_valid():
             serializer.save()
