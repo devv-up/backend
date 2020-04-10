@@ -102,7 +102,7 @@ class PostAPI(viewsets.ViewSet):
                 no = int(params['page'])
                 page_size = params.get('pageSize', 20)
                 page_size = 50 if int(page_size) > 50 else page_size
-            except TypeError:
+            except ValueError:
                 raise ParseError(detail='Page or page size should be integer.')
 
             paginated_posts: Page = Paginator(posts, page_size).get_page(no)
