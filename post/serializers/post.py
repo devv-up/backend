@@ -27,7 +27,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
     createdDate = serializers.DateTimeField(source='created_date')
     comments = serializers.SerializerMethodField()
 
-    @swagger_serializer_method(serializer_or_field=CommentSerializer)  # type: ignore
+    @swagger_serializer_method(serializer_or_field=CommentSerializer(many=True))  # type: ignore
     def get_comments(self, obj: Post) -> Dict[str, Any]:
         comments = Comment.objects.filter(post=obj.id, is_active=True)
         serializer = CommentSerializer(comments, many=True)

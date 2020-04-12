@@ -7,8 +7,7 @@ from rest_framework.response import Response
 
 from common.querytools import get_one
 from post.models import Comment
-from post.serializers import (CommentCreateSerializer, CommentPutSerializer,
-                              CommentSerializer)
+from post.serializers import CommentCreateSerializer, CommentPutSerializer, CommentSerializer
 
 
 class CommentAPI(viewsets.ViewSet):

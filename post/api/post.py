@@ -13,9 +13,8 @@ from rest_framework.response import Response
 
 from common.querytools import filter_exists, get_one
 from post.models import Post, Tag
-from post.serializers import (PostCreateSerializer, PostDetailSerializer,
-                              PostPatchSerializer, PostQuerySerializer,
-                              PostSerializer)
+from post.serializers import (PostCreateSerializer, PostDetailSerializer, PostPatchSerializer,
+                              PostQuerySerializer, PostSerializer)
 
 
 class PostAPI(viewsets.ViewSet):
