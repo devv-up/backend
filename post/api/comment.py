@@ -7,15 +7,16 @@ from rest_framework.response import Response
 
 from common.querytools import get_one
 from post.models import Comment
-from post.serializers import (CommentBodySerializer, CommentCreateBodySerializer,
-                              CommentCreateSerializer, CommentPutSerializer, CommentSerializer)
+from post.serializers import (CommentCreateSerializer, CommentPutSerializer,
+                              CommentSerializer)
 
 
 class CommentAPI(viewsets.ViewSet):
-    create_response = openapi.Response('Success', CommentCreateSerializer())
-    put_response = openapi.Response('Success', CommentSerializer)
+    # model_register = openapi.Response('I\'m a teapot', CommentSerializer)
+    create_response = openapi.Response('Success', CommentCreateSerializer)
+    put_response = openapi.Response('Success', CommentPutSerializer)
 
-    @swagger_auto_schema(request_body=CommentCreateBodySerializer,
+    @swagger_auto_schema(request_body=CommentCreateSerializer,
                          responses={201: create_response, 400: 'Parameter Error'})
     def create(self, request: Request) -> Response:
         """
@@ -32,7 +33,7 @@ class CommentAPI(viewsets.ViewSet):
 
         raise ValidationError(detail=serializer.errors)
 
-    @swagger_auto_schema(request_body=CommentBodySerializer,
+    @swagger_auto_schema(request_body=CommentPutSerializer,
                          responses={200: put_response, 400: 'Parameter Error', 404: 'Not Found'})
     def update(self, request: Request, comment_id: int) -> Response:
         """
@@ -53,7 +54,8 @@ class CommentAPI(viewsets.ViewSet):
 
         raise ValidationError(detail=serializer.errors)
 
-    @swagger_auto_schema(responses={204: 'Success', 400: 'Parameter Error', 404: 'Not Found'})
+    @swagger_auto_schema(responses={
+        204: 'Success', 400: 'Parameter Error', 404: 'Not Found'})
     def destroy(self, request: Request, comment_id: int) -> Response:
         """
         Make the comment disabled.

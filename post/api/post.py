@@ -13,8 +13,8 @@ from rest_framework.response import Response
 
 from common.querytools import filter_exists, get_one
 from post.models import Post, Tag
-from post.serializers import (PostBodySerializer, PostCreateSerializer, PostDetailSerializer,
-                              PostPatchBodySerializer, PostPatchSerializer, PostQuerySerializer,
+from post.serializers import (PostCreateSerializer, PostDetailSerializer,
+                              PostPatchSerializer, PostQuerySerializer,
                               PostSerializer)
 
 
@@ -77,7 +77,7 @@ class PostAPI(viewsets.ViewSet):
         return Response(serializer.data)
 
     @transaction.atomic
-    @swagger_auto_schema(request_body=PostBodySerializer,
+    @swagger_auto_schema(request_body=PostCreateSerializer,
                          responses={201: create_response, 400: 'Parameter Error'})
     def create(self, request: Request) -> Response:
         """
@@ -108,7 +108,7 @@ class PostAPI(viewsets.ViewSet):
         return Response(serializer.data)
 
     @transaction.atomic
-    @swagger_auto_schema(request_body=PostPatchBodySerializer,
+    @swagger_auto_schema(request_body=PostPatchSerializer,
                          responses={200: patch_response, 400: 'Parameter Error', 404: 'Not Found'})
     def partial_update(self, request: Request, post_id: int) -> Response:
         """
