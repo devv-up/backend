@@ -35,6 +35,7 @@ class TestComment:
 
     def test_delete_comment(self, api_client, comments):
         response = api_client.delete('/posts/comments/1')
+        comment = Comment.objects.get(id=1)
 
         assert response.status_code == 204
-        assert not response.data['is_active']
+        assert comment.is_active is False
