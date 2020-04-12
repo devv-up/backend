@@ -52,5 +52,4 @@ class CommentAPI(viewsets.ViewSet):
         serializer = CommentSerializer(comment)
         serializer.update(comment, {'is_active': False})
 
-        deleted_comment = CommentSerializer(comment).data
-        return Response(deleted_comment, status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_204_NO_CONTENT)
