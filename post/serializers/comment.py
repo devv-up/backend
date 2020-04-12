@@ -28,6 +28,7 @@ class CommentCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
+        ref_name = None
         fields = ('id', 'content', 'post', 'parentComment',
                   'author')
 
@@ -67,4 +68,4 @@ class CommentBodySerializer(serializers.Serializer):
 
     class Meta:
         ref_name = None
-        fields = ('content')
+        fields = ('content',)

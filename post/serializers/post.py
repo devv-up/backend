@@ -1,11 +1,11 @@
 from typing import Any, Dict, TypeVar
 
 from django.db import models
+from drf_yasg.utils import swagger_serializer_method
 from rest_framework import serializers
 
 from post.api.comment import CommentSerializer
-from post.models import Category, Comment, Post
-from user.models import User
+from post.models import Category, Comment, Post, Tag
 
 T = TypeVar('T', bound=models.Model)
 
@@ -27,6 +27,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
     createdDate = serializers.DateTimeField(source='created_date')
     comments = serializers.SerializerMethodField()
 
+    @swagger_serializer_method(serializer_or_field=CommentSerializer)  # type: ignore
     def get_comments(self, obj: Post) -> Dict[str, Any]:
         comments = Comment.objects.filter(post=obj.id, is_active=True)
         serializer = CommentSerializer(comments, many=True)
@@ -42,16 +43,44 @@ class PostDetailSerializer(serializers.ModelSerializer):
 
 class PostCreateSerializer(serializers.ModelSerializer):
     timeOfDay = serializers.IntegerField(source='time_of_day')
+    category = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.filter(is_active=True),
+        required=True
+    )
 
     class Meta:
         model = Post
+        ref_name = None
         fields = ('id', 'title', 'content', 'location',
                   'capacity', 'date', 'timeOfDay', 'author',
                   'category', 'tags')
 
 
 class PostPatchSerializer(serializers.ModelSerializer):
-    timeOfDay = serializers.IntegerField(source='time_of_day')
+    title = serializers.CharField(
+        required=False
+    )
+    content = serializers.CharField(
+        required=False
+    )
+    location = serializers.CharField(
+        required=False
+    )
+    capacity = serializers.CharField(
+        required=False
+    )
+    date = serializers.DateField(
+        required=False
+    )
+    timeOfDay = serializers.IntegerField(
+        source='time_of_day',
+        required=False
+    )
+    tags = serializers.PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(),
+        many=True,
+        required=False
+    )
 
     def update(self, instance: T, validated_data: Dict[str, Any]) -> Post:
         time_of_day = validated_data.get('timeOfDay')
@@ -61,13 +90,14 @@ class PostPatchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
+        ref_name = None
         fields = ('id', 'title', 'content', 'location',
                   'capacity', 'date', 'timeOfDay', 'tags')
 
 
 class PostQuerySerializer(serializers.Serializer):
     page = serializers.IntegerField(
-        required=False,
+        required=True,
         help_text='A page number within the paginated result set.\n\n ex) page=1',
     )
     pageSize = serializers.IntegerField(
@@ -102,85 +132,3 @@ class PostQuerySerializer(serializers.Serializer):
     class Meta:
         fields = ('page', 'pageSize', 'category', 'tags',
                   'startDate', 'endDate', 'timeOfDay', 'location')
-
-
-class PostBodySerializer(serializers.Serializer):
-    title = serializers.CharField(
-        required=True,
-        help_text='The title of the post',
-    )
-    content = serializers.CharField(
-        required=True,
-        help_text='The content of the post',
-    )
-    location = serializers.CharField(
-        required=True,
-        help_text='The location of the meeting',
-    )
-    capacity = serializers.IntegerField(
-        required=True,
-        help_text='The capacity of the meeting',
-    )
-    date = serializers.DateField(
-        required=True,
-        help_text='The start date of the meeting',
-    )
-    timeOfDay = serializers.IntegerField(
-        required=True,
-        help_text='Time of the day of the meeting',
-    )
-    author = serializers.PrimaryKeyRelatedField(
-        required=True,
-        queryset=User.objects.all(),
-        help_text='The author ID of the post',
-    )
-    category = serializers.PrimaryKeyRelatedField(
-        required=True,
-        queryset=Category.objects.all(),
-        help_text='The category ID of the post',
-    )
-    tags = serializers.CharField(
-        required=False,
-        help_text='Tag titles of the post',
-    )
-
-    class Meta:
-        ref_name = None
-        fields = ('title', 'content', 'location', 'capacity', 'date',
-                  'timeOfDay', 'author', 'category', 'tags')
-
-
-class PostPatchBodySerializer(serializers.Serializer):
-    title = serializers.CharField(
-        required=True,
-        help_text='The title of the post',
-    )
-    content = serializers.CharField(
-        required=True,
-        help_text='The content of the post',
-    )
-    location = serializers.CharField(
-        required=True,
-        help_text='The location of the meeting',
-    )
-    capacity = serializers.IntegerField(
-        required=True,
-        help_text='The capacity of the meeting',
-    )
-    date = serializers.DateField(
-        required=True,
-        help_text='The start date of the meeting',
-    )
-    timeOfDay = serializers.IntegerField(
-        required=True,
-        help_text='Time of the day of the meeting',
-    )
-    tags = serializers.CharField(
-        required=False,
-        help_text='Tag titles of the post',
-    )
-
-    class Meta:
-        ref_name = None
-        fields = ('title', 'content', 'location', 'capacity', 'date',
-                  'timeOfDay', 'tags')
