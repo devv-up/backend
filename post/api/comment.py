@@ -5,15 +5,7 @@ from rest_framework.response import Response
 
 from common.querytools import get_one
 from post.models import Comment
-from post.serializers import CommentSerializer
-
-CREATE_FIELDS = {
-    'id',
-    'content',
-    'post',
-    'parentComment',
-    'author',
-}
+from post.serializers import CommentCreateSerializer, CommentPutSerializer, CommentSerializer
 
 
 class CommentAPI(viewsets.ViewSet):
@@ -24,7 +16,7 @@ class CommentAPI(viewsets.ViewSet):
         A post ID in request data must be required.
         """
         comment_data = {**request.data}
-        serializer = CommentSerializer(data=comment_data, fields=CREATE_FIELDS)
+        serializer = CommentCreateSerializer(data=comment_data)
 
         if serializer.is_valid():
             serializer.save()
@@ -42,7 +34,7 @@ class CommentAPI(viewsets.ViewSet):
 
         comment = get_one(Comment, id=comment_id, is_active=True)
         comment_data = {'content': request.data['content']}
-        serializer = CommentSerializer(comment, data=comment_data, partial=True)
+        serializer = CommentPutSerializer(comment, data=comment_data, partial=True)
 
         if serializer.is_valid():
             serializer.update(comment, validated_data=request.data)

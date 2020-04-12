@@ -11,45 +11,8 @@ from rest_framework.response import Response
 
 from common.querytools import filter_exists, get_one
 from post.models import Post, Tag
-from post.serializers import PostSerializer
-
-LIST_FIELDS = {
-    'id',
-    'title',
-    'content',
-    'location',
-    'capacity',
-    'date',
-    'timeOfDay',
-    'createdDate',
-    'author',
-    'category',
-    'tags',
-}
-
-CREATE_FIELDS = {
-    'id',
-    'title',
-    'content',
-    'location',
-    'capacity',
-    'date',
-    'timeOfDay',
-    'author',
-    'category',
-    'tags',
-}
-
-PATCH_FIELDS = {
-    'id',
-    'title',
-    'content',
-    'location',
-    'capacity',
-    'date',
-    'timeOfDay',
-    'tags',
-}
+from post.serializers import (PostCreateSerializer, PostDetailSerializer, PostPatchSerializer,
+                              PostSerializer)
 
 
 class PostAPI(viewsets.ViewSet):
@@ -95,7 +58,7 @@ class PostAPI(viewsets.ViewSet):
             posts = self.__tag_filter(posts, params=params)
 
         posts = posts.filter(is_active=True)
-        serializer = PostSerializer(posts, many=True, fields=LIST_FIELDS)
+        serializer = PostSerializer(posts, many=True)
 
         if 'page' in params:
             try:
@@ -106,7 +69,7 @@ class PostAPI(viewsets.ViewSet):
                 raise ParseError(detail='Page or page size should be integer.')
 
             paginated_posts: Page = Paginator(posts, page_size).get_page(no)
-            serializer = PostSerializer(paginated_posts, many=True, fields=LIST_FIELDS)
+            serializer = PostSerializer(paginated_posts, many=True)
 
         else:
             raise ValidationError(detail='Page parameter must be required.')
@@ -126,7 +89,7 @@ class PostAPI(viewsets.ViewSet):
             tags = self.__create_tags_with(tag_titles)
             post_data.update(tags=[tag.id for tag in tags])
 
-        serializer = PostSerializer(data=post_data, fields=CREATE_FIELDS)
+        serializer = PostCreateSerializer(data=post_data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -140,7 +103,7 @@ class PostAPI(viewsets.ViewSet):
         A specific post ID must be required by uri resources.
         """
         post = get_one(Post, id=post_id, is_active=True)
-        serializer = PostSerializer(post)
+        serializer = PostDetailSerializer(post)
         return Response(serializer.data)
 
     @transaction.atomic
@@ -152,6 +115,10 @@ class PostAPI(viewsets.ViewSet):
         """
         if not request.data:
             raise ParseError(detail='At least one field must be required to update the post.')
+        elif request.data.get('id') or request.data.get('pk'):
+            raise ParseError(detail='Post ID cannot be updated.')
+        elif request.data.get('category'):
+            raise ParseError(detail='Category cannot be updated.')
 
         patch_data = {**request.data}
 
@@ -162,8 +129,8 @@ class PostAPI(viewsets.ViewSet):
 
         post = get_one(Post, id=post_id, is_active=True)
 
-        serializer = PostSerializer(
-            post, data=patch_data, fields=PATCH_FIELDS, partial=True)
+        serializer = PostPatchSerializer(
+            post, data=patch_data, partial=True)
 
         if serializer.is_valid():
             serializer.update(post, validated_data=patch_data)
