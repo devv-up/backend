@@ -43,3 +43,6 @@ def swagger_auto_schema(
     tags: Optional[List[str]] = ...,
     **extra_overrides: Any
 ) -> Callable[[_VIEW], _VIEW]: ...
+
+
+def swagger_serializer_method(serializer_or_field: Any) -> Callable[[_VIEW], _VIEW]: ...
