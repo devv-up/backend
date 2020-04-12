@@ -27,7 +27,7 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ('id', 'title')
 
 
-class CommentSerializer(FilteredSerializer):
+class CommentSerializer(serializers.ModelSerializer):
     createdDate = serializers.DateTimeField(source='created_date')
     parentComment = serializers.PrimaryKeyRelatedField(
         queryset=Comment.objects.all(),
@@ -40,7 +40,7 @@ class CommentSerializer(FilteredSerializer):
                   'parentComment', 'author', 'is_active')
 
 
-class PostSerializer(FilteredSerializer):
+class PostSerializer(serializers.ModelSerializer):
     timeOfDay = serializers.IntegerField(source='time_of_day')
     createdDate = serializers.DateTimeField(source='created_date')
     comments = CommentSerializer(many=True)
