@@ -60,7 +60,7 @@ class PostPatchSerializer(serializers.ModelSerializer):
     title = serializers.CharField(required=False)
     content = serializers.CharField(required=False)
     location = serializers.CharField(required=False)
-    capacity = serializers.CharField(required=False)
+    capacity = serializers.IntegerField(required=False)
     date = serializers.DateField(required=False)
 
     timeOfDay = serializers.IntegerField(
