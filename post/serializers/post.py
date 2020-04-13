@@ -88,7 +88,7 @@ class PostPatchSerializer(serializers.ModelSerializer):
 
 class PostQuerySerializer(serializers.Serializer):
     page = serializers.IntegerField(
-        required=True,
+        required=False,
         help_text='A page number within the paginated result set.\n\n ex) page=1',
     )
     pageSize = serializers.IntegerField(
