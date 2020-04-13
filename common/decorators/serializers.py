@@ -5,6 +5,9 @@ from typing import Any, Callable, Dict, Iterable, Optional, Type, TypeVar, cast
 from django.db import models
 from rest_framework import serializers
 
+__all__ = ['filtered_serializer', 'model_serializer', 'serializer', 'field', 'required',
+           'Method', 'Date', 'DateTime']
+
 T = TypeVar('T', bound=serializers.Field)
 U = TypeVar('U', bound=serializers.Serializer)
 V = TypeVar('V', bound=models.Model)
@@ -46,7 +49,7 @@ def filtered_serializer(super_class: type,
     field_set = set(fields)
 
     def wrap(origin: type) -> Type[U]:
-        _fields = set()
+        meta_fields = set()
         cls = type(f'{origin.__module__}.{origin.__name__}',
                    tuple([super_class]),
                    {})
@@ -58,18 +61,18 @@ def filtered_serializer(super_class: type,
         new_declared_fields: OrderedDict[str, Any] = OrderedDict()
         for key, value in declared_fields.items():
             if key in field_set:
-                _fields.add(key)
+                meta_fields.add(key)
                 new_declared_fields[key] = value
 
         for key, value in origin.__dict__.items():
-            if isinstance(value, _Item):
+            if isinstance(value, Item):
                 new_declared_fields[key] = value.origin
                 if value.db_field:
-                    _fields.add(key)
+                    meta_fields.add(key)
 
         setattr(cls, '_declared_fields', new_declared_fields)
 
-        setattr(meta_class, 'fields', tuple(_fields))
+        setattr(meta_class, 'fields', tuple(meta_fields))
         if meta is not None:
             for key, value in meta.items():
                 setattr(meta, key, value)
@@ -118,15 +121,15 @@ def serializer(model: Type[V],
         cls = type(f'{origin.__module__}.{origin.__name__}',
                    tuple(inherited),
                    dict(Meta=meta_class))
-        _fields = set()
+        meta_fields = set()
         declared_fields = getattr(cls, '_declared_fields')
         for key, value in origin.__dict__.items():
-            if isinstance(value, _Item):
+            if isinstance(value, Item):
                 declared_fields[key] = value.origin
                 if value.db_field:
-                    _fields.add(key)
+                    meta_fields.add(key)
 
-        meta_class.fields = tuple(_fields)
+        meta_class.fields = tuple(meta_fields)
         if meta is not None:
             for key, value in meta.items():
                 setattr(meta_class, key, value)
@@ -178,22 +181,22 @@ def model_serializer(model: Type[V],
         cls = type(f'{origin.__module__}.{origin.__name__}',
                    tuple(inherited),
                    dict(Meta=meta_class))
-        _fields = set()
-        _referenced = set()
+        meta_fields = set()
+        referenced = set()
         declared_fields = getattr(cls, '_declared_fields')
         for key, value in origin.__dict__.items():
-            if isinstance(value, _Item):
+            if isinstance(value, Item):
                 declared_fields[key] = value.origin
                 if value.db_field:
-                    _fields.add(key)
+                    meta_fields.add(key)
                 if value.source:
-                    _referenced.add(value.source)
+                    referenced.add(value.source)
 
         for f in model._meta.get_fields():
-            if f.name not in _referenced and (fields is None or f.name in filtered_fields):
-                _fields.add(f.name)
+            if f.name not in referenced and (fields is None or f.name in filtered_fields):
+                meta_fields.add(f.name)
 
-        meta_class.fields = tuple(_fields)
+        meta_class.fields = tuple(meta_fields)
         if meta is not None:
             for key, value in meta.items():
                 setattr(meta_class, key, value)
@@ -226,7 +229,7 @@ FIELD_DICT: Dict[type, type] = {
 }
 
 
-class _Item:
+class Item:
     def __init__(self, _db_field: bool, _origin: type, **kwargs: Any) -> None:
         if not issubclass(_origin, serializers.Field):
             if issubclass(_origin, models.Model):
@@ -239,11 +242,11 @@ class _Item:
         self.source = getattr(self.origin, 'source', '')
 
 
-def field(value_type: type, help_text: str, _db_field: bool = True, **kwargs: Any) -> _Item:
+def field(value_type: type, help_text: str, _db_field: bool = True, **kwargs: Any) -> Item:
     kwargs['help_text'] = help_text
-    return _Item(_db_field, value_type, **kwargs)
+    return Item(_db_field, value_type, **kwargs)
 
 
-def required(value_type: type, help_text: str, _db_field: bool = True, **kwargs: Any) -> _Item:
+def required(value_type: type, help_text: str, _db_field: bool = True, **kwargs: Any) -> Item:
     kwargs['required'] = True
     return field(value_type, help_text, _db_field, **kwargs)
