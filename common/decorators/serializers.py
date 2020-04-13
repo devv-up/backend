@@ -1,5 +1,6 @@
+from collections import OrderedDict
 from datetime import datetime
-from typing import Any, Callable, cast, Type, Dict, Optional, TypeVar, Iterable, OrderedDict
+from typing import Any, Callable, Dict, Iterable, Optional, Type, TypeVar, cast
 
 from django.db import models
 from rest_framework import serializers
@@ -54,7 +55,7 @@ def filtered_serializer(super_class: type,
                           tuple([super_meta_class]),
                           {})
         declared_fields = getattr(cls, '_declared_fields')
-        new_declared_fields = OrderedDict()
+        new_declared_fields: OrderedDict[str, Any] = OrderedDict()
         for key, value in declared_fields.items():
             if key in field_set:
                 _fields.add(key)

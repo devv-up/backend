@@ -1,8 +1,8 @@
 import pytest
-from common.decorators.serializers import serializer, filtered_serializer, required, field, Date, \
-    model_serializer
 from rest_framework import serializers
 
+from common.decorators.serializers import (Date, field, filtered_serializer, model_serializer,
+                                           required, serializer)
 from tests.models import TestModel
 
 
