@@ -1,11 +1,11 @@
 from typing import List
 
-from django.core.paginator import Page, Paginator
+from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models.query import QuerySet
 from django.http.request import QueryDict
 from rest_framework import status, viewsets
-from rest_framework.exceptions import ParseError, ValidationError
+from rest_framework.exceptions import ParseError
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -46,7 +46,8 @@ class PostAPI(viewsets.ViewSet):
         will be returned.
         """
         params = request.GET
-        posts = filter_exists(Post, params.dict(),
+        posts = filter_exists(Post,
+                              params.dict(),
                               date__gte='startDate',
                               date__lte='endDate',
                               time_of_day='timeOfDay',
@@ -57,22 +58,16 @@ class PostAPI(viewsets.ViewSet):
         if 'tags' in params:
             posts = self.__tag_filter(posts, params=params)
 
-        posts = posts.filter(is_active=True)
-        serializer = PostSerializer(posts, many=True)
+        try:
+            posts = posts.filter(is_active=True)
+            no = int(params.get('page', 1))
+            page_size = params.get('pageSize', 20)
+            page_size = 50 if int(page_size) > 50 else page_size
+        except ValueError:
+            raise ParseError(detail='Page or page size should be integer.')
 
-        if 'page' in params:
-            try:
-                no = int(params['page'])
-                page_size = params.get('pageSize', 20)
-                page_size = 50 if int(page_size) > 50 else page_size
-            except ValueError:
-                raise ParseError(detail='Page or page size should be integer.')
-
-            paginated_posts: Page = Paginator(posts, page_size).get_page(no)
-            serializer = PostSerializer(paginated_posts, many=True)
-
-        else:
-            raise ValidationError(detail='Page parameter must be required.')
+        paginated_posts = Paginator(posts, page_size).get_page(no)
+        serializer = PostSerializer(paginated_posts, many=True)
 
         return Response(serializer.data)
 
@@ -119,6 +114,8 @@ class PostAPI(viewsets.ViewSet):
             raise ParseError(detail='Post ID cannot be updated.')
         elif request.data.get('category'):
             raise ParseError(detail='Category cannot be updated.')
+        elif request.data.get('author'):
+            raise ParseError(detail='Author cannot be updated.')
 
         patch_data = {**request.data}
 
@@ -129,8 +126,7 @@ class PostAPI(viewsets.ViewSet):
 
         post = get_one(Post, id=post_id, is_active=True)
 
-        serializer = PostPatchSerializer(
-            post, data=patch_data, partial=True)
+        serializer = PostPatchSerializer(post, data=patch_data, partial=True)
 
         if serializer.is_valid():
             serializer.update(post, validated_data=patch_data)
