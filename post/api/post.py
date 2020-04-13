@@ -42,7 +42,8 @@ class PostAPI(viewsets.ViewSet):
         return None
 
     @swagger_auto_schema(query_serializer=PostQuerySerializer,
-                         responses={200: list_response, 400: 'Parameter Error'})
+                         responses={200: list_response,
+                                    400: 'Parameter Error'})
     def list(self, request: Request) -> Response:
         """
         Get the list of posts.
@@ -77,7 +78,8 @@ class PostAPI(viewsets.ViewSet):
 
     @transaction.atomic
     @swagger_auto_schema(request_body=PostCreateSerializer,
-                         responses={201: create_response, 400: 'Parameter Error'})
+                         responses={201: create_response,
+                                    400: 'Parameter Error'})
     def create(self, request: Request) -> Response:
         """
         Create a post.
@@ -94,8 +96,9 @@ class PostAPI(viewsets.ViewSet):
 
         raise ValidationError(detail=serializer.errors)
 
-    @swagger_auto_schema(
-        responses={200: retrieve_response, 400: 'Parameter Error', 404: 'Not Found'})
+    @swagger_auto_schema(responses={200: retrieve_response,
+                                    400: 'Parameter Error',
+                                    404: 'Not Found'})
     def retrieve(self, request: Request, post_id: int = None) -> Response:
         """
         Get a post object.
@@ -108,7 +111,9 @@ class PostAPI(viewsets.ViewSet):
 
     @transaction.atomic
     @swagger_auto_schema(request_body=PostPatchSerializer,
-                         responses={200: patch_response, 400: 'Parameter Error', 404: 'Not Found'})
+                         responses={200: patch_response,
+                                    400: 'Parameter Error',
+                                    404: 'Not Found'})
     def partial_update(self, request: Request, post_id: int) -> Response:
         """
         Update data of the post.
@@ -137,7 +142,8 @@ class PostAPI(viewsets.ViewSet):
 
         raise ValidationError(detail=serializer.errors)
 
-    @swagger_auto_schema(responses={204: 'Success', 404: 'Not Found'})
+    @swagger_auto_schema(responses={204: 'Success',
+                                    404: 'Not Found'})
     def destroy(self, request: Request, post_id: int) -> Response:
         """
         Make the post disabled.

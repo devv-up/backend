@@ -11,12 +11,12 @@ from post.serializers import CommentCreateSerializer, CommentPutSerializer, Comm
 
 
 class CommentAPI(viewsets.ViewSet):
-    # model_register = openapi.Response('I\'m a teapot', CommentSerializer)
     create_response = openapi.Response('Success', CommentCreateSerializer)
     put_response = openapi.Response('Success', CommentPutSerializer)
 
     @swagger_auto_schema(request_body=CommentCreateSerializer,
-                         responses={201: create_response, 400: 'Parameter Error'})
+                         responses={201: create_response,
+                                    400: 'Parameter Error'})
     def create(self, request: Request) -> Response:
         """
         Create a comment.
@@ -32,8 +32,11 @@ class CommentAPI(viewsets.ViewSet):
 
         raise ValidationError(detail=serializer.errors)
 
-    @swagger_auto_schema(request_body=CommentPutSerializer,
-                         responses={200: put_response, 400: 'Parameter Error', 404: 'Not Found'})
+    @swagger_auto_schema(
+        request_body=CommentPutSerializer,
+        responses={200: put_response,
+                   400: 'Parameter Error',
+                   404: 'Not Found'})
     def update(self, request: Request, comment_id: int) -> Response:
         """
         Update data of the comment.
@@ -53,8 +56,10 @@ class CommentAPI(viewsets.ViewSet):
 
         raise ValidationError(detail=serializer.errors)
 
-    @swagger_auto_schema(responses={
-        204: 'Success', 400: 'Parameter Error', 404: 'Not Found'})
+    @swagger_auto_schema(
+        responses={204: 'Success',
+                   400: 'Parameter Error',
+                   404: 'Not Found'})
     def destroy(self, request: Request, comment_id: int) -> Response:
         """
         Make the comment disabled.

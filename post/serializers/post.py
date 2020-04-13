@@ -57,21 +57,12 @@ class PostCreateSerializer(serializers.ModelSerializer):
 
 
 class PostPatchSerializer(serializers.ModelSerializer):
-    title = serializers.CharField(
-        required=False
-    )
-    content = serializers.CharField(
-        required=False
-    )
-    location = serializers.CharField(
-        required=False
-    )
-    capacity = serializers.CharField(
-        required=False
-    )
-    date = serializers.DateField(
-        required=False
-    )
+    title = serializers.CharField(required=False)
+    content = serializers.CharField(required=False)
+    location = serializers.CharField(required=False)
+    capacity = serializers.CharField(required=False)
+    date = serializers.DateField(required=False)
+
     timeOfDay = serializers.IntegerField(
         source='time_of_day',
         required=False
@@ -130,5 +121,11 @@ class PostQuerySerializer(serializers.Serializer):
     )
 
     class Meta:
-        fields = ('page', 'pageSize', 'category', 'tags',
-                  'startDate', 'endDate', 'timeOfDay', 'location')
+        fields = ('page',
+                  'pageSize',
+                  'category',
+                  'tags',
+                  'startDate',
+                  'endDate',
+                  'timeOfDay',
+                  'location')
