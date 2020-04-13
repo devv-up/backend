@@ -1,3 +1,4 @@
+--index-url https://pypi.org/simple/
 django==3.0.3
 flake8
 isort
@@ -10,6 +11,6 @@ pytest-django==3.8.0
 djangorestframework==3.11.0
 djangorestframework-stubs==1.1.0
 drf-yasg==1.17.1
-psycopg2==2.8.4
+psycopg2-binary==2.8.4
 model-bakery==1.1.0
 django-allauth==0.41.0
