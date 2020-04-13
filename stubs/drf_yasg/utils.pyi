@@ -1,6 +1,5 @@
 from typing import Any, Callable, Dict, List, Optional, Type, TypeVar, Union
 
-from django.http.response import HttpResponseBase
 from drf_yasg.inspectors.base import FieldInspector, FilterInspector, PaginatorInspector
 from drf_yasg.inspectors.view import SwaggerAutoSchema
 from drf_yasg.openapi import Parameter, Response, Schema, SchemaRef
@@ -16,7 +15,7 @@ class unset:
 
 
 _T = TypeVar("_T")
-_VIEW = TypeVar("_VIEW", bound=Callable[..., HttpResponseBase])
+_VIEW = TypeVar("_VIEW", bound=Callable[..., Any])
 _SerializerOrClass = Union[Serializer, Type[Serializer]]
 _SchemaOrRef = Union[Schema, SchemaRef]
 
