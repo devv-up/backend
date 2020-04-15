@@ -52,6 +52,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.github',
     'allauth.socialaccount.providers.google',
+    'rest_auth.registration',
+    'rest_auth'
 ]
 
 SITE_ID = 1
@@ -64,9 +66,13 @@ ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_LOGIN_ATTEMPTS_LIMIT = 5
 ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT = 180
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'name'
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = 'user/accounts/login'
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = 'user/accounts/login'
+# ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/?verification=1'
+# ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/?verification=1'
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
 LOGIN_REDIRECT_URL = '/'
+
 
 # Provider specific settings
 SOCIALACCOUNT_PROVIDERS = {
@@ -94,6 +100,7 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
+REST_USE_JWT = True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -147,8 +154,8 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.BasicAuthentication',
     ),
 }
 
@@ -158,6 +165,10 @@ JWT_AUTH = {
     'JWT_ALLOW_REFRESH': True,
     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=7),
     'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=28),
+}
+
+REST_AUTH_SERIALIZERS = {
+    'USER_DETAILS_SERIALIZER': 'user.serializers.UserDetailsSerializer'
 }
 
 # Database

@@ -4,11 +4,17 @@ from user.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("id", "name", "password")
+        extra_kwargs = {"password": {"write_only": True}}
+
+
+class UserDetailsSerializer(serializers.ModelSerializer):
     """
-    This class will be used until the UserSerializer from
-    the user app is created.
+    User model w/o password
     """
     class Meta:
         model = User
-        fields = ("id", "username", "password")
-        extra_kwargs = {"password": {"write_only": True}}
+        fields = ('id', 'email', 'name')
+        read_only_fields = ('email', )
