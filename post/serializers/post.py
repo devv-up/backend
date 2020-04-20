@@ -3,9 +3,8 @@ from typing import Any, Dict, TypeVar
 from django.db import models
 from rest_framework import serializers
 
+from post.api.comment import CommentSerializer
 from post.models import Comment, Post
-
-from .comment import CommentSerializer
 
 T = TypeVar('T', bound=models.Model)
 
@@ -17,17 +16,9 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         depth = 1
-        fields = ('id',
-                  'title',
-                  'content',
-                  'location',
-                  'capacity',
-                  'date',
-                  'timeOfDay',
-                  'createdDate',
-                  'author',
-                  'category',
-                  'tags')
+        fields = ('id', 'title', 'content', 'location',
+                  'capacity', 'date', 'timeOfDay', 'createdDate',
+                  'author', 'category', 'tags')
 
 
 class PostDetailSerializer(serializers.ModelSerializer):
@@ -43,18 +34,9 @@ class PostDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         depth = 1
-        fields = ('id',
-                  'title',
-                  'content',
-                  'location',
-                  'capacity',
-                  'date',
-                  'timeOfDay',
-                  'createdDate',
-                  'author',
-                  'category',
-                  'tags',
-                  'comments')
+        fields = ('id', 'title', 'content', 'location',
+                  'capacity', 'date', 'timeOfDay', 'createdDate',
+                  'author', 'category', 'tags', 'comments')
 
 
 class PostCreateSerializer(serializers.ModelSerializer):
@@ -62,16 +44,9 @@ class PostCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ('id',
-                  'title',
-                  'content',
-                  'location',
-                  'capacity',
-                  'date',
-                  'timeOfDay',
-                  'author',
-                  'category',
-                  'tags')
+        fields = ('id', 'title', 'content', 'location',
+                  'capacity', 'date', 'timeOfDay', 'author',
+                  'category', 'tags')
 
 
 class PostPatchSerializer(serializers.ModelSerializer):
@@ -85,11 +60,5 @@ class PostPatchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ('id',
-                  'title',
-                  'content',
-                  'location',
-                  'capacity',
-                  'date',
-                  'timeOfDay',
-                  'tags')
+        fields = ('id', 'title', 'content', 'location',
+                  'capacity', 'date', 'timeOfDay', 'tags')
