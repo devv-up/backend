@@ -61,8 +61,7 @@ class PostAPI(viewsets.ViewSet):
         try:
             posts = posts.filter(is_active=True)
             no = int(params.get('page', 1))
-            page_size = params.get('pageSize', 20)
-            page_size = 50 if int(page_size) > 50 else page_size
+            page_size = min(int(params.get('pageSize', 20)), 50)
         except ValueError:
             raise ParseError(detail='Page or page size should be integer.')
 
@@ -110,11 +109,11 @@ class PostAPI(viewsets.ViewSet):
         """
         if not request.data:
             raise ParseError(detail='At least one field must be required to update the post.')
-        elif request.data.get('id') or request.data.get('pk'):
+        elif 'id' in request.data or 'pk' in request.data:
             raise ParseError(detail='Post ID cannot be updated.')
-        elif request.data.get('category'):
+        elif 'category' in request.data:
             raise ParseError(detail='Category cannot be updated.')
-        elif request.data.get('author'):
+        elif 'author' in request.data:
             raise ParseError(detail='Author cannot be updated.')
 
         patch_data = {**request.data}
