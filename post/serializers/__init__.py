@@ -1,11 +1,10 @@
 from rest_framework import serializers
 
+from post.serializers.category import *  # noqa 401
+from post.serializers.comment import *  # noqa 401
+from post.serializers.post import *  # noqa 401
+from post.serializers.tag import *  # noqa 401
 from user.models import User
-
-from .category import *  # noqa 401
-from .comment import *  # noqa 401
-from .post import *  # noqa 401
-from .tag import *  # noqa 401
 
 
 class TempUserSerializer(serializers.ModelSerializer):
