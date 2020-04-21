@@ -24,7 +24,9 @@ class PostAPI(viewsets.ViewSet):
         """
         tags: List[Tag] = list()
         for title in titles:
-            tags.append(Tag.objects.get_or_create(title=title)[0])
+            if not title.strip():
+                continue
+            tags.append(Tag.objects.get_or_create(title=title.strip())[0])
         return tags
 
     def __tag_filter(self, posts: 'QuerySet[Post]', params: QueryDict) -> 'QuerySet[Post]':
@@ -33,7 +35,9 @@ class PostAPI(viewsets.ViewSet):
 
         tags: List[str] = params['tags'].split(',')
         for tag in tags:
-            posts = posts.filter(tags__title=tag)
+            if not tag.strip():
+                continue
+            posts = posts.filter(tags__title=tag.strip())
 
         return posts
 
@@ -107,18 +111,18 @@ class PostAPI(viewsets.ViewSet):
 
         A specific post ID must be required by uri resources.
         """
-        if not request.data:
-            raise ParseError(detail='At least one field must be required to update the post.')
-        elif 'id' in request.data or 'pk' in request.data:
-            raise ParseError(detail='Post ID cannot be updated.')
-        elif 'category' in request.data:
-            raise ParseError(detail='Category cannot be updated.')
-        elif 'author' in request.data:
-            raise ParseError(detail='Author cannot be updated.')
-
         patch_data = {**request.data}
 
-        tag_titles = request.data.get('tags')
+        if not patch_data:
+            raise ParseError(detail='At least one field must be required to update the post.')
+        elif 'id' in patch_data or 'pk' in patch_data:
+            raise ParseError(detail='Post ID cannot be updated.')
+        elif 'category' in patch_data:
+            raise ParseError(detail='Category cannot be updated.')
+        elif 'author' in patch_data:
+            raise ParseError(detail='Author cannot be updated.')
+
+        tag_titles = patch_data.get('tags')
         if tag_titles is not None:
             tags = self.__create_tags_with(tag_titles)
             patch_data.update(tags=[tag.id for tag in tags])
