@@ -54,9 +54,7 @@ def count_tags_of_multiple(response, *tag_titles):
 
 
 def check_data_duplication_of(response):
-    ids = set()
-    for result in response.data:
-        ids.add(result['id'])
+    ids = {result['id'] for result in response.data}
     assert len(ids) == len(response.data)
 
 
@@ -114,7 +112,7 @@ class TestPostFiltering:
         assert len(response.data) == 2
 
         for result in response.data:
-            assert start_date <= result['date'] and result['date'] <= end_date
+            assert start_date <= result['date'] <= end_date
 
     def test_post_on_time_of_day_filtering(self, api_client, posts):
         time_of_day = TIME_OF_DAY['AFTERNOON']
