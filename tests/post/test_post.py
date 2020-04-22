@@ -1,5 +1,7 @@
 import pytest
 
+from post.models import Post
+
 
 class TestPost:
     pytestmark = pytest.mark.django_db
@@ -80,9 +82,10 @@ class TestPost:
         }
         response = api_client.patch('/posts/1', data=data, format='json')
 
+        updated_post = Post.objects.get(id=1)
         assert response.status_code == 200
-        assert response.data['id'] == 1
-        assert response.data['title'] == 'after'
+        assert updated_post.id == 1
+        assert updated_post.title == 'after'
         assert before_update.data['title'] != 'after'
 
         # Update the created date of the post.

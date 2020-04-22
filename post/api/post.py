@@ -90,7 +90,7 @@ class PostAPI(viewsets.ViewSet):
         serializer = PostCreateSerializer(data=post_data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({'detail': 'Successfully created.'}, status=status.HTTP_201_CREATED)
 
         raise ParseError(detail=serializer.errors)
 
@@ -133,7 +133,7 @@ class PostAPI(viewsets.ViewSet):
 
         if serializer.is_valid():
             serializer.update(post, validated_data=patch_data)
-            return Response(serializer.data)
+            return Response({'detail': 'Successfully updated.'})
 
         raise ParseError(detail=serializer.errors)
 
