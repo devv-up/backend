@@ -39,4 +39,4 @@ class TestComment:
         comment = Comment.objects.get(id=1)
 
         assert response.status_code == 204
-        assert comment.is_active is False
+        assert not comment.is_active

@@ -55,7 +55,7 @@ class TestPost:
 
     def test_list_posts(self, api_client, many_posts):
         # Pagination
-        response = api_client.get('/posts?page=2')
+        response = api_client.get('/posts')
         assert response.status_code == 200
         assert len(response.data) > 1
 
@@ -88,7 +88,7 @@ class TestPost:
         assert updated_post.title == 'after'
         assert before_update.data['title'] != 'after'
 
-        # Update the created date of the post.
+        # Prevent updating the created date of the post.
         before_update = api_client.get('/posts/1')
 
         bad_post_data = {
