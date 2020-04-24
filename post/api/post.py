@@ -56,8 +56,8 @@ class PostAPI(viewsets.ViewSet):
                               date__gte='startDate',
                               date__lte='endDate',
                               time_of_day='timeOfDay',
-                              location__contains='location',
-                              category__title='category',
+                              location__icontains='location',
+                              category__title__icontains='category',
                               ).order_by('id')
 
         if 'tags' in params:
