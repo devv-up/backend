@@ -1,11 +1,11 @@
-from typing import List
+from typing import List, Optional
 
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models.query import QuerySet
 from django.http.request import QueryDict
 from rest_framework import status, viewsets
-from rest_framework.exceptions import ParseError
+from rest_framework.exceptions import ParseError, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -22,24 +22,25 @@ class PostAPI(viewsets.ViewSet):
         If the same title tags exists,
         the tag objects will be returned.
         """
-        tags: List[Tag] = list()
-        for title in titles:
-            if not title.strip():
-                continue
-            tags.append(Tag.objects.get_or_create(title=title.strip())[0])
-        return tags
+        return [Tag.objects.get_or_create(title=title.strip())[0]
+                for title in titles if title.strip()]
 
     def __tag_filter(self, posts: 'QuerySet[Post]', params: QueryDict) -> 'QuerySet[Post]':
         if len(params.getlist('tags')) > 1:
             raise ParseError(detail='This type of tag parameters are not supported.')
 
-        tags: List[str] = params['tags'].split(',')
+        tags = params['tags'].split(',')
         for tag in tags:
-            if not tag.strip():
-                continue
-            posts = posts.filter(tags__title=tag.strip())
+            if tag.strip():
+                posts = posts.filter(tags__title__icontains=tag.strip())
 
         return posts
+
+    def __convert(self, tag_titles: List[str] = None) -> Optional[List[int]]:
+        if tag_titles is not None:
+            tags = self.__create_tags_with(tag_titles)
+            return [tag.id for tag in tags]
+        return None
 
     def list(self, request: Request) -> Response:
         """
@@ -82,17 +83,14 @@ class PostAPI(viewsets.ViewSet):
         A category ID in request data must be required.
         """
         post_data = {**request.data}
-        tag_titles = request.data.get('tags')
-        if tag_titles is not None:
-            tags = self.__create_tags_with(tag_titles)
-            post_data.update(tags=[tag.id for tag in tags])
+        post_data['tags'] = self.__convert(post_data.get('tags'))
 
         serializer = PostCreateSerializer(data=post_data)
         if serializer.is_valid():
             serializer.save()
             return Response({'detail': 'Successfully created.'}, status=status.HTTP_201_CREATED)
 
-        raise ParseError(detail=serializer.errors)
+        raise ValidationError(detail=serializer.errors)
 
     def retrieve(self, request: Request, post_id: int = None) -> Response:
         """
@@ -122,20 +120,16 @@ class PostAPI(viewsets.ViewSet):
         elif 'author' in patch_data:
             raise ParseError(detail='Author cannot be updated.')
 
-        tag_titles = patch_data.get('tags')
-        if tag_titles is not None:
-            tags = self.__create_tags_with(tag_titles)
-            patch_data.update(tags=[tag.id for tag in tags])
+        patch_data['tags'] = self.__convert(patch_data.get('tags'))
 
         post = get_one(Post, id=post_id, is_active=True)
-
         serializer = PostPatchSerializer(post, data=patch_data, partial=True)
 
         if serializer.is_valid():
             serializer.update(post, validated_data=patch_data)
             return Response({'detail': 'Successfully updated.'})
 
-        raise ParseError(detail=serializer.errors)
+        raise ValidationError(detail=serializer.errors)
 
     def destroy(self, request: Request, post_id: int) -> Response:
         """

@@ -1,5 +1,5 @@
 from rest_framework import status, viewsets
-from rest_framework.exceptions import ParseError
+from rest_framework.exceptions import ParseError, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -21,7 +21,8 @@ class CommentAPI(viewsets.ViewSet):
         if serializer.is_valid():
             serializer.save()
             return Response({'detail': 'Successfully created.'}, status=status.HTTP_201_CREATED)
-        raise ParseError(detail=serializer.errors)
+
+        raise ValidationError(detail=serializer.errors)
 
     def update(self, request: Request, comment_id: int) -> Response:
         """
@@ -40,7 +41,7 @@ class CommentAPI(viewsets.ViewSet):
             serializer.update(comment, validated_data=request.data)
             return Response({'detail': 'Successfully updated.'})
 
-        raise ParseError(detail=serializer.errors)
+        raise ValidationError(detail=serializer.errors)
 
     def destroy(self, request: Request, comment_id: int) -> Response:
         """
