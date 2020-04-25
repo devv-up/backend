@@ -46,5 +46,5 @@ def get_schema_view(
     validators: Optional[List[str]] = ...,
     generator_class: Optional[Type[OpenAPISchemaGenerator]] = ...,
     authentication_classes: Optional[Tuple[str]] = ...,
-    permission_classes: Optional[Tuple[str]] = ...,
+    permission_classes: Optional[Tuple[type]] = ...,
 ) -> _SchemaView: ...
