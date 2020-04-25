@@ -9,7 +9,7 @@ from post.serializers import TagSerializer
 
 
 class TagAPI(viewsets.ViewSet):
-    list_response = openapi.Response('Success', TagSerializer(many=True))
+    list_response = openapi.Response('**Success**', TagSerializer(many=True))
 
     @swagger_auto_schema(responses={200: list_response})
     def list(self, request: Request) -> Response:

@@ -9,7 +9,7 @@ from post.serializers import CategorySerializer
 
 
 class CategoryAPI(viewsets.ViewSet):
-    list_response = openapi.Response('Success', CategorySerializer(many=True))
+    list_response = openapi.Response('**Success**', CategorySerializer(many=True))
 
     @swagger_auto_schema(responses={200: list_response})
     def list(self, request: Request) -> Response:
