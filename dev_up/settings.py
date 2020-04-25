@@ -181,3 +181,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# Required to prevent warnings related to URL routing.
+# Basically a slash is needed at the end of URLs and if this option is True,
+# it will check wheather an url is ended with slash.
+APPEND_SLASH = False
