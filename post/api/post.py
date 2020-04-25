@@ -16,16 +16,7 @@ from post.serializers import (PostCreateSerializer, PostDetailSerializer, PostPa
 
 
 class PostAPI(viewsets.ViewSet):
-    def __create_tags_with(self, titles: List[str]) -> List[Tag]:
-        """
-        Create tags before creating a post.
-        If the same title tags exists,
-        the tag objects will be returned.
-        """
-        return [Tag.objects.get_or_create(title=title.strip())[0]
-                for title in titles if title.strip()]
-
-    def __tag_filter(self, posts: 'QuerySet[Post]', params: QueryDict) -> 'QuerySet[Post]':
+    def _tag_filter(self, posts: 'QuerySet[Post]', params: QueryDict) -> 'QuerySet[Post]':
         if len(params.getlist('tags')) > 1:
             raise ParseError(detail='This type of tag parameters are not supported.')
 
@@ -36,9 +27,10 @@ class PostAPI(viewsets.ViewSet):
 
         return posts
 
-    def __convert(self, tag_titles: List[str] = None) -> Optional[List[int]]:
+    def _convert(self, tag_titles: Optional[List[str]]) -> Optional[List[int]]:
         if tag_titles is not None:
-            tags = self.__create_tags_with(tag_titles)
+            tags = [Tag.objects.get_or_create(title=title.strip())[0]
+                    for title in tag_titles if title.strip()]
             return [tag.id for tag in tags]
         return None
 
@@ -51,7 +43,7 @@ class PostAPI(viewsets.ViewSet):
         will be returned.
         """
         params = request.GET
-        posts = filter_exists(Post,
+        posts = filter_exists(Post.objects.filter(is_active=True),
                               params.dict(),
                               date__gte='startDate',
                               date__lte='endDate',
@@ -61,10 +53,9 @@ class PostAPI(viewsets.ViewSet):
                               ).order_by('id')
 
         if 'tags' in params:
-            posts = self.__tag_filter(posts, params=params)
+            posts = self._tag_filter(posts, params=params)
 
         try:
-            posts = posts.filter(is_active=True)
             no = int(params.get('page', 1))
             page_size = min(int(params.get('pageSize', 20)), 50)
         except ValueError:
@@ -83,7 +74,7 @@ class PostAPI(viewsets.ViewSet):
         A category ID in request data must be required.
         """
         post_data = {**request.data}
-        post_data['tags'] = self.__convert(post_data.get('tags'))
+        post_data['tags'] = self._convert(post_data.get('tags'))
 
         serializer = PostCreateSerializer(data=post_data)
         if serializer.is_valid():
@@ -120,7 +111,7 @@ class PostAPI(viewsets.ViewSet):
         elif 'author' in patch_data:
             raise ParseError(detail='Author cannot be updated.')
 
-        patch_data['tags'] = self.__convert(patch_data.get('tags'))
+        patch_data['tags'] = self._convert(patch_data.get('tags'))
 
         post = get_one(Post, id=post_id, is_active=True)
         serializer = PostPatchSerializer(post, data=patch_data, partial=True)
