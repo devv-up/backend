@@ -132,36 +132,36 @@ class PostPatchBodySerializer(serializers.ModelSerializer):
 class PostQuerySerializer(serializers.Serializer):
     page = serializers.IntegerField(
         required=False,
-        help_text='A page number within the paginated result set.\n\n ex) page=1',
+        help_text='A page number within the paginated result set.\n\n\tex) page=1',
     )
     pageSize = serializers.IntegerField(
         required=False,
-        help_text='Number of results to return per page.\n\n ex) pageSize=30',
+        help_text='Number of results to return per page.\n\n\tex) pageSize=30',
     )
     startDate = serializers.DateField(
         required=False,
-        help_text='The Start date.\n\n ex) startDate=2020-01-01',
+        help_text='The Start date.\n\n\tex) startDate=2020-01-01',
     )
     endDate = serializers.DateField(
         required=False,
-        help_text='The End date.\n\n ex) endDate=2020-02-02',
+        help_text='The End date.\n\n\tex) endDate=2020-02-02',
     )
     timeOfDay = serializers.IntegerField(
         required=False,
         min_value=0,
-        help_text='The time of day of studies or projects.\n\n ex) timeOfDay=1',
+        help_text='The time of day of studies or projects.\n\n\tex) timeOfDay=1',
     )
     location = serializers.CharField(
         required=False,
-        help_text='The location of studies or projects.\n\n ex) location=seoul',
+        help_text='The location of studies or projects.\n\n\tex) location=seoul',
     )
     category = serializers.CharField(
         required=False,
-        help_text='The Category title.\n\n ex) category=project',
+        help_text='The Category title.\n\n\tex) category=project',
     )
     tags = serializers.CharField(
         required=False,
-        help_text='The Tag titles.\n\n ex) tags=python,django',
+        help_text='The Tag titles.\n\n\tex) tags=python,django',
     )
 
     class Meta:
