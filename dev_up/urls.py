@@ -23,7 +23,11 @@ schema_view = get_schema_view(
     openapi.Info(
         title="Dev-Up API",
         default_version='v1',
-        description="A simple instruction manual for those who need the dev-up api.",
+        description="""
+        The body parameter: `author` is required at the moment.
+        After `JWT` is applied, it is replaced by the header: `Authorization`
+        which contains a JWT token.
+        """,
     ),
     public=True,
     permission_classes=(AllowAny,),
