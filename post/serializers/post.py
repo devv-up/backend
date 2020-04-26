@@ -4,8 +4,9 @@ from django.db import models
 from drf_yasg.utils import swagger_serializer_method
 from rest_framework import serializers
 
-from post.api.comment import CommentSerializer
 from post.models import Category, Comment, Post, Tag
+from post.serializers.comment import CommentSerializer
+from post.serializers.tag import TagTitleSerializer
 
 T = TypeVar('T', bound=models.Model)
 
@@ -56,6 +57,25 @@ class PostCreateSerializer(serializers.ModelSerializer):
                   'category', 'tags')
 
 
+class PostCreateBodySerializer(serializers.ModelSerializer):
+    timeOfDay = serializers.IntegerField(source='time_of_day')
+    category = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.filter(is_active=True),
+        required=True
+    )
+    tags = serializers.ListField(
+        child=TagTitleSerializer(),
+        required=False
+    )
+
+    class Meta:
+        model = Post
+        ref_name = None
+        fields = ('title', 'content', 'location',
+                  'capacity', 'date', 'timeOfDay', 'author',
+                  'category', 'tags')
+
+
 class PostPatchSerializer(serializers.ModelSerializer):
     title = serializers.CharField(required=False)
     content = serializers.CharField(required=False)
@@ -86,6 +106,29 @@ class PostPatchSerializer(serializers.ModelSerializer):
                   'capacity', 'date', 'timeOfDay', 'tags')
 
 
+class PostPatchBodySerializer(serializers.ModelSerializer):
+    title = serializers.CharField(required=False)
+    content = serializers.CharField(required=False)
+    location = serializers.CharField(required=False)
+    capacity = serializers.IntegerField(required=False)
+    date = serializers.DateField(required=False)
+
+    timeOfDay = serializers.IntegerField(
+        source='time_of_day',
+        required=False
+    )
+    tags = serializers.ListField(
+        child=TagTitleSerializer(),
+        required=False
+    )
+
+    class Meta:
+        model = Post
+        ref_name = None
+        fields = ('title', 'content', 'location', 'capacity',
+                  'date', 'timeOfDay', 'tags')
+
+
 class PostQuerySerializer(serializers.Serializer):
     page = serializers.IntegerField(
         required=False,
@@ -94,14 +137,6 @@ class PostQuerySerializer(serializers.Serializer):
     pageSize = serializers.IntegerField(
         required=False,
         help_text='Number of results to return per page.\n\n ex) pageSize=30',
-    )
-    category = serializers.CharField(
-        required=False,
-        help_text='The Category title.\n\n ex) category=project',
-    )
-    tags = serializers.CharField(
-        required=False,
-        help_text='The Tag titles.\n\n ex) tags=python,django',
     )
     startDate = serializers.DateField(
         required=False,
@@ -113,19 +148,22 @@ class PostQuerySerializer(serializers.Serializer):
     )
     timeOfDay = serializers.IntegerField(
         required=False,
+        min_value=0,
         help_text='The time of day of studies or projects.\n\n ex) timeOfDay=1',
     )
     location = serializers.CharField(
         required=False,
         help_text='The location of studies or projects.\n\n ex) location=seoul',
     )
+    category = serializers.CharField(
+        required=False,
+        help_text='The Category title.\n\n ex) category=project',
+    )
+    tags = serializers.CharField(
+        required=False,
+        help_text='The Tag titles.\n\n ex) tags=python,django',
+    )
 
     class Meta:
-        fields = ('page',
-                  'pageSize',
-                  'category',
-                  'tags',
-                  'startDate',
-                  'endDate',
-                  'timeOfDay',
-                  'location')
+        fields = ('page', 'pageSize', 'startDate', 'endDate',
+                  'timeOfDay', 'location', 'category', 'tags',)

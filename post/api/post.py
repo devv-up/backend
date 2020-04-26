@@ -12,16 +12,17 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from common.querytools import filter_exists, get_one
+from common.responses import (APPLY_200_UPDATED, APPLY_201_CREATED, APPLY_204_DELETED,
+                              APPLY_400_PARAMETER_ERROR, APPLY_404_NOT_FOUND)
 from post.models import Post, Tag
-from post.serializers import (PostCreateSerializer, PostDetailSerializer, PostPatchSerializer,
-                              PostQuerySerializer, PostSerializer)
+from post.serializers import (
+    PostCreateBodySerializer, PostCreateSerializer, PostDetailSerializer, PostPatchBodySerializer,
+    PostPatchSerializer, PostQuerySerializer, PostSerializer)
 
 
 class PostAPI(viewsets.ViewSet):
-    list_response = openapi.Response('Success', PostSerializer(many=True))
-    create_response = openapi.Response('Success', PostCreateSerializer)
-    retrieve_response = openapi.Response('Success', PostDetailSerializer)
-    patch_response = openapi.Response('Success', PostPatchSerializer)
+    list_response = openapi.Response('**Success**', PostSerializer(many=True))
+    retrieve_response = openapi.Response('**Success**', PostDetailSerializer)
 
     def _tag_filter(self, posts: 'QuerySet[Post]', params: QueryDict) -> 'QuerySet[Post]':
         if len(params.getlist('tags')) > 1:
@@ -43,7 +44,7 @@ class PostAPI(viewsets.ViewSet):
 
     @swagger_auto_schema(query_serializer=PostQuerySerializer,
                          responses={200: list_response,
-                                    400: 'Parameter Error'})
+                                    400: APPLY_400_PARAMETER_ERROR.as_md()})
     def list(self, request: Request) -> Response:
         """
         Get the list of posts.
@@ -68,6 +69,8 @@ class PostAPI(viewsets.ViewSet):
         try:
             no = int(params.get('page', 1))
             page_size = min(int(params.get('pageSize', 20)), 50)
+            if page_size <= 0:
+                raise ParseError(detail='Page size should not be 0 or less.')
         except ValueError:
             raise ParseError(detail='Page or page size should be integer.')
 
@@ -77,9 +80,9 @@ class PostAPI(viewsets.ViewSet):
         return Response(serializer.data)
 
     @transaction.atomic
-    @swagger_auto_schema(request_body=PostCreateSerializer,
-                         responses={201: create_response,
-                                    400: 'Parameter Error'})
+    @swagger_auto_schema(request_body=PostCreateBodySerializer,
+                         responses={201: APPLY_201_CREATED.as_md(),
+                                    400: APPLY_400_PARAMETER_ERROR.as_md()})
     def create(self, request: Request) -> Response:
         """
         Create a post.
@@ -97,9 +100,9 @@ class PostAPI(viewsets.ViewSet):
         raise ValidationError(detail=serializer.errors)
 
     @swagger_auto_schema(responses={200: retrieve_response,
-                                    400: 'Parameter Error',
-                                    404: 'Not Found'})
-    def retrieve(self, request: Request, post_id: int = None) -> Response:
+                                    400: APPLY_400_PARAMETER_ERROR.as_md(),
+                                    404: APPLY_404_NOT_FOUND.as_md()})
+    def retrieve(self, request: Request, post_id: int) -> Response:
         """
         Get a post object.
 
@@ -110,10 +113,10 @@ class PostAPI(viewsets.ViewSet):
         return Response(serializer.data)
 
     @transaction.atomic
-    @swagger_auto_schema(request_body=PostPatchSerializer,
-                         responses={200: patch_response,
-                                    400: 'Parameter Error',
-                                    404: 'Not Found'})
+    @swagger_auto_schema(request_body=PostPatchBodySerializer,
+                         responses={200: APPLY_200_UPDATED.as_md(),
+                                    400: APPLY_400_PARAMETER_ERROR.as_md(),
+                                    404: APPLY_404_NOT_FOUND.as_md()})
     def partial_update(self, request: Request, post_id: int) -> Response:
         """
         Update data of the post.
@@ -142,8 +145,8 @@ class PostAPI(viewsets.ViewSet):
 
         raise ValidationError(detail=serializer.errors)
 
-    @swagger_auto_schema(responses={204: 'Success',
-                                    404: 'Not Found'})
+    @swagger_auto_schema(responses={204: APPLY_204_DELETED.as_md(),
+                                    404: APPLY_404_NOT_FOUND.as_md()})
     def destroy(self, request: Request, post_id: int) -> Response:
         """
         Make the post disabled.
