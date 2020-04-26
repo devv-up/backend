@@ -15,9 +15,9 @@ from common.querytools import filter_exists, get_one
 from common.responses import (APPLY_200_UPDATED, APPLY_201_CREATED, APPLY_204_DELETED,
                               APPLY_400_PARAMETER_ERROR, APPLY_404_NOT_FOUND)
 from post.models import Post, Tag
-from post.serializers import (
-    PostCreateBodySerializer, PostCreateSerializer, PostDetailSerializer, PostPatchBodySerializer,
-    PostPatchSerializer, PostQuerySerializer, PostSerializer)
+from post.serializers.post import (PostCreateBodySerializer, PostCreateSerializer,
+                                   PostDetailSerializer, PostPatchBodySerializer,
+                                   PostPatchSerializer, PostQuerySerializer, PostSerializer)
 
 
 class PostAPI(viewsets.ViewSet):
