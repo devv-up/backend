@@ -9,10 +9,8 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ('id', 'title')
 
 
-class TagTitleSerializer(serializers.ModelSerializer):
+class TagTitleSerializer(serializers.Serializer):
     title = serializers.CharField(required=False)
 
     class Meta:
-        model = Tag
         ref_name = None
-        fields = ('title',)
