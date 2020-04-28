@@ -11,23 +11,23 @@ SITE_URL = os.environ.get("SITE_URL", "http://127.0.0.1:8000")
 
 class GithubLogin(SocialLoginView):
     adapter_class = GitHubOAuth2Adapter
-    callback_url = SITE_URL+"/user/accounts/github/login/callback/"
+    callback_url = f'{SITE_URL}/user/accounts/github/login/callback/'
     client_class = OAuth2Client
 
 
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
-    callback_url = SITE_URL+"/user/accounts/google/login/callback/"
+    callback_url = f'{SITE_URL}/user/accounts/google/login/callback/'
     client_class = OAuth2Client
 
 
 class GithubConnect(SocialConnectView):
     adapter_class = GitHubOAuth2Adapter
-    callback_url = SITE_URL+"/user/accounts/github/login/callback/"
+    callback_url = f'{SITE_URL}/user/accounts/github/login/callback/'
     client_class = OAuth2Client
 
 
 class GoogleConnect(SocialConnectView):
     adapter_class = GoogleOAuth2Adapter
-    callback_url = SITE_URL+":/user/accounts/google/login/callback/"
+    callback_url = f'{SITE_URL}/user/accounts/google/login/callback/'
     client_class = OAuth2Client
