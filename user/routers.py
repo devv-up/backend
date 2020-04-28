@@ -15,15 +15,16 @@ Including another URLconf
 """
 from allauth.account.views import confirm_email
 from django.urls import include, path, re_path
-from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify_jwt_token
+from rest_framework_jwt.views import (obtain_jwt_token, refresh_jwt_token,
+                                      verify_jwt_token)
 
 from user.social import GithubConnect, GithubLogin, GoogleConnect, GoogleLogin
 
 urlpatterns = [
     path('accounts/', include('allauth.urls')),
-    path('token/auth/', obtain_jwt_token),
-    path('token/refresh/', refresh_jwt_token),
-    path('token/verify/', verify_jwt_token),
+    path('auth/token', obtain_jwt_token),
+    path('auth/token/refresh', refresh_jwt_token),
+    path('auth/token/verify', verify_jwt_token),
     path('auth/', include('rest_auth.urls')),
     path('auth/registration/', include('rest_auth.registration.urls')),
     path('auth/github/', GithubLogin.as_view(), name='github_login'),
