@@ -14,8 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from allauth.account.views import confirm_email
-from django.urls import include, path
-from rest_framework.compat import re_path
+from django.urls import include, path, re_path
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify_jwt_token
 
 from user.social import GithubConnect, GithubLogin, GoogleConnect, GoogleLogin
