@@ -19,13 +19,6 @@ class CommentSerializer(serializers.ModelSerializer):
                   'author', 'is_active')
 
 
-class CommentBodySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Comment
-        ref_name = None
-        fields = ('content',)
-
-
 class CommentCreateSerializer(serializers.ModelSerializer):
     parentComment = serializers.PrimaryKeyRelatedField(
         queryset=Comment.objects.filter(is_active=True),
@@ -63,3 +56,10 @@ class CommentCreateBodySerializer(serializers.Serializer):
 
     class Meta:
         ref_name = None
+
+
+class CommentPatchBodySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        ref_name = None
+        fields = ('content',)

@@ -6,7 +6,6 @@ from rest_framework import serializers
 
 from post.models import Category, Comment, Post, Tag
 from post.serializers.comment import CommentSerializer
-from post.serializers.tag import TagTitleSerializer
 
 T = TypeVar('T', bound=models.Model)
 
@@ -57,25 +56,6 @@ class PostCreateSerializer(serializers.ModelSerializer):
                   'category', 'tags')
 
 
-class PostCreateBodySerializer(serializers.ModelSerializer):
-    timeOfDay = serializers.IntegerField(source='time_of_day')
-    category = serializers.PrimaryKeyRelatedField(
-        queryset=Category.objects.filter(is_active=True),
-        required=True
-    )
-    tags = serializers.ListField(
-        child=TagTitleSerializer(),
-        required=False
-    )
-
-    class Meta:
-        model = Post
-        ref_name = None
-        fields = ('title', 'content', 'location',
-                  'capacity', 'date', 'timeOfDay', 'author',
-                  'category', 'tags')
-
-
 class PostPatchSerializer(serializers.ModelSerializer):
     title = serializers.CharField(required=False)
     content = serializers.CharField(required=False)
@@ -104,29 +84,6 @@ class PostPatchSerializer(serializers.ModelSerializer):
         ref_name = None
         fields = ('id', 'title', 'content', 'location',
                   'capacity', 'date', 'timeOfDay', 'tags')
-
-
-class PostPatchBodySerializer(serializers.ModelSerializer):
-    title = serializers.CharField(required=False)
-    content = serializers.CharField(required=False)
-    location = serializers.CharField(required=False)
-    capacity = serializers.IntegerField(required=False)
-    date = serializers.DateField(required=False)
-
-    timeOfDay = serializers.IntegerField(
-        source='time_of_day',
-        required=False
-    )
-    tags = serializers.ListField(
-        child=TagTitleSerializer(),
-        required=False
-    )
-
-    class Meta:
-        model = Post
-        ref_name = None
-        fields = ('title', 'content', 'location', 'capacity',
-                  'date', 'timeOfDay', 'tags')
 
 
 class PostQuerySerializer(serializers.Serializer):
@@ -167,3 +124,45 @@ class PostQuerySerializer(serializers.Serializer):
     class Meta:
         fields = ('page', 'pageSize', 'startDate', 'endDate',
                   'timeOfDay', 'location', 'category', 'tags',)
+
+
+class PostCreateBodySerializer(serializers.ModelSerializer):
+    timeOfDay = serializers.IntegerField(source='time_of_day')
+    category = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.filter(is_active=True),
+        required=True
+    )
+    tags = serializers.ListField(
+        child=serializers.CharField(),
+        required=False,
+    )
+
+    class Meta:
+        model = Post
+        ref_name = None
+        fields = ('title', 'content', 'location',
+                  'capacity', 'date', 'timeOfDay', 'author',
+                  'category', 'tags')
+
+
+class PostPatchBodySerializer(serializers.ModelSerializer):
+    title = serializers.CharField(required=False)
+    content = serializers.CharField(required=False)
+    location = serializers.CharField(required=False)
+    capacity = serializers.IntegerField(required=False)
+    date = serializers.DateField(required=False)
+
+    timeOfDay = serializers.IntegerField(
+        source='time_of_day',
+        required=False
+    )
+    tags = serializers.ListField(
+        child=serializers.CharField(),
+        required=False,
+    )
+
+    class Meta:
+        model = Post
+        ref_name = None
+        fields = ('title', 'content', 'location', 'capacity',
+                  'date', 'timeOfDay', 'tags')

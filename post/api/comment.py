@@ -8,8 +8,8 @@ from common.querytools import get_one
 from common.responses import (APPLY_200_UPDATED, APPLY_201_CREATED, APPLY_204_DELETED,
                               APPLY_400_PARAMETER_ERROR, APPLY_404_NOT_FOUND)
 from post.models import Comment
-from post.serializers import (CommentBodySerializer, CommentCreateBodySerializer,
-                              CommentCreateSerializer, CommentSerializer)
+from post.serializers import (CommentCreateBodySerializer, CommentCreateSerializer,
+                              CommentPatchBodySerializer, CommentSerializer)
 
 
 class CommentAPI(viewsets.ViewSet):
@@ -32,7 +32,7 @@ class CommentAPI(viewsets.ViewSet):
         raise ValidationError(detail=serializer.errors)
 
     @swagger_auto_schema(
-        request_body=CommentBodySerializer,
+        request_body=CommentPatchBodySerializer,
         responses={200: APPLY_200_UPDATED.as_md(),
                    400: APPLY_400_PARAMETER_ERROR.as_md(),
                    404: APPLY_404_NOT_FOUND.as_md()})
