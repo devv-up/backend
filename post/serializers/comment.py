@@ -14,18 +14,6 @@ class CommentSerializer(serializers.ModelSerializer):
         required=False
     )
 
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        put_body = kwargs.pop('put_body', False)
-        super().__init__(*args, **kwargs)
-
-        if put_body:
-            self.fields.pop('id')
-            self.fields.pop('createdDate')
-            self.fields.pop('parentComment')
-            self.fields.pop('author')
-            self.fields.pop('is_active')
-            self.depth = None
-
     class Meta:
         model = Comment
         depth = 1
@@ -71,3 +59,10 @@ class CommentCreateSerializer(serializers.ModelSerializer):
         ref_name = None
         fields = ('id', 'content', 'post', 'parentComment',
                   'author')
+
+
+class CommentPutBodySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        ref_name = None
+        fields = ('content',)
