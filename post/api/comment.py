@@ -8,12 +8,11 @@ from common.querytools import get_one
 from common.responses import (APPLY_200_UPDATED, APPLY_201_CREATED, APPLY_204_DELETED,
                               APPLY_400_PARAMETER_ERROR, APPLY_404_NOT_FOUND)
 from post.models import Comment
-from post.serializers import (CommentCreateBodySerializer, CommentCreateSerializer,
-                              CommentPatchBodySerializer, CommentSerializer)
+from post.serializers import CommentCreateSerializer, CommentSerializer
 
 
 class CommentAPI(viewsets.ViewSet):
-    @swagger_auto_schema(request_body=CommentCreateBodySerializer,
+    @swagger_auto_schema(request_body=CommentCreateSerializer(create_body=True),
                          responses={201: APPLY_201_CREATED.as_md(),
                                     400: APPLY_400_PARAMETER_ERROR.as_md()})
     def create(self, request: Request) -> Response:
@@ -23,19 +22,19 @@ class CommentAPI(viewsets.ViewSet):
         A post ID in request data must be required.
         """
         comment_data = {**request.data}
-        serializer = CommentCreateSerializer(data=comment_data)
+        comment_data.pop('create_body', '')
 
+        serializer = CommentCreateSerializer(data=comment_data)
         if serializer.is_valid():
             serializer.save()
             return Response({'detail': 'Successfully created.'}, status=status.HTTP_201_CREATED)
 
         raise ValidationError(detail=serializer.errors)
 
-    @swagger_auto_schema(
-        request_body=CommentPatchBodySerializer,
-        responses={200: APPLY_200_UPDATED.as_md(),
-                   400: APPLY_400_PARAMETER_ERROR.as_md(),
-                   404: APPLY_404_NOT_FOUND.as_md()})
+    @swagger_auto_schema(request_body=CommentSerializer(put_body=True),
+                         responses={200: APPLY_200_UPDATED.as_md(),
+                                    400: APPLY_400_PARAMETER_ERROR.as_md(),
+                                    404: APPLY_404_NOT_FOUND.as_md()})
     def update(self, request: Request, comment_id: int) -> Response:
         """
         Update data of the comment.
@@ -55,10 +54,9 @@ class CommentAPI(viewsets.ViewSet):
 
         raise ValidationError(detail=serializer.errors)
 
-    @swagger_auto_schema(
-        responses={204: APPLY_204_DELETED.as_md(),
-                   400: APPLY_400_PARAMETER_ERROR.as_md(),
-                   404: APPLY_404_NOT_FOUND.as_md()})
+    @swagger_auto_schema(responses={204: APPLY_204_DELETED.as_md(),
+                                    400: APPLY_400_PARAMETER_ERROR.as_md(),
+                                    404: APPLY_404_NOT_FOUND.as_md()})
     def destroy(self, request: Request, comment_id: int) -> Response:
         """
         Make the comment disabled.

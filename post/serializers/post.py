@@ -1,11 +1,11 @@
-from typing import Any, Dict, TypeVar
+from typing import Any, Dict, TypeVar, Union
 
 from django.db import models
 from drf_yasg.utils import swagger_serializer_method
 from rest_framework import serializers
 
 from post.models import Category, Comment, Post, Tag
-from post.serializers.comment import CommentSerializer
+from post.serializers import CommentSerializer
 
 T = TypeVar('T', bound=models.Model)
 
@@ -48,6 +48,18 @@ class PostCreateSerializer(serializers.ModelSerializer):
         required=True
     )
 
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        create_body = kwargs.pop('create_body', True)
+        super().__init__(*args, **kwargs)
+
+        if create_body:
+            self.fields.pop('id')
+            self.fields['tags'] = serializers.ListField(
+                child=serializers.CharField(),
+                required=False,
+                help_text='Tag titles',
+            )
+
     class Meta:
         model = Post
         ref_name = None
@@ -62,16 +74,28 @@ class PostPatchSerializer(serializers.ModelSerializer):
     location = serializers.CharField(required=False)
     capacity = serializers.IntegerField(required=False)
     date = serializers.DateField(required=False)
-
     timeOfDay = serializers.IntegerField(
         source='time_of_day',
         required=False
     )
-    tags = serializers.PrimaryKeyRelatedField(
-        queryset=Tag.objects.all(),
-        many=True,
-        required=False
+    tags: Union[serializers.ListField, serializers.PrimaryKeyRelatedField] = \
+        serializers.PrimaryKeyRelatedField(
+            queryset=Tag.objects.all(),
+            many=True,
+            required=False
     )
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        patch_body = kwargs.pop('patch_body', False)
+        super().__init__(*args, **kwargs)
+
+        if patch_body:
+            self.fields.pop('id')
+            self.fields['tags'] = serializers.ListField(
+                child=serializers.CharField(),
+                required=False,
+                help_text='Tag titles',
+            )
 
     def update(self, instance: T, validated_data: Dict[str, Any]) -> Post:
         time_of_day = validated_data.get('timeOfDay')
@@ -123,46 +147,4 @@ class PostQuerySerializer(serializers.Serializer):
 
     class Meta:
         fields = ('page', 'pageSize', 'startDate', 'endDate',
-                  'timeOfDay', 'location', 'category', 'tags',)
-
-
-class PostCreateBodySerializer(serializers.ModelSerializer):
-    timeOfDay = serializers.IntegerField(source='time_of_day')
-    category = serializers.PrimaryKeyRelatedField(
-        queryset=Category.objects.filter(is_active=True),
-        required=True
-    )
-    tags = serializers.ListField(
-        child=serializers.CharField(),
-        required=False,
-    )
-
-    class Meta:
-        model = Post
-        ref_name = None
-        fields = ('title', 'content', 'location',
-                  'capacity', 'date', 'timeOfDay', 'author',
-                  'category', 'tags')
-
-
-class PostPatchBodySerializer(serializers.ModelSerializer):
-    title = serializers.CharField(required=False)
-    content = serializers.CharField(required=False)
-    location = serializers.CharField(required=False)
-    capacity = serializers.IntegerField(required=False)
-    date = serializers.DateField(required=False)
-
-    timeOfDay = serializers.IntegerField(
-        source='time_of_day',
-        required=False
-    )
-    tags = serializers.ListField(
-        child=serializers.CharField(),
-        required=False,
-    )
-
-    class Meta:
-        model = Post
-        ref_name = None
-        fields = ('title', 'content', 'location', 'capacity',
-                  'date', 'timeOfDay', 'tags')
+                  'timeOfDay', 'location', 'category', 'tags')

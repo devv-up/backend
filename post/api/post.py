@@ -15,9 +15,8 @@ from common.querytools import filter_exists, get_one
 from common.responses import (APPLY_200_UPDATED, APPLY_201_CREATED, APPLY_204_DELETED,
                               APPLY_400_PARAMETER_ERROR, APPLY_404_NOT_FOUND)
 from post.models import Post, Tag
-from post.serializers.post import (PostCreateBodySerializer, PostCreateSerializer,
-                                   PostDetailSerializer, PostPatchBodySerializer,
-                                   PostPatchSerializer, PostQuerySerializer, PostSerializer)
+from post.serializers import (PostCreateSerializer, PostDetailSerializer, PostPatchSerializer,
+                              PostQuerySerializer, PostSerializer)
 
 
 class PostAPI(viewsets.ViewSet):
@@ -80,7 +79,7 @@ class PostAPI(viewsets.ViewSet):
         return Response(serializer.data)
 
     @transaction.atomic
-    @swagger_auto_schema(request_body=PostCreateBodySerializer,
+    @swagger_auto_schema(request_body=PostCreateSerializer(create_body=True),
                          responses={201: APPLY_201_CREATED.as_md(),
                                     400: APPLY_400_PARAMETER_ERROR.as_md()})
     def create(self, request: Request) -> Response:
@@ -90,7 +89,11 @@ class PostAPI(viewsets.ViewSet):
         A category ID in request data must be required.
         """
         post_data = {**request.data}
+        post_data.pop('create_body', '')
+
         post_data['tags'] = self._convert(post_data.get('tags'))
+        if post_data.get('tags') is None:
+            del post_data['tags']
 
         serializer = PostCreateSerializer(data=post_data)
         if serializer.is_valid():
@@ -113,7 +116,7 @@ class PostAPI(viewsets.ViewSet):
         return Response(serializer.data)
 
     @transaction.atomic
-    @swagger_auto_schema(request_body=PostPatchBodySerializer,
+    @swagger_auto_schema(request_body=PostPatchSerializer(patch_body=True),
                          responses={200: APPLY_200_UPDATED.as_md(),
                                     400: APPLY_400_PARAMETER_ERROR.as_md(),
                                     404: APPLY_404_NOT_FOUND.as_md()})
@@ -124,6 +127,7 @@ class PostAPI(viewsets.ViewSet):
         A specific post ID must be required by uri resources.
         """
         patch_data = {**request.data}
+        patch_data.pop('patch_body', '')
 
         if not patch_data:
             raise ParseError(detail='At least one field must be required to update the post.')
@@ -135,6 +139,8 @@ class PostAPI(viewsets.ViewSet):
             raise ParseError(detail='Author cannot be updated.')
 
         patch_data['tags'] = self._convert(patch_data.get('tags'))
+        if patch_data.get('tags') is None:
+            del patch_data['tags']
 
         post = get_one(Post, id=post_id, is_active=True)
         serializer = PostPatchSerializer(post, data=patch_data, partial=True)

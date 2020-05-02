@@ -1,3 +1,5 @@
+from typing import Any
+
 from rest_framework import serializers
 
 from post.models import Comment, Post
@@ -11,6 +13,18 @@ class CommentSerializer(serializers.ModelSerializer):
         source='parent_comment',
         required=False
     )
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        put_body = kwargs.pop('put_body', False)
+        super().__init__(*args, **kwargs)
+
+        if put_body:
+            self.fields.pop('id')
+            self.fields.pop('createdDate')
+            self.fields.pop('parentComment')
+            self.fields.pop('author')
+            self.fields.pop('is_active')
+            self.depth = None
 
     class Meta:
         model = Comment
@@ -26,40 +40,34 @@ class CommentCreateSerializer(serializers.ModelSerializer):
         required=False
     )
 
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        create_body = kwargs.pop('create_body', False)
+        super().__init__(*args, **kwargs)
+
+        if create_body:
+            self.fields.pop('id')
+            self.fields['content'] = serializers.CharField(
+                required=True,
+                help_text='The content of the comment',
+            )
+            self.fields['post'] = serializers.PrimaryKeyRelatedField(
+                required=True,
+                queryset=Post.objects.filter(is_active=True),
+                help_text='The post ID of the comment',
+            )
+            self.fields['parentComment'] = serializers.PrimaryKeyRelatedField(
+                required=False,
+                queryset=Comment.objects.filter(is_active=True),
+                help_text='The parent comment ID of the comment',
+            )
+            self.fields['author'] = serializers.PrimaryKeyRelatedField(
+                required=False,
+                queryset=User.objects.filter(is_active=True),
+                help_text='The author ID of the comment',
+            )
+
     class Meta:
         model = Comment
         ref_name = None
         fields = ('id', 'content', 'post', 'parentComment',
                   'author')
-
-
-class CommentCreateBodySerializer(serializers.Serializer):
-    content = serializers.CharField(
-        required=True,
-        help_text='The content of the comment',
-    )
-    post = serializers.PrimaryKeyRelatedField(
-        required=True,
-        queryset=Post.objects.filter(is_active=True),
-        help_text='The post ID of the comment',
-    )
-    parentComment = serializers.PrimaryKeyRelatedField(
-        required=False,
-        queryset=Comment.objects.filter(is_active=True),
-        help_text='The parent comment ID of the comment',
-    )
-    author = serializers.PrimaryKeyRelatedField(
-        required=False,
-        queryset=User.objects.filter(is_active=True),
-        help_text='The author ID of the comment',
-    )
-
-    class Meta:
-        ref_name = None
-
-
-class CommentPatchBodySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Comment
-        ref_name = None
-        fields = ('content',)
