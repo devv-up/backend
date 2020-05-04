@@ -21,14 +21,22 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = '#2r0owr!p%q3k%^$wb3nt!rqh^v^dha5k!z%7=7%26nv!1&ig8'
-
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "abcd")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DJANGO_MODE", "development") != "production"
 
-ALLOWED_HOSTS: List[str] = []
+ALLOWED_HOSTS: List[str] = [
+    'localhost',
+    '127.0.0.1',
+    'app'
+]
+
+# Add allowed hosts
+domains = os.environ.get("ALLOWED_HOSTS", "")
+if domains:
+    hosts = domains.split(',')
+    ALLOWED_HOSTS.extend([host.strip() for host in hosts])
 
 AUTH_USER_MODEL = 'user.User'
 
@@ -43,6 +51,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'drf_yasg',
+    'corsheaders',
     'post',
     'user',
     'django.contrib.sites',
@@ -91,6 +100,7 @@ SOCIALACCOUNT_PROVIDERS = {
 
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -98,6 +108,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'dev_up.urls'
@@ -181,7 +192,39 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
+# Cross Origin Resource Sharing Settings
+# Required to use nginx as a proxy server.
+# Because nginx uses port:80, whereas this WAS uses 8000.
+SECURE_REFERRER_POLICY = 'same-origin'
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_WHITELIST = [
+    'localhost',
+    '127.0.0.1'
+]
+
+# Add cors origin whitelist
+whitelist = os.environ.get("CORS_ORIGIN_WHITELIST", "")
+if whitelist:
+    hosts = whitelist.split(',')
+    CORS_ORIGIN_WHITELIST.extend([host.strip() for host in hosts])
+
+# Using secure-only session cookies & CSRF cookies make it more difficult
+# for network traffic sniffers to hijack user sessions or steal the CSRF token.
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
+
+# Only SSL connections (https) are allowed.
+SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# HSTS settings for https redirection.
+SECURE_HSTS_PRELOAD = True
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_SECONDS = 31536000  # 365 * 24 * 60 * 60
 
 # Required to prevent warnings related to URL routing.
 # Basically a slash is needed at the end of URLs and if this option is True,

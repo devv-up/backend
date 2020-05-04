@@ -275,4 +275,7 @@ fabric.properties
 .idea/watcherTasks.xml
 .idea/inspectionProfiles/profiles_settings.xml
 
+# Deployment settings
+/.config
+
 # End of https://www.gitignore.io/api/django,python,pycharm,visualstudiocode
