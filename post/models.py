@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.constraints import UniqueConstraint
 
 from user.models import User
 
@@ -65,3 +66,14 @@ class Tag(models.Model):
 
     def __str__(self) -> str:
         return f'Tag(title="{self.title}")'
+
+
+class Like(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+
+    class Meta:
+        constraints = [UniqueConstraint(
+            fields=['user', 'post'],
+            name='UQ_like_user_post',
+        )]
