@@ -4,7 +4,7 @@ from django.db import models
 from drf_yasg.utils import swagger_serializer_method
 from rest_framework import serializers
 
-from post.models import Category, Comment, Post, Tag
+from post.models import Category, Comment, Like, Post, Tag
 from post.serializers import CommentSerializer
 
 T = TypeVar('T', bound=models.Model)
@@ -13,19 +13,25 @@ T = TypeVar('T', bound=models.Model)
 class PostSerializer(serializers.ModelSerializer):
     timeOfDay = serializers.IntegerField(source='time_of_day')
     createdDate = serializers.DateTimeField(source='created_date')
+    likes = serializers.SerializerMethodField()
+
+    @swagger_serializer_method(serializer_or_field=serializers.IntegerField(min_value=0))
+    def get_likes(self, obj: Post) -> int:
+        return len(Like.objects.filter(post=obj.id))
 
     class Meta:
         model = Post
         depth = 1
         fields = ('id', 'title', 'content', 'location',
                   'capacity', 'date', 'timeOfDay', 'createdDate',
-                  'author', 'category', 'tags')
+                  'author', 'category', 'tags', 'likes')
 
 
 class PostDetailSerializer(serializers.ModelSerializer):
     timeOfDay = serializers.IntegerField(source='time_of_day')
     createdDate = serializers.DateTimeField(source='created_date')
     comments = serializers.SerializerMethodField()
+    likes = serializers.SerializerMethodField()
 
     @swagger_serializer_method(serializer_or_field=CommentSerializer(many=True))
     def get_comments(self, obj: Post) -> Dict[str, Any]:
@@ -33,12 +39,17 @@ class PostDetailSerializer(serializers.ModelSerializer):
         serializer = CommentSerializer(comments, many=True)
         return serializer.data
 
+    @swagger_serializer_method(serializer_or_field=serializers.IntegerField(min_value=0))
+    def get_likes(self, obj: Post) -> int:
+        return len(Like.objects.filter(post=obj.id))
+
     class Meta:
         model = Post
         depth = 1
         fields = ('id', 'title', 'content', 'location',
                   'capacity', 'date', 'timeOfDay', 'createdDate',
-                  'author', 'category', 'tags', 'comments')
+                  'author', 'category', 'tags', 'comments',
+                  'likes')
 
 
 class PostCreateSerializer(serializers.ModelSerializer):
