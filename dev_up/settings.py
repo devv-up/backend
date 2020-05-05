@@ -226,7 +226,7 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_SECONDS = 31536000  # 365 * 24 * 60 * 60
 
-    # Required to prevent warnings related to URL routing.
-    # Basically a slash is needed at the end of URLs and if this option is True,
-    # it will check wheather an url is ended with slash.
-    APPEND_SLASH = False
+# Required to prevent warnings related to URL routing.
+# Basically a slash is needed at the end of URLs and if this option is True,
+# it will check wheather an url is ended with slash.
+APPEND_SLASH = False
