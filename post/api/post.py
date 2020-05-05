@@ -58,6 +58,8 @@ class PostAPI(viewsets.ViewSet):
         try:
             no = int(params.get('page', 1))
             page_size = min(int(params.get('pageSize', 20)), 50)
+            if page_size <= 0:
+                raise ParseError(detail='Page size should not be 0 or less.')
         except ValueError:
             raise ParseError(detail='Page or page size should be integer.')
 
@@ -75,6 +77,9 @@ class PostAPI(viewsets.ViewSet):
         """
         post_data = {**request.data}
         post_data['tags'] = self._convert(post_data.get('tags'))
+
+        if post_data.get('tags') is None:
+            del post_data['tags']
 
         serializer = PostCreateSerializer(data=post_data)
         if serializer.is_valid():
@@ -112,6 +117,9 @@ class PostAPI(viewsets.ViewSet):
             raise ParseError(detail='Author cannot be updated.')
 
         patch_data['tags'] = self._convert(patch_data.get('tags'))
+
+        if patch_data.get('tags') is None:
+            del patch_data['tags']
 
         post = get_one(Post, id=post_id, is_active=True)
         serializer = PostPatchSerializer(post, data=patch_data, partial=True)
