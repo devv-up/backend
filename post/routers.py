@@ -18,6 +18,7 @@ from django.urls import path, re_path
 
 from post.api.category import CategoryAPI
 from post.api.comment import CommentAPI
+from post.api.like import LikeAPI
 from post.api.post import PostAPI
 from post.api.tag import TagAPI
 
@@ -34,6 +35,10 @@ urlpatterns = [
     path('/<int:post_id>', PostAPI.as_view({
         'get': 'retrieve',
         'patch': 'partial_update',
+        'delete': 'destroy',
+    })),
+    path('/likes', LikeAPI.as_view({
+        'post': 'create',
         'delete': 'destroy',
     })),
     re_path(r'^$', PostAPI.as_view({
