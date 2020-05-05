@@ -11,6 +11,8 @@ pipeline {
         stage ('Build') {
             steps {
                 sh 'python -m venv .env'
+                sh 'apk update'
+                sh 'apk add postgresql-dev gcc musl-dev'
                 sh '.env/bin/pip install -r requirements.txt'
             }
         }
