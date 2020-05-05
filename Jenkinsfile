@@ -1,8 +1,6 @@
 pipeline {
     agent {
-        docker {
-            image 'python:alpine3.11'
-        }
+        dockerfile true
     }
     options {
         timeout(time: 10, unit: 'MINUTES')
@@ -11,8 +9,6 @@ pipeline {
         stage ('Build') {
             steps {
                 sh 'python -m venv .env'
-                sh 'sudo apk update'
-                sh 'sudo apk add postgresql-dev gcc musl-dev'
                 sh '.env/bin/pip install -r requirements.txt'
             }
         }
