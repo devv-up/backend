@@ -1,6 +1,8 @@
 pipeline {
     agent {
-        dockerfile true
+        docker {
+            image 'python:3.8'
+        }
     }
     options {
         timeout(time: 10, unit: 'MINUTES')
