@@ -195,38 +195,38 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
-# Cross Origin Resource Sharing Settings
-# Required to use nginx as a proxy server.
-# Because nginx uses port:80, whereas this WAS uses 8000.
-SECURE_REFERRER_POLICY = 'same-origin'
-CORS_ORIGIN_ALLOW_ALL = False
-CORS_ORIGIN_WHITELIST = [
-    'localhost',
-    '127.0.0.1'
-]
+if not DEBUG:
+    # Cross Origin Resource Sharing Settings
+    # Required to use nginx as a proxy server.
+    # Because nginx uses port:80, whereas this WAS uses 8000.
+    SECURE_REFERRER_POLICY = 'same-origin'
+    CORS_ORIGIN_ALLOW_ALL = False
+    CORS_ORIGIN_WHITELIST = [
+        'http://localhost',
+        'http://127.0.0.1'
+    ]
 
-# Add cors origin whitelist
-whitelist = os.environ.get("CORS_ORIGIN_WHITELIST", "")
-if whitelist:
-    hosts = whitelist.split(',')
-    CORS_ORIGIN_WHITELIST.extend([host.strip() for host in hosts])
+    # Add cors origin whitelist
+    whitelist = os.environ.get("CORS_ORIGIN_WHITELIST", "")
+    if whitelist:
+        hosts = whitelist.split(',')
+        CORS_ORIGIN_WHITELIST.extend([host.strip() for host in hosts])
 
-# Using secure-only session cookies & CSRF cookies make it more difficult
-# for network traffic sniffers to hijack user sessions or steal the CSRF token.
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+    # Using secure-only session cookies & CSRF cookies make it more difficult
+    # for network traffic sniffers to hijack user sessions or steal the CSRF token.
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
 
+    # Only SSL connections (https) are allowed.
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# Only SSL connections (https) are allowed.
-SECURE_SSL_REDIRECT = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    # HSTS settings for https redirection.
+    SECURE_HSTS_PRELOAD = True
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_SECONDS = 31536000  # 365 * 24 * 60 * 60
 
-# HSTS settings for https redirection.
-SECURE_HSTS_PRELOAD = True
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_SECONDS = 31536000  # 365 * 24 * 60 * 60
-
-# Required to prevent warnings related to URL routing.
-# Basically a slash is needed at the end of URLs and if this option is True,
-# it will check wheather an url is ended with slash.
-APPEND_SLASH = False
+    # Required to prevent warnings related to URL routing.
+    # Basically a slash is needed at the end of URLs and if this option is True,
+    # it will check wheather an url is ended with slash.
+    APPEND_SLASH = False
