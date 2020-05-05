@@ -11,18 +11,18 @@ class TestComment:
             'content': 'creating',
             'post': 1,
             'author': 1,
-        }, format='json')
+        }, format='json', secure=True)
         assert response.status_code == 201
 
         # Create a comment without a post ID
         response = api_client.post(
-            '/posts/comments', data={'content': 'no_post_id'}, format='json')
+            '/posts/comments', data={'content': 'no_post_id'}, format='json', secure=True)
         assert response.status_code == 400
 
     def test_update_comment(self, api_client, comments):
         content_before_update = Comment.objects.get(id=1).content
         response = api_client.put(
-            '/posts/comments/1', data={'content': 'after'}, format='json')
+            '/posts/comments/1', data={'content': 'after'}, format='json', secure=True)
 
         updated_comment = Comment.objects.get(id=1)
         assert response.status_code == 200
@@ -31,11 +31,11 @@ class TestComment:
         assert updated_comment.content != content_before_update
 
         # Update the comment without any data.
-        response = api_client.put('/posts/comments/1')
+        response = api_client.put('/posts/comments/1', secure=True)
         assert response.status_code == 400
 
     def test_delete_comment(self, api_client, comments):
-        response = api_client.delete('/posts/comments/1')
+        response = api_client.delete('/posts/comments/1', secure=True)
         comment = Comment.objects.get(id=1)
 
         assert response.status_code == 204
