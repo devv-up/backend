@@ -14,6 +14,8 @@ import datetime
 import os
 from typing import List
 
+from django.urls import reverse_lazy
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -67,7 +69,8 @@ ACCOUNT_LOGIN_ATTEMPTS_LIMIT = 5
 ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT = 180
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'name'
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
-
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = reverse_lazy('account_confirm_complete')
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = reverse_lazy('account_confirm_complete')
 
 # Provider specific settings
 SOCIALACCOUNT_PROVIDERS = {
@@ -108,11 +111,11 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'dev_up.urls'
-
+TEMPLATES_ROOT = os.path.join(BASE_DIR, "templates")
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [TEMPLATES_ROOT],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
