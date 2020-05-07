@@ -53,17 +53,22 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.github',
     'allauth.socialaccount.providers.google',
+    'rest_auth.registration',
+    'rest_auth'
 ]
 
 SITE_ID = 1
 
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_LOGIN_ATTEMPTS_LIMIT = 5
 ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT = 180
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'name'
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
+
 
 # Provider specific settings
 SOCIALACCOUNT_PROVIDERS = {
@@ -91,6 +96,7 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
+REST_USE_JWT = True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -130,11 +136,12 @@ AUTHENTICATION_BACKENDS = (
 
 WSGI_APPLICATION = 'dev_up.wsgi.application'
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", ''),
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", ''),
-EMAIL_PORT = 587
+EMAIL_BACKEND = os.environ.get(
+    "EMAIL_BACKEND", 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = os.environ.get("EMAIL_HOST", 'smtp.gmail.com')
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", '')
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", '')
+EMAIL_PORT = os.environ.get("EMAIL_PORT", 587)
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
@@ -144,8 +151,6 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
     ),
 }
 
@@ -153,8 +158,12 @@ JWT_AUTH = {
     'JWT_SECRET_KEY': SECRET_KEY,
     'JWT_ALGORITHM': 'HS256',
     'JWT_ALLOW_REFRESH': True,
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=7),
-    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=28),
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=1),
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=14),
+}
+
+REST_AUTH_SERIALIZERS = {
+    'USER_DETAILS_SERIALIZER': 'user.serializers.UserDetailsSerializer'
 }
 
 # Database
@@ -210,6 +219,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-# media files(images)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Required to prevent warnings related to URL routing.
+# Basically a slash is needed at the end of URLs and if this option is True,
+# it will check wheather an url is ended with slash.
+APPEND_SLASH = False

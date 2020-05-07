@@ -13,13 +13,22 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.urls import include, path
+from allauth.account.views import confirm_email
+from django.urls import include, path, re_path
 from rest_framework_jwt.views import (obtain_jwt_token, refresh_jwt_token,
                                       verify_jwt_token)
 
+from user.social import GithubLogin, GoogleLogin
+
 urlpatterns = [
     path('accounts/', include('allauth.urls')),
-    path('api-token-auth/', obtain_jwt_token),
-    path('api-token-refresh/', refresh_jwt_token),
-    path('api-token-verify/', verify_jwt_token),
+    path('auth/token', obtain_jwt_token),
+    path('auth/token/refresh', refresh_jwt_token),
+    path('auth/token/verify', verify_jwt_token),
+    path('auth/', include('rest_auth.urls')),
+    path('auth/registration/', include('rest_auth.registration.urls')),
+    path('auth/github/', GithubLogin.as_view(), name='github_login'),
+    path('auth/google/', GoogleLogin.as_view(), name='google_login'),
+    re_path('accounts-rest/registration/account-confirm-email/(?P<key>.+)/$',
+            confirm_email, name='account_confirm_email'),
 ]
