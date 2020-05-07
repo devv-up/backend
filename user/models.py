@@ -1,7 +1,12 @@
 from typing import Any
 
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.conf import settings
+from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
+                                        PermissionsMixin)
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
 
 
 class UserManager(BaseUserManager):  # type: ignore
@@ -56,3 +61,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def has_module_perms(self, app_label: Any) -> bool:
         return True
+
+    @receiver(post_save, sender=settings.AUTH_USER_MODEL)
+    def create_auth_token(sender: Any, instance: Any = None, created: Any = False,
+                          **kwargs: Any) -> None:
+        if created:
+            Token.objects.create(user=instance)
