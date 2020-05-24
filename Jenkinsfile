@@ -1,3 +1,13 @@
+def findComment() {
+  for (comment in pullRequest.comments) {
+    if (comment.body.startsWith("[Jenkins]")) {
+      return comment
+    }
+  }
+  comment = pullRequest.comment("[Jenkins]")
+  return comment
+}
+
 pipeline {
     agent {
         docker {
@@ -36,6 +46,16 @@ pipeline {
         stage ('Test') {
             steps {
                 sh '.env/bin/pytest --ds=dev_up.jenkins'
+            }
+        }
+        stage ('Wakeup') {
+            steps {
+                sh 'curl https://test.dev-up.kr/api/${GIT_BRANCH}'
+                script {
+                    if (env.GIT_BRANCH) {
+                        pullRequest.editComment(comment.id, "[Jenkins]\n" + "https://test.dev-up.kr/api/" + env.GIT_BRANCH + "\n")
+                    }
+                }
             }
         }
     }
