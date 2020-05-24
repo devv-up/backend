@@ -54,7 +54,9 @@ pipeline {
                     if (env.GIT_BRANCH) {
                         def branchName = env.GIT_BRANCH.replace("/", "_")
                         sh("curl https://test.dev-up.kr/api/" + branchName)
-                        pullRequest.editComment(comment.id, "[Jenkins]\n" + "https://test.dev-up.kr/api/" + branchName + "\n")
+                        if (env.CHANGE_ID) {
+                            pullRequest.editComment(comment.id, "[Jenkins]\n" + "https://test.dev-up.kr/api/" + branchName + "\n")
+                        }
                     }
                 }
             }
