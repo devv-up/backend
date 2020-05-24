@@ -50,10 +50,11 @@ pipeline {
         }
         stage ('Wakeup') {
             steps {
-                sh 'curl https://test.dev-up.kr/api/${GIT_BRANCH}'
                 script {
                     if (env.GIT_BRANCH) {
-                        pullRequest.editComment(comment.id, "[Jenkins]\n" + "https://test.dev-up.kr/api/" + env.GIT_BRANCH + "\n")
+                        def branchName = env.GIT_BRANCH.replace("/", "_")
+                        sh("curl https://test.dev-up.kr/api/" + branchName)
+                        pullRequest.editComment(comment.id, "[Jenkins]\n" + "https://test.dev-up.kr/api/" + branchName + "\n")
                     }
                 }
             }
