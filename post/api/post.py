@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Type, Union
 
 from django.core.paginator import Paginator
 from django.db import transaction
@@ -6,6 +6,7 @@ from django.db.models.query import QuerySet
 from django.http.request import QueryDict
 from rest_framework import status, viewsets
 from rest_framework.exceptions import ParseError, ValidationError
+from rest_framework.permissions import AllowAny, BasePermission, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -16,6 +17,19 @@ from post.serializers import (PostCreateSerializer, PostDetailSerializer, PostPa
 
 
 class PostAPI(viewsets.ViewSet):
+    def __init__(self) -> None:
+        self.action = None
+        super().__init__()
+
+    def get_permissions(self) -> List[BasePermission]:
+        permission_classes: List[Union[Type[AllowAny], Type[IsAuthenticated]]] = list()
+
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [AllowAny]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
+
     def _tag_filter(self, posts: 'QuerySet[Post]', params: QueryDict) -> 'QuerySet[Post]':
         if len(params.getlist('tags')) > 1:
             raise ParseError(detail='This type of tag parameters are not supported.')
