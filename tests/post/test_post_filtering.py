@@ -1,5 +1,5 @@
-import pytest
 from model_bakery.recipe import Recipe
+import pytest
 
 from post.models import Post
 
