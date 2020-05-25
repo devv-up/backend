@@ -1,5 +1,5 @@
-from model_bakery.recipe import Recipe
 import pytest
+from model_bakery.recipe import Recipe
 
 from post.models import Post
 
@@ -63,7 +63,7 @@ class TestPostFiltering:
 
     def test_post_on_category_filtering(self, api_client, posts, categories):
         category_title = categories[0].title
-        response = api_client.get(f'/posts?category={category_title}')
+        response = api_client.get(f'/posts?category={category_title}', secure=True)
         assert response.status_code == 200
         assert len(response.data) == 2
 
@@ -73,7 +73,7 @@ class TestPostFiltering:
 
     def test_post_on_tag_filtering(self, api_client, posts, tags):
         tag_title = tags[1].title
-        response = api_client.get(f'/posts?tags={tag_title}')
+        response = api_client.get(f'/posts?tags={tag_title}', secure=True)
         assert response.status_code == 200
         assert len(response.data) == 2
 
@@ -82,7 +82,7 @@ class TestPostFiltering:
 
         # Filter the posts by more than one tag.
         tag_title1, tag_title2 = tags[0].title, tags[1].title
-        response = api_client.get(f'/posts?tags={tag_title1},{tag_title2}')
+        response = api_client.get(f'/posts?tags={tag_title1},{tag_title2}', secure=True)
         assert response.status_code == 200
         assert len(response.data) == 2
 
@@ -90,12 +90,13 @@ class TestPostFiltering:
         count_tags_of_multiple(response, tag_title1, tag_title2)
 
         # This type of tag filtering is not supported.
-        response = api_client.get(f'/posts?tags={tag_title1}&tags={tag_title2}')
+        response = api_client.get(f'/posts?tags={tag_title1}&tags={tag_title2}', secure=True)
         assert response.status_code == 400
 
     def test_post_on_category_tag_filtering(self, api_client, posts, categories, tags):
         category_title, tag_title = categories[0].title, tags[1].title
-        response = api_client.get(f'/posts?category={category_title}&tags={tag_title}')
+        response = api_client.get(
+            f'/posts?category={category_title}&tags={tag_title}', secure=True)
         assert response.status_code == 200
         assert len(response.data) == 1
 
@@ -107,7 +108,7 @@ class TestPostFiltering:
 
     def test_post_on_date_filtering(self, api_client, posts):
         start_date, end_date = '2020-01-01', '2020-02-02'
-        response = api_client.get(f'/posts?startDate={start_date}&endDate={end_date}')
+        response = api_client.get(f'/posts?startDate={start_date}&endDate={end_date}', secure=True)
         assert response.status_code == 200
         assert len(response.data) == 2
 
@@ -116,7 +117,7 @@ class TestPostFiltering:
 
     def test_post_on_time_of_day_filtering(self, api_client, posts):
         time_of_day = TIME_OF_DAY['AFTERNOON']
-        response = api_client.get(f'/posts?timeOfDay={time_of_day}')
+        response = api_client.get(f'/posts?timeOfDay={time_of_day}', secure=True)
         assert response.status_code == 200
         assert len(response.data) == 2
 
@@ -125,7 +126,7 @@ class TestPostFiltering:
 
     def test_post_on_location_filtering(self, api_client, posts):
         location = 'location'
-        response = api_client.get(f'/posts?location={location}')
+        response = api_client.get(f'/posts?location={location}', secure=True)
         assert response.status_code == 200
         assert len(response.data) == 2
 
