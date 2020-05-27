@@ -57,7 +57,7 @@ class TestPost:
         after_transaction = api_client.get('/posts/tags', secure=True)
         assert before_transaction.data == after_transaction.data
 
-    def test_list_posts(self, api_client, many_posts, users):
+    def test_list_posts(self, api_client, many_posts):
         # Pagination
         response = api_client.get('/posts', secure=True)
         assert response.status_code == 200
@@ -68,7 +68,7 @@ class TestPost:
         assert response.status_code == 200
         assert len(response.data) == 30
 
-    def test_detail_post(self, api_client, posts, users):
+    def test_detail_post(self, api_client, posts):
         response = api_client.get('/posts/1', secure=True)
         assert response.status_code == 200
         assert response.data['id'] == 1
@@ -77,7 +77,7 @@ class TestPost:
         response = api_client.get('/posts/65535', secure=True)
         assert response.status_code == 404
 
-    def test_update_post(self, api_client, posts, tags, users, token):
+    def test_update_post(self, api_client, posts, tags, token):
         before_update = api_client.get('/posts/1', secure=True)
 
         data = {
@@ -123,7 +123,7 @@ class TestPost:
         response = api_client.patch('/posts/1', HTTP_AUTHORIZATION=token, secure=True)
         assert response.status_code == 400
 
-    def test_delete_post(self, api_client, posts, users, token):
+    def test_delete_post(self, api_client, posts, token):
         response = api_client.delete('/posts/1', HTTP_AUTHORIZATION=token, secure=True)
         after_delete = api_client.get('/posts/1', secure=True)
 
