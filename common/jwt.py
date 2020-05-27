@@ -3,7 +3,7 @@ from rest_framework_jwt.settings import api_settings
 from user.models import User
 
 
-def get_jwt_token_of(user: User) -> str:
+def get_jwt_of(user: User) -> str:
     jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
     jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 

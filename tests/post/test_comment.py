@@ -1,14 +1,12 @@
 import pytest
 
 from post.models import Comment
-from tests.post.jwt_token import get_jwt_token_of
 
 
 class TestComment:
     pytestmark = pytest.mark.django_db
 
-    def test_create_comment(self, api_client, users, posts):
-        token = f'JWT {get_jwt_token_of(users[0])}'
+    def test_create_comment(self, api_client, users, posts, token):
         response = api_client.post('/posts/comments', data={
             'content': 'creating',
             'post': 1,
@@ -25,8 +23,7 @@ class TestComment:
             secure=True)
         assert response.status_code == 400
 
-    def test_update_comment(self, api_client, comments, users):
-        token = f'JWT {get_jwt_token_of(users[0])}'
+    def test_update_comment(self, api_client, comments, users, token):
         content_before_update = Comment.objects.get(id=1).content
         response = api_client.put(
             '/posts/comments/1',
@@ -45,8 +42,7 @@ class TestComment:
         response = api_client.put('/posts/comments/1', HTTP_AUTHORIZATION=token, secure=True)
         assert response.status_code == 400
 
-    def test_delete_comment(self, api_client, comments, users):
-        token = f'JWT {get_jwt_token_of(users[0])}'
+    def test_delete_comment(self, api_client, comments, users, token):
         response = api_client.delete('/posts/comments/1', HTTP_AUTHORIZATION=token, secure=True)
         comment = Comment.objects.get(id=1)
 

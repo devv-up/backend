@@ -4,6 +4,7 @@ from model_bakery import baker
 import pytest
 from rest_framework.test import APIClient
 
+from common.jwt import get_jwt_of
 from post.models import Category, Comment, Post, Tag
 from user.models import User
 
@@ -41,3 +42,8 @@ def many_posts() -> List[Post]:
 @pytest.fixture
 def comments() -> List[Comment]:
     return baker.make(Comment, _quantity=3)
+
+
+@pytest.fixture
+def token(users):
+    return f'JWT {get_jwt_of(users[0])}'

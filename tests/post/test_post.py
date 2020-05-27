@@ -1,14 +1,12 @@
 import pytest
 
 from post.models import Post
-from tests.post.jwt_token import get_jwt_token_of
 
 
 class TestPost:
     pytestmark = pytest.mark.django_db
 
-    def test_create_post(self, api_client, users, categories):
-        token = f'JWT {get_jwt_token_of(users[0])}'
+    def test_create_post(self, api_client, users, categories, token):
         post_data = {
             'title': 'test_title',
             'content': 'test_content',
@@ -79,8 +77,7 @@ class TestPost:
         response = api_client.get('/posts/65535', secure=True)
         assert response.status_code == 404
 
-    def test_update_post(self, api_client, posts, tags, users):
-        token = f'JWT {get_jwt_token_of(users[0])}'
+    def test_update_post(self, api_client, posts, tags, users, token):
         before_update = api_client.get('/posts/1', secure=True)
 
         data = {
@@ -126,8 +123,7 @@ class TestPost:
         response = api_client.patch('/posts/1', HTTP_AUTHORIZATION=token, secure=True)
         assert response.status_code == 400
 
-    def test_delete_post(self, api_client, posts, users):
-        token = f'JWT {get_jwt_token_of(users[0])}'
+    def test_delete_post(self, api_client, posts, users, token):
         response = api_client.delete('/posts/1', HTTP_AUTHORIZATION=token, secure=True)
         after_delete = api_client.get('/posts/1', secure=True)
 
