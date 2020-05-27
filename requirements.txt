@@ -13,5 +13,5 @@ drf-yasg==1.17.1
 psycopg2==2.8.4
 model-bakery==1.1.0
 django-allauth==0.41.0
-djangorestframework-jwt==1.11.0
+djangorestframework-simplejwt==4.4.0
 django-rest-auth ==0.9.5
