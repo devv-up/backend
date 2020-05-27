@@ -1,4 +1,4 @@
-from typing import List, Optional, Type, Union
+from typing import List, Optional
 
 from django.core.paginator import Paginator
 from django.db import transaction
@@ -17,17 +17,10 @@ from post.serializers import (PostCreateSerializer, PostDetailSerializer, PostPa
 
 
 class PostAPI(viewsets.ViewSet):
-    def __init__(self) -> None:
-        self.action = None
-        super().__init__()
+    action: Optional[str] = None
 
     def get_permissions(self) -> List[BasePermission]:
-        permission_classes: List[Union[Type[AllowAny], Type[IsAuthenticated]]] = list()
-
-        if self.action in ['list', 'retrieve']:
-            permission_classes = [AllowAny]
-        else:
-            permission_classes = [IsAuthenticated]
+        permission_classes = [AllowAny if self.action in ['list', 'retrieve'] else IsAuthenticated]
         return [permission() for permission in permission_classes]
 
     def _tag_filter(self, posts: 'QuerySet[Post]', params: QueryDict) -> 'QuerySet[Post]':
