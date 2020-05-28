@@ -1,4 +1,5 @@
 from rest_framework import viewsets
+from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -7,6 +8,8 @@ from post.serializers import CategorySerializer
 
 
 class CategoryAPI(viewsets.ViewSet):
+    permission_classes = [AllowAny]
+
     def list(self, request: Request) -> Response:
         """
         Get the list of categories.
