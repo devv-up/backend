@@ -46,8 +46,8 @@ class PostAPI(viewsets.ViewSet):
         if post.author is None:
             return None
 
-        if post.author.id != user.id:
-            raise PermissionDenied({'detail': 'Permission Denied'})
+        if post.author.id != user.id or not user.is_superuser:
+            raise PermissionDenied({'detail': 'Permission Denied.'})
 
     def list(self, request: Request) -> Response:
         """
@@ -88,7 +88,6 @@ class PostAPI(viewsets.ViewSet):
 
         A category ID in request data must be required.
         """
-
         post_data = {**request.data}
         post_data['tags'] = self._convert(post_data.get('tags'))
         post_data['author'] = request.user.id
