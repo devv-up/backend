@@ -164,7 +164,7 @@ JWT_AUTH = {
     'JWT_ALLOW_REFRESH': True,
     'JWT_EXPIRATION_DELTA': timedelta(hours=1),
     'JWT_REFRESH_EXPIRATION_DELTA': timedelta(days=14),
-    'JWT_AUTH_COOKIE': 'Jwt-Token',
+    'JWT_AUTH_COOKIE': 'jwt',
 }
 
 REST_AUTH_SERIALIZERS = {
