@@ -3,7 +3,7 @@ from typing import List
 from model_bakery import baker
 import pytest
 from rest_framework.test import APIClient
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_jwt.serializers import api_settings
 
 from post.models import Category, Comment, Post, Tag
 from user.models import User
@@ -46,6 +46,10 @@ def comments() -> List[Comment]:
 
 @pytest.fixture
 def token(users):
-    refresh = RefreshToken.for_user(users[0])
+    jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+    jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 
-    return f'Bearer {str(refresh.access_token)}'
+    payload = jwt_payload_handler(users[0])
+    token = jwt_encode_handler(payload)
+
+    return f'Bearer {token}'
