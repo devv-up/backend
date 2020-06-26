@@ -7,5 +7,6 @@ COPY . /app
 WORKDIR /app
 
 RUN apk update && \
-    apk add postgresql-dev gcc musl-dev && \
+    apk add postgresql-dev gcc musl-dev libffi-dev && \
+    pip install --upgrade pip && \
     pip install -r requirements.txt
