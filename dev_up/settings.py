@@ -10,8 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
-from datetime import timedelta
 import os
+from datetime import timedelta
 from typing import List
 
 from django.urls import reverse_lazy
@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'post',
     'user',
+    'photo',
     'django.contrib.sites',
     'allauth',
     'allauth.account',
@@ -241,3 +242,7 @@ STATIC_URL = '/static/'
 # Basically a slash is needed at the end of URLs and if this option is True,
 # it will check wheather an url is ended with slash.
 APPEND_SLASH = False
+
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
