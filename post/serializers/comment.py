@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from post.models import Comment
+from user.serializers import UserDetailsSerializer
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -10,6 +11,7 @@ class CommentSerializer(serializers.ModelSerializer):
         source='parent_comment',
         required=False
     )
+    author = UserDetailsSerializer(read_only=True)
 
     class Meta:
         model = Comment

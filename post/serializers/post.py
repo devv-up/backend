@@ -5,6 +5,7 @@ from rest_framework import serializers
 
 from post.api.comment import CommentSerializer
 from post.models import Comment, Post
+from user.serializers import UserDetailsSerializer
 
 T = TypeVar('T', bound=models.Model)
 
@@ -12,6 +13,7 @@ T = TypeVar('T', bound=models.Model)
 class PostSerializer(serializers.ModelSerializer):
     timeOfDay = serializers.IntegerField(source='time_of_day')
     createdDate = serializers.DateTimeField(source='created_date')
+    author = UserDetailsSerializer(read_only=True)
 
     class Meta:
         model = Post
@@ -25,6 +27,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
     timeOfDay = serializers.IntegerField(source='time_of_day')
     createdDate = serializers.DateTimeField(source='created_date')
     comments = serializers.SerializerMethodField()
+    author = UserDetailsSerializer(read_only=True)
 
     def get_comments(self, obj: Post) -> Dict[str, Any]:
         comments = Comment.objects.filter(post=obj.id, is_active=True)

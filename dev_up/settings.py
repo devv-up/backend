@@ -236,6 +236,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+
 # Required to prevent warnings related to URL routing.
 # Basically a slash is needed at the end of URLs and if this option is True,
 # it will check wheather an url is ended with slash.
