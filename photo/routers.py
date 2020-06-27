@@ -13,11 +13,11 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.conf.urls import include
 from django.conf.urls.static import static
-from itypes import List
+from django.urls import path
 from rest_framework import routers
-from rest_framework.compat import path
 
 from dev_up import settings
 from photo import views
@@ -26,7 +26,7 @@ router = routers.DefaultRouter()
 
 router.register(r'', views.PhotoViewSet)
 
-urlpatterns: List = [
+urlpatterns = [
     path('', include(router.urls)),
 ]
 
