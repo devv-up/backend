@@ -5,16 +5,16 @@ from django.db import transaction
 from django.db.models.query import QuerySet
 from django.http.request import QueryDict
 from rest_framework import status, viewsets
-from rest_framework.exceptions import ParseError, PermissionDenied, ValidationError
+from rest_framework.exceptions import ParseError, ValidationError
 from rest_framework.permissions import AllowAny, BasePermission, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from common.permissions import check_permission
 from common.querytools import filter_exists, get_one
 from post.models import Post, Tag
 from post.serializers import (PostCreateSerializer, PostDetailSerializer, PostPatchSerializer,
                               PostSerializer)
-from user.models import User
 
 
 class PostAPI(viewsets.ViewSet):
@@ -41,13 +41,6 @@ class PostAPI(viewsets.ViewSet):
                     for title in tag_titles if title.strip()]
             return [tag.id for tag in tags]
         return None
-
-    def _check_permission(self, user: User, post: Post) -> None:
-        if post.author is None:
-            return None
-
-        if post.author.id != user.id or not user.is_superuser:
-            raise PermissionDenied({'detail': 'Permission Denied.'})
 
     def list(self, request: Request) -> Response:
         """
@@ -130,7 +123,7 @@ class PostAPI(viewsets.ViewSet):
         patch_data['tags'] = self._convert(patch_data.get('tags'))
 
         post = get_one(Post, id=post_id, is_active=True)
-        self._check_permission(request.user, post)
+        check_permission(request.user, post)
 
         serializer = PostPatchSerializer(post, data=patch_data, partial=True)
         if serializer.is_valid():
@@ -146,7 +139,7 @@ class PostAPI(viewsets.ViewSet):
         A specific post ID must be required by uri resources.
         """
         post = get_one(Post, id=post_id, is_active=True)
-        self._check_permission(request.user, post)
+        check_permission(request.user, post)
 
         serializer = PostSerializer(post)
         serializer.update(post, {'is_active': False})
