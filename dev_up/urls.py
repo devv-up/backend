@@ -37,4 +37,5 @@ urlpatterns = [
                                        cache_timeout=0), name='schema-redoc'),
     path('user/', include('user.routers')),
     path('posts', include('post.routers')),
+    path('photos', include('photo.routers')),
 ]
