@@ -2,8 +2,16 @@ from django.db import models
 
 from user.models import User
 
-
 # Create your models here.
+
+
+class Modifiable(models.Model):
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+
+    class Meta:
+        abstract = True
+
+
 class Category(models.Model):
     """
     A category model which defines purposes of posts.
@@ -16,7 +24,7 @@ class Category(models.Model):
         return f'Category(title="{self.title}")'
 
 
-class Post(models.Model):
+class Post(Modifiable):
     """
     A post model which has simple information.
     meeting_time_of_day have integer value
@@ -33,13 +41,13 @@ class Post(models.Model):
 
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     category = models.ForeignKey('Category', on_delete=models.SET_NULL, null=True)
-    tags = models.ManyToManyField('Tag')
+    tags = models.ManyToManyField('Tag', blank=True)
 
     def __str__(self) -> str:
         return f'Post(id={self.id}, title="{self.title}")'
 
 
-class Comment(models.Model):
+class Comment(Modifiable):
     """
     A Comment model which has the depth up to 2 levels
     by possessing another comment's id.

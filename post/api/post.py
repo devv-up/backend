@@ -10,6 +10,7 @@ from rest_framework.permissions import AllowAny, BasePermission, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from common.permissions import check_permission
 from common.querytools import filter_exists, get_one
 from post.models import Post, Tag
 from post.serializers import (PostCreateSerializer, PostDetailSerializer, PostPatchSerializer,
@@ -82,6 +83,7 @@ class PostAPI(viewsets.ViewSet):
         """
         post_data = {**request.data}
         post_data['tags'] = self._convert(post_data.get('tags'))
+        post_data['author'] = request.user.id
 
         serializer = PostCreateSerializer(data=post_data)
         if serializer.is_valid():
@@ -121,8 +123,9 @@ class PostAPI(viewsets.ViewSet):
         patch_data['tags'] = self._convert(patch_data.get('tags'))
 
         post = get_one(Post, id=post_id, is_active=True)
-        serializer = PostPatchSerializer(post, data=patch_data, partial=True)
+        check_permission(request.user, post)
 
+        serializer = PostPatchSerializer(post, data=patch_data, partial=True)
         if serializer.is_valid():
             serializer.update(post, validated_data=patch_data)
             return Response({'detail': 'Successfully updated.'})
@@ -136,6 +139,8 @@ class PostAPI(viewsets.ViewSet):
         A specific post ID must be required by uri resources.
         """
         post = get_one(Post, id=post_id, is_active=True)
+        check_permission(request.user, post)
+
         serializer = PostSerializer(post)
         serializer.update(post, {'is_active': False})
 
