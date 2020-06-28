@@ -54,10 +54,10 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.github',
     'allauth.socialaccount.providers.google',
-    'rest_auth.registration',
-    'rest_auth',
+    'dj_rest_auth.registration',
+    'dj_rest_auth',
     'rest_framework.authtoken',
-    'rest_framework_jwt',
+    'rest_framework_simplejwt',
 ]
 
 SITE_ID = 1
@@ -102,6 +102,9 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 REST_USE_JWT = True
+JWT_AUTH_COOKIE = 'token'
+JWT_AUTH_SECURE = os.environ.get("JWT_AUTH_SECURE", False)
+JWT_AUTH_SAMESITE = None
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -154,17 +157,26 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 }
 
-JWT_AUTH = {
-    'JWT_SECRET_KEY': SECRET_KEY,
-    'JWT_ALGORITHM': 'HS256',
-    'JWT_ALLOW_REFRESH': True,
-    'JWT_EXPIRATION_DELTA': timedelta(hours=1),
-    'JWT_REFRESH_EXPIRATION_DELTA': timedelta(days=14),
-    'JWT_AUTH_COOKIE': 'jwt',
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=14),
+
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'access',
+
+    'JTI_CLAIM': 'jti',
 }
 
 REST_AUTH_SERIALIZERS = {
