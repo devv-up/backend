@@ -14,6 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from allauth.account.views import confirm_email
+from dj_rest_auth.registration.views import VerifyEmailView
 from django.urls import include, path, re_path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
@@ -27,6 +28,8 @@ urlpatterns = [
     path('auth/registration/', include('dj_rest_auth.registration.urls')),
     path('auth/github/', GithubLogin.as_view(), name='github_login'),
     path('auth/google/', GoogleLogin.as_view(), name='google_login'),
+    path('dj-rest-auth/account-confirm-email/', VerifyEmailView.as_view(),
+         name='account_email_verification_sent'),
     re_path('auth/registration/confirm/(?P<key>.+)/$',
             confirm_email, name='account_confirm_email'),
 ]
